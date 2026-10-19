@@ -507,7 +507,7 @@
 }
 
 .spdf-pass-panel__seg--pass-lost {
-  background: #b86b6b;
+  background: #e0a82e;
 }
 
 .spdf-pass-panel__legend {
@@ -542,7 +542,7 @@
 }
 
 .spdf-pass-panel__dot--pass-lost {
-  background: #b86b6b;
+  background: #e0a82e;
 }
 
 .spdf-pass-panel__legend-label {
@@ -598,22 +598,22 @@
 }
 
 .spdf-stat__value--red {
-  color: #a1343c;
+  color: #a97412;
 }
 
 .spdf-stat__value--strong-red {
-  color: #c41616;
+  color: #a97412;
 }
 
 .spdf-stat--emphasis {
-  border-color: #c41616;
-  background: #fde8e8;
+  border-color: #c4960c;
+  background: #fbf6e8;
 }
 
 .spdf-stat__detail--emphasis {
   font-size: 12px;
   font-weight: 800;
-  color: #9b1010;
+  color: #8a6410;
 }
 
 .spdf-stat__value--grey {
@@ -709,7 +709,7 @@
 }
 
 .spdf-stat__value--pass-lost {
-  color: #b86b6b;
+  color: #a97412;
 }
 
 .spdf-stat__label {
@@ -790,7 +790,7 @@
 }
 
 .spdf-strip__lost {
-  color: #a1343c;
+  color: #a97412;
 }
 
 .spdf-strip__rate {
@@ -842,7 +842,7 @@
 }
 
 .spdf-rate__seg--red {
-  background: #a1343c;
+  background: #e0a82e;
 }
 
 .spdf-rate__seg--grey {

@@ -300,7 +300,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
                 {
                   label: "Lost balls",
                   value: possessions.lostBalls,
-                  tone: "red",
+                  tone: "burnt",
                   detail: `${pct(possessions.lostBalls, possessions.total)}%`,
                 },
                 {

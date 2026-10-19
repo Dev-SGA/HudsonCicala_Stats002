@@ -8,7 +8,6 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 
 - **Club Ohio**, **Chicago Fire** e **Columbus Crew** — as três partidas na mesma navegação, com setas e botões.
 - **Club Ohio** não tem o card Stats.
-- **Trends** — gráficos de linha só com as métricas presentes nas três partidas.
 
 ## O que mudou em relação ao Stats 001
 

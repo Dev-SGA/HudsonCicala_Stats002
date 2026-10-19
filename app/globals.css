@@ -12,12 +12,12 @@
   /* Grade hues lifted toward white so they stay legible on navy */
   --tone-accent: #5aa2e0;
   --tone-positive: #3fb56b;
-  --tone-negative: #e0616b;
+  --tone-negative: #e0a82e;
   --tone-warn: #e08a4f;
   --tone-muted: color-mix(in srgb, var(--sga-white) 26%, var(--sga-navy));
   --tone-pass-progressive: #4d8f6e;
   --tone-pass-neutral: #b4bcc6;
-  --tone-pass-lost: #b86b6b;
+  --tone-pass-lost: #e0a82e;
   --tone-burnt-yellow: #e0a82e;
   --tone-burnt-yellow-deep: #a97412;
 
@@ -1002,39 +1002,7 @@ body::before {
   }
 }
 
-/* ---------- Views, matches, duels, trends ---------- */
-
-.view-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--line);
-}
-
-.view-tabs__tab {
-  margin-bottom: -1px;
-  padding: 10px 16px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.view-tabs__tab.is-active {
-  color: var(--text);
-  border-bottom-color: var(--accent);
-}
-
-.view-tabs__tab:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+/* ---------- Matches and stats ---------- */
 
 .view-panel {
   display: grid;
@@ -1246,192 +1214,6 @@ body::before {
   color: var(--text-muted);
 }
 
-.trends__intro {
-  display: grid;
-  gap: 6px;
-}
-
-.trends__lead {
-  margin: 0;
-  max-width: 68ch;
-  color: var(--text-muted);
-}
-
-.trend-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.trend-card {
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--sga-blue) 8%, var(--surface));
-}
-
-.trend-card--wide {
-  grid-column: 1 / -1;
-}
-
-.trend-card--burnt {
-  border-left-color: var(--tone-burnt-yellow);
-  background: color-mix(in srgb, var(--tone-burnt-yellow) 8%, var(--surface));
-}
-
-.trend-card__head {
-  display: grid;
-  gap: 4px;
-}
-
-.trend-card__title {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.trend-card__note {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-faint);
-}
-
-.trend-plot {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: 8px;
-  align-items: start;
-}
-
-.trend-plot__y {
-  position: relative;
-  height: 168px;
-}
-
-.trend-plot__y span {
-  position: absolute;
-  right: 0;
-  transform: translateY(-50%);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.trend-plot__canvas {
-  position: relative;
-  height: 168px;
-  border-radius: 8px;
-  background: color-mix(in srgb, #000000 22%, transparent);
-}
-
-.trend-chart {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.trend-chart__grid {
-  stroke: color-mix(in srgb, var(--sga-white) 14%, transparent);
-  stroke-width: 1;
-}
-
-.trend-chart__grid--base {
-  stroke: color-mix(in srgb, var(--sga-white) 28%, transparent);
-}
-
-.trend-card--wide .trend-plot__y,
-.trend-card--wide .trend-plot__canvas {
-  height: 200px;
-}
-
-.trend-dot {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--sga-navy);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sga-white) 16%, transparent);
-}
-
-.trend-legend__swatch {
-  flex: 0 0 auto;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.trend-table__metric {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trend-table-wrap {
-  overflow-x: auto;
-}
-
-.trend-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 13px;
-}
-
-.trend-table th,
-.trend-table td {
-  padding: 6px 8px;
-  border-top: 1px solid var(--line);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.trend-table th:first-child,
-.trend-table td:first-child {
-  width: 38%;
-  text-align: left;
-}
-
-.trend-card--wide .trend-table th:first-child,
-.trend-card--wide .trend-table td:first-child {
-  width: 24%;
-}
-
-.trend-table thead th {
-  border-top: none;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.trend-table tbody th {
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-@media (max-width: 900px) {
-  .trend-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .trend-card--wide {
-    grid-column: auto;
-  }
-}
-
 @media (max-width: 720px) {
   .match-nav__pills {
     flex-wrap: wrap;
@@ -1449,13 +1231,6 @@ body::before {
     align-items: flex-start;
     flex-direction: column;
     gap: 4px;
-  }
-
-  .trend-plot__y,
-  .trend-plot__canvas,
-  .trend-card--wide .trend-plot__y,
-  .trend-card--wide .trend-plot__canvas {
-    height: 148px;
   }
 }
 

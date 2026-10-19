@@ -8,7 +8,6 @@ import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
-import { TrendCharts } from "@/components/TrendCharts";
 import { BRAND } from "@/lib/brand";
 import {
   matchSummary,
@@ -25,7 +24,6 @@ type GameStatsReportProps = {
 };
 
 type BarTone = "accent" | "positive" | "negative" | "muted" | "warn";
-type View = "match" | "trends";
 
 const PASS_PLAY_TIPS = {
   progressive:
@@ -468,7 +466,6 @@ function buildTopics(match: MatchStats): Topic[] {
 export function GameStatsReport({ report }: GameStatsReportProps) {
   const { player, meta, matches } = report;
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
-  const [view, setView] = useState<View>("match");
   const [matchId, setMatchId] = useState(initialMatchId);
   const match = matches.find((item) => item.id === matchId) ?? matches[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
@@ -488,9 +485,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           <div className="report-header__intro">
             <p className="report-header__eyebrow">{BRAND.legal}</p>
             <h1 className="report-header__title">{meta.title}</h1>
-            <p className="report-header__meta">
-              {view === "trends" ? "Continuous evaluation · 3 matches" : match.label}
-            </p>
+            <p className="report-header__meta">{match.label}</p>
           </div>
         </header>
 
@@ -500,41 +495,10 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           </AthleteProfileCard>
 
           <main className="report-main">
-            <div className="view-tabs" role="tablist" aria-label="Report views">
-              <button
-                type="button"
-                role="tab"
-                id="tab-match"
-                className={`view-tabs__tab${view === "match" ? " is-active" : ""}`}
-                aria-selected={view === "match"}
-                aria-controls="panel-match"
-                onClick={() => setView("match")}
-              >
-                Match
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="tab-trends"
-                className={`view-tabs__tab${view === "trends" ? " is-active" : ""}`}
-                aria-selected={view === "trends"}
-                aria-controls="panel-trends"
-                onClick={() => setView("trends")}
-              >
-                Trends
-              </button>
+            <div className="view-panel">
+              <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
+              <TopicsBoard topics={topics} />
             </div>
-
-            {view === "match" ? (
-              <div id="panel-match" role="tabpanel" aria-labelledby="tab-match" className="view-panel">
-                <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
-                <TopicsBoard topics={topics} />
-              </div>
-            ) : (
-              <div id="panel-trends" role="tabpanel" aria-labelledby="tab-trends" className="view-panel">
-                <TrendCharts matches={matches} />
-              </div>
-            )}
           </main>
         </div>
 
