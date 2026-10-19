@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { AthleteProfileCard } from "@/components/AthleteProfileCard";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
@@ -167,7 +167,7 @@ function PossessionStat({
   );
 }
 
-function StatFigure({ label, value, tone }: { label: string; value: string; tone?: "positive" | "negative" }) {
+function StatFigure({ label, value, tone }: { label: string; value: string; tone?: "positive" | "negative" | "accent" }) {
   return (
     <div className={`stat-figure${tone ? ` stat-figure--${tone}` : ""}`}>
       <span className="stat-figure__value">{value}</span>
@@ -176,58 +176,149 @@ function StatFigure({ label, value, tone }: { label: string; value: string; tone
   );
 }
 
-function StatsBoard({ summary }: { summary: MatchSummary }) {
-  const groups: {
-    title: string;
-    pair?: boolean;
-    items: { label: string; value: string; tone?: "positive" | "negative" }[];
-  }[] = [
-    {
-      title: "General passing",
-      pair: true,
-      items: [
-        { label: "Total passes", value: String(summary.totalPasses) },
-        { label: "Accuracy", value: `${summary.accuracy}%`, tone: "positive" },
-      ],
-    },
-    {
-      title: "Offensive duels",
-      items: [
-        { label: "Won", value: String(summary.offensiveWon), tone: "positive" },
-        { label: "Lost", value: String(summary.offensiveLost), tone: "negative" },
-        { label: "% won", value: `${summary.offensiveWinRate}%` },
-      ],
-    },
-    {
-      title: "Defensive duels",
-      items: [
-        { label: "Won", value: String(summary.defensiveWon), tone: "positive" },
-        { label: "Lost", value: String(summary.defensiveLost), tone: "negative" },
-        { label: "% won", value: `${summary.defensiveWinRate}%` },
-      ],
-    },
-    {
-      title: "Interceptions & recoveries",
-      items: [
-        { label: "Total", value: String(summary.regains) },
-        { label: "Interceptions", value: String(summary.interceptions) },
-        { label: "Recoveries", value: String(summary.recoveries) },
-      ],
-    },
-  ];
+function BalanceBar({
+  primary,
+  secondary,
+  primaryTone,
+  secondaryTone,
+  label,
+}: {
+  primary: number;
+  secondary: number;
+  primaryTone: "positive" | "negative" | "accent" | "recover" | "muted";
+  secondaryTone: "positive" | "negative" | "accent" | "recover" | "muted";
+  label: string;
+}) {
+  const total = primary + secondary;
+  const primaryPct = total > 0 ? (primary / total) * 100 : 0;
 
   return (
+    <div className="stats-bar" role="img" aria-label={label}>
+      {total === 0 ? (
+        <span className="stats-bar__seg stats-bar__seg--muted" style={{ width: "100%" }} />
+      ) : (
+        <>
+          <span className={`stats-bar__seg stats-bar__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
+          <span className={`stats-bar__seg stats-bar__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function StatsPanel({
+  title,
+  rate,
+  rateLabel,
+  bar,
+  figures,
+  single,
+}: {
+  title: string;
+  rate?: string;
+  rateLabel?: string;
+  bar: ReactNode;
+  figures: ReactNode;
+  single?: boolean;
+}) {
+  return (
+    <section className="stats-panel">
+      <header className="stats-panel__head">
+        <h3 className="stats-panel__title">{title}</h3>
+        {rate ? (
+          <p className="stats-panel__rate">
+            <strong>{rate}</strong>
+            {rateLabel}
+          </p>
+        ) : null}
+        </header>
+      <div className={`stats-split${single ? " stats-split--single" : ""}`}>{figures}</div>
+      {bar}
+    </section>
+  );
+}
+
+function StatsBoard({ summary }: { summary: MatchSummary }) {
+  return (
     <div className="stats-board">
-      {groups.map((group) => (
-        <section key={group.title} className="stats-group">
-          <h3 className="stats-group__title">{group.title}</h3>
-          <div className={`stats-grid${group.pair ? " stats-grid--pair" : ""}`}>
-            {group.items.map((item) => (
-              <StatFigure key={item.label} label={item.label} value={item.value} tone={item.tone} />
-            ))}
-          </div>
-        </section>
-      ))}
+      <StatsPanel
+        title="General passing"
+        bar={
+          <BalanceBar
+            primary={summary.accuracy}
+            secondary={Math.max(0, 100 - summary.accuracy)}
+            primaryTone="positive"
+            secondaryTone="muted"
+            label={`Accuracy ${summary.accuracy} percent`}
+          />
+        }
+        figures={
+          <>
+            <StatFigure label="Total passes" value={String(summary.totalPasses)} />
+            <StatFigure label="Accuracy" value={`${summary.accuracy}%`} tone="positive" />
+          </>
+        }
+      />
+      <StatsPanel
+        title="Interceptions & recoveries"
+        rate={String(summary.regains)}
+        rateLabel="total"
+        bar={
+          <BalanceBar
+            primary={summary.interceptions}
+            secondary={summary.recoveries}
+            primaryTone="accent"
+            secondaryTone="recover"
+            label={`${summary.interceptions} interceptions and ${summary.recoveries} recoveries`}
+          />
+        }
+        figures={
+          <>
+            <StatFigure label="Interceptions" value={String(summary.interceptions)} tone="accent" />
+            <StatFigure label="Recoveries" value={String(summary.recoveries)} />
+          </>
+        }
+      />
+      <StatsPanel
+        title="Offensive duels"
+        rate={`${summary.offensiveWinRate}%`}
+        rateLabel="won"
+        bar={
+          <BalanceBar
+            primary={summary.offensiveWon}
+            secondary={summary.offensiveLost}
+            primaryTone="positive"
+            secondaryTone="negative"
+            label={`${summary.offensiveWon} won and ${summary.offensiveLost} lost`}
+          />
+        }
+        figures={
+          <>
+            <StatFigure label="Won" value={String(summary.offensiveWon)} tone="positive" />
+            <StatFigure label="Lost" value={String(summary.offensiveLost)} tone="negative" />
+          </>
+        }
+      />
+      <StatsPanel
+        title="Defensive duels"
+        rate={`${summary.defensiveWinRate}%`}
+        rateLabel="won"
+        bar={
+          <BalanceBar
+            primary={summary.defensiveWon}
+            secondary={summary.defensiveLost}
+            primaryTone="positive"
+            secondaryTone="negative"
+            label={`${summary.defensiveWon} won and ${summary.defensiveLost} lost`}
+          />
+        }
+        figures={
+          <>
+            <StatFigure label="Won" value={String(summary.defensiveWon)} tone="positive" />
+            <StatFigure label="Lost" value={String(summary.defensiveLost)} tone="negative" />
+          </>
+        }
+      />
     </div>
   );
 }
