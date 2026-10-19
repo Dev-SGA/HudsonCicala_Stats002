@@ -1163,7 +1163,7 @@ body::before {
 }
 
 .stats-bar__seg--recover {
-  background: #5ec8c5;
+  background: var(--tone-positive);
 }
 
 .stats-bar__seg--muted {
@@ -1194,15 +1194,18 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-.stat-figure--positive .stat-figure__value {
+.stat-figure--positive .stat-figure__value,
+.stat-figure--positive .stat-figure__label {
   color: var(--tone-positive);
 }
 
-.stat-figure--negative .stat-figure__value {
+.stat-figure--negative .stat-figure__value,
+.stat-figure--negative .stat-figure__label {
   color: var(--tone-negative);
 }
 
-.stat-figure--accent .stat-figure__value {
+.stat-figure--accent .stat-figure__value,
+.stat-figure--accent .stat-figure__label {
   color: var(--tone-accent);
 }
 

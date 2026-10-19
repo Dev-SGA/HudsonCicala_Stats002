@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-import { matchSummary, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { combinePassResults, matchSummary, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -33,7 +33,15 @@ function StatTiles({
   );
 }
 
-function PassResultPanel({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
+function PassResultPanel({
+  title,
+  breakdown,
+  compact = false,
+}: {
+  title: string;
+  breakdown: PassResultBreakdown;
+  compact?: boolean;
+}) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const segments = [
     { value: breakdown.progressive, tone: "pass-progressive" as const },
@@ -42,7 +50,7 @@ function PassResultPanel({ title, breakdown }: { title: string; breakdown: PassR
   ];
 
   return (
-    <div className="spdf-pass-panel">
+    <div className={`spdf-pass-panel${compact ? " spdf-pass-panel--total" : ""}`}>
       <div className="spdf-pass-panel__head">
         <p className="spdf-pass-panel__title">{title}</p>
         <span className="spdf-pass-panel__total">{total} passes</span>
@@ -134,6 +142,73 @@ function PdfSide({ photoUrl, logoUrl, name, club }: { photoUrl: string; logoUrl:
   );
 }
 
+function SumFigure({ value, label, tone }: { value: string; label: string; tone?: "green" | "yellow" | "blue" }) {
+  return (
+    <div className="spdf-sum__figure">
+      <span className={`spdf-sum__value${tone ? ` spdf-sum__value--${tone}` : ""}`}>{value}</span>
+      <span className={`spdf-sum__caption${tone ? ` spdf-sum__caption--${tone}` : ""}`}>{label}</span>
+    </div>
+  );
+}
+
+function SumBar({
+  primary,
+  secondary,
+  primaryTone,
+  secondaryTone,
+}: {
+  primary: number;
+  secondary: number;
+  primaryTone: "green" | "yellow" | "blue" | "grey";
+  secondaryTone: "green" | "yellow" | "blue" | "grey";
+}) {
+  const total = primary + secondary;
+  const primaryPct = total > 0 ? (primary / total) * 100 : 0;
+
+  return (
+    <div className="spdf-sum__bar">
+      {total === 0 ? (
+        <span className="spdf-sum__seg spdf-sum__seg--grey" style={{ width: "100%" }} />
+      ) : (
+        <>
+          <span className={`spdf-sum__seg spdf-sum__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
+          <span className={`spdf-sum__seg spdf-sum__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function SumPanel({
+  title,
+  rate,
+  rateLabel,
+  bar,
+  children,
+}: {
+  title: string;
+  rate?: string;
+  rateLabel?: string;
+  bar: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="spdf-sum">
+      <header className="spdf-sum__head">
+        <h2 className="spdf-sum__title">{title}</h2>
+        {rate ? (
+          <p className="spdf-sum__rate">
+            <strong>{rate}</strong>
+            {rateLabel}
+          </p>
+        ) : null}
+      </header>
+      <div className="spdf-sum__figures">{children}</div>
+      {bar}
+    </section>
+  );
+}
+
 function SummaryPdfPage({
   stats,
   photoUrl,
@@ -145,40 +220,6 @@ function SummaryPdfPage({
 }) {
   const summary = matchSummary(stats);
   if (!summary) return null;
-  const groups: { title: string; pair?: boolean; items: { label: string; value: string }[] }[] = [
-    {
-      title: "General passing",
-      pair: true,
-      items: [
-        { label: "Total passes", value: String(summary.totalPasses) },
-        { label: "Accuracy", value: `${summary.accuracy}%` },
-      ],
-    },
-    {
-      title: "Offensive duels",
-      items: [
-        { label: "Won", value: String(summary.offensiveWon) },
-        { label: "Lost", value: String(summary.offensiveLost) },
-        { label: "% won", value: `${summary.offensiveWinRate}%` },
-      ],
-    },
-    {
-      title: "Defensive duels",
-      items: [
-        { label: "Won", value: String(summary.defensiveWon) },
-        { label: "Lost", value: String(summary.defensiveLost) },
-        { label: "% won", value: `${summary.defensiveWinRate}%` },
-      ],
-    },
-    {
-      title: "Interceptions & recoveries",
-      items: [
-        { label: "Total", value: String(summary.regains) },
-        { label: "Interceptions", value: String(summary.interceptions) },
-        { label: "Recoveries", value: String(summary.recoveries) },
-      ],
-    },
-  ];
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -193,20 +234,69 @@ function SummaryPdfPage({
             <span>{stats.meta.subtitle}</span>
           </div>
         </header>
-        <div className="spdf-duel-stack">
-          {groups.map((group) => (
-            <section key={group.title} className="spdf-duel-group">
-              <h2 className="spdf-duel-group__title">{group.title}</h2>
-              <ul className={`spdf-duel-grid${group.pair ? " spdf-duel-grid--pair" : ""}`}>
-                {group.items.map((item) => (
-                  <li key={item.label} className="spdf-duel">
-                    <span className="spdf-duel__value">{item.value}</span>
-                    <span className="spdf-duel__label">{item.label}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+        <div className="spdf-summary">
+          <SumPanel
+            title="General passing"
+            bar={
+              <SumBar
+                primary={summary.accuracy}
+                secondary={Math.max(0, 100 - summary.accuracy)}
+                primaryTone="green"
+                secondaryTone="grey"
+              />
+            }
+          >
+            <SumFigure value={String(summary.totalPasses)} label="Total passes" />
+            <SumFigure value={`${summary.accuracy}%`} label="Accuracy" tone="green" />
+          </SumPanel>
+          <SumPanel
+            title="Interceptions & recoveries"
+            rate={String(summary.regains)}
+            rateLabel="total"
+            bar={
+              <SumBar
+                primary={summary.interceptions}
+                secondary={summary.recoveries}
+                primaryTone="blue"
+                secondaryTone="green"
+              />
+            }
+          >
+            <SumFigure value={String(summary.interceptions)} label="Interceptions" tone="blue" />
+            <SumFigure value={String(summary.recoveries)} label="Recoveries" tone="green" />
+          </SumPanel>
+          <SumPanel
+            title="Offensive duels"
+            rate={`${summary.offensiveWinRate}%`}
+            rateLabel="won"
+            bar={
+              <SumBar
+                primary={summary.offensiveWon}
+                secondary={summary.offensiveLost}
+                primaryTone="green"
+                secondaryTone="yellow"
+              />
+            }
+          >
+            <SumFigure value={String(summary.offensiveWon)} label="Won" tone="green" />
+            <SumFigure value={String(summary.offensiveLost)} label="Lost" tone="yellow" />
+          </SumPanel>
+          <SumPanel
+            title="Defensive duels"
+            rate={`${summary.defensiveWinRate}%`}
+            rateLabel="won"
+            bar={
+              <SumBar
+                primary={summary.defensiveWon}
+                secondary={summary.defensiveLost}
+                primaryTone="green"
+                secondaryTone="yellow"
+              />
+            }
+          >
+            <SumFigure value={String(summary.defensiveWon)} label="Won" tone="green" />
+            <SumFigure value={String(summary.defensiveLost)} label="Lost" tone="yellow" />
+          </SumPanel>
         </div>
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
@@ -288,9 +378,16 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
           </section>
 
           <PdfSection title="Pass Results" kpi={passTotal} unit="Passes" size="lg">
-            <div className="spdf-pass-row">
-              <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
-              <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
+            <div className="spdf-pass-stack">
+              <PassResultPanel
+                title="Total passes"
+                breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+                compact
+              />
+              <div className="spdf-pass-row">
+                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
+                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
+              </div>
             </div>
           </PdfSection>
 

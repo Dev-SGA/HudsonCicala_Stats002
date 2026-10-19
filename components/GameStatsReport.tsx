@@ -10,6 +10,7 @@ import { SgaCornerBrand } from "@/components/SgaCornerBrand";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
+  combinePassResults,
   matchSummary,
   toGameStats,
   type GameStats,
@@ -266,14 +267,14 @@ function StatsBoard({ summary }: { summary: MatchSummary }) {
             primary={summary.interceptions}
             secondary={summary.recoveries}
             primaryTone="accent"
-            secondaryTone="recover"
+            secondaryTone="positive"
             label={`${summary.interceptions} interceptions and ${summary.recoveries} recoveries`}
           />
         }
         figures={
           <>
             <StatFigure label="Interceptions" value={String(summary.interceptions)} tone="accent" />
-            <StatFigure label="Recoveries" value={String(summary.recoveries)} />
+            <StatFigure label="Recoveries" value={String(summary.recoveries)} tone="positive" />
           </>
         }
       />
@@ -408,12 +409,18 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Pass Results",
       phase: "build-up",
       content: (
-        <MetricFlow
-          items={[
-            <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} />,
-            <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} />,
-          ]}
-        />
+        <>
+          <PassResultsMeter
+            title="Total passes"
+            breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+          />
+          <MetricFlow
+            items={[
+              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} />,
+              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} />,
+            ]}
+          />
+        </>
       ),
     },
     {

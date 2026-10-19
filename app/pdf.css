@@ -444,10 +444,151 @@
   flex-shrink: 0;
 }
 
+.spdf-pass-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.spdf-pass-panel--total .spdf-pass-panel__legend {
+  flex-direction: row;
+  gap: 4px 12px;
+}
+
+.spdf-pass-panel--total .spdf-pass-panel__legend li {
+  flex: 1 1 0;
+}
+
 .spdf-pass-row {
   display: flex;
   gap: 10px;
   align-items: stretch;
+}
+
+.spdf-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 16px;
+}
+
+.spdf-sum {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 18px 16px;
+  border: 1px solid #d5e3ee;
+  border-top: 3px solid #072334;
+  border-radius: 10px;
+  background: #f7fafc;
+}
+
+.spdf-sum__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.spdf-sum__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5d7384;
+}
+
+.spdf-sum__rate {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b8192;
+  white-space: nowrap;
+}
+
+.spdf-sum__rate strong {
+  margin-right: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: #072334;
+}
+
+.spdf-sum__figures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.spdf-sum__value {
+  display: block;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: #072334;
+}
+
+.spdf-sum__caption {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b8192;
+}
+
+.spdf-sum__value--green,
+.spdf-sum__caption--green {
+  color: #05712d;
+}
+
+.spdf-sum__value--yellow,
+.spdf-sum__caption--yellow {
+  color: #a97412;
+}
+
+.spdf-sum__value--blue,
+.spdf-sum__caption--blue {
+  color: #044f80;
+}
+
+.spdf-sum__bar {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3eaf0;
+}
+
+.spdf-sum__seg {
+  height: 100%;
+}
+
+.spdf-sum__seg--green {
+  background: #05712d;
+}
+
+.spdf-sum__seg--yellow {
+  background: #e0a82e;
+}
+
+.spdf-sum__seg--blue {
+  background: #297cc1;
+}
+
+.spdf-sum__seg--grey {
+  background: #c5d0d8;
 }
 
 .spdf-pass-panel {

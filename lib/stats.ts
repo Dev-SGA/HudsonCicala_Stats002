@@ -99,6 +99,17 @@ type SummarySource = {
   duels: DuelBlock | null;
 };
 
+export function combinePassResults(...parts: PassResultBreakdown[]): PassResultBreakdown {
+  return parts.reduce(
+    (sum, part) => ({
+      progressive: sum.progressive + part.progressive,
+      neutral: sum.neutral + part.neutral,
+      lost: sum.lost + part.lost,
+    }),
+    { progressive: 0, neutral: 0, lost: 0 },
+  );
+}
+
 function rate(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
 }
