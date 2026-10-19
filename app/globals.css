@@ -314,13 +314,13 @@ body::before {
   color: var(--text-faint);
 }
 
-.topic--duels {
+.topic--stats {
   --topic-color: var(--tone-burnt-yellow);
   background: color-mix(in srgb, var(--tone-burnt-yellow) 10%, var(--surface));
   border-left-color: var(--tone-burnt-yellow);
 }
 
-.topic--duels .topic__phase {
+.topic--stats .topic__phase {
   color: var(--tone-burnt-yellow);
 }
 
@@ -1106,16 +1106,9 @@ body::before {
 }
 
 .match-nav__pill:focus-visible,
-.match-nav__arrow:focus-visible,
-.match-nav__first:focus-visible {
+.match-nav__arrow:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-.match-nav__first.is-active {
-  border-color: var(--tone-burnt-yellow);
-  color: var(--tone-burnt-yellow);
-  background: color-mix(in srgb, var(--tone-burnt-yellow) 14%, transparent);
 }
 
 .metric-note {
@@ -1124,12 +1117,12 @@ body::before {
   color: var(--text-muted);
 }
 
-.duel-groups {
+.stats-board {
   display: grid;
   gap: 18px;
 }
 
-.duel-group__title {
+.stats-group__title {
   margin: 0 0 10px;
   font-size: 11px;
   font-weight: 700;
@@ -1138,60 +1131,46 @@ body::before {
   color: var(--text-faint);
 }
 
-.duel-grid {
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
-.duel-card {
+.stats-grid--pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-figure {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 16px;
   border: 1px solid var(--line);
-  border-left: 3px solid var(--tone-muted);
   border-radius: var(--radius-sm);
   background: var(--surface-sunken);
 }
 
-.duel-card--positive {
-  border-left-color: var(--tone-positive);
+.stat-figure__value {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
-.duel-card--negative {
-  border-left-color: var(--tone-negative);
+.stat-figure--positive .stat-figure__value {
+  color: var(--tone-positive);
 }
 
-.duel-card--warn {
-  border-left-color: var(--tone-warn);
+.stat-figure--negative .stat-figure__value {
+  color: var(--tone-negative);
 }
 
-.duel-card--accent {
-  border-left-color: var(--tone-accent);
-}
-
-.duel-card__title {
-  margin: 0;
+.stat-figure__label {
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--tone-accent);
-}
-
-.duel-card__value {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.duel-card__split,
-.duel-card__neutral {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 650;
   color: var(--text-muted);
 }
 
@@ -1320,7 +1299,8 @@ body::before {
 }
 
 @media (max-width: 900px) {
-  .duel-grid {
+  .stats-grid,
+  .stats-grid--pair {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1334,7 +1314,8 @@ body::before {
     padding: 8px 10px;
   }
 
-  .duel-grid {
+  .stats-grid,
+  .stats-grid--pair {
     grid-template-columns: 1fr;
   }
 }

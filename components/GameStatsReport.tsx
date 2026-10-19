@@ -11,12 +11,11 @@ import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { TrendCharts } from "@/components/TrendCharts";
 import { BRAND } from "@/lib/brand";
 import {
-  duelNeutral,
+  matchSummary,
   toGameStats,
-  type DuelAction,
-  type DuelBlock,
   type GameStats,
   type MatchStats,
+  type MatchSummary,
   type PassResultBreakdown,
   type StatsReport,
 } from "@/lib/stats";
@@ -35,30 +34,6 @@ const PASS_PLAY_TIPS = {
     "Neutral Play — Finding a teammate without a clear opportunity to progress the ball, but with a clear option to maintain possession.",
   lost: "Lost Play — Losing possession through an inaccurate pass or finding a teammate who is immediately under pressure and at high risk of losing possession.",
 } as const;
-
-const DUEL_GROUPS: {
-  title: string;
-  items: { key: keyof DuelBlock; label: string; tone: "positive" | "negative" | "warn" | "accent" }[];
-}[] = [
-  {
-    title: "Offensive",
-    items: [
-      { key: "offensiveWon", label: "Offensive won", tone: "positive" },
-      { key: "offensiveLost", label: "Offensive lost", tone: "negative" },
-      { key: "fouled", label: "Fouled", tone: "warn" },
-    ],
-  },
-  {
-    title: "Defensive",
-    items: [
-      { key: "defensiveWon", label: "Defensive won", tone: "positive" },
-      { key: "defensiveLost", label: "Defensive lost", tone: "negative" },
-      { key: "fouls", label: "Fouls", tone: "negative" },
-      { key: "interception", label: "Interception", tone: "accent" },
-      { key: "recovery", label: "Recovery", tone: "accent" },
-    ],
-  },
-];
 
 function PassPlayTip({ label, tip }: { label: string; tip: string }) {
   return (
@@ -192,44 +167,63 @@ function PossessionStat({
   );
 }
 
-function DuelCard({ label, action, tone }: { label: string; action: DuelAction; tone: string }) {
-  const neutral = duelNeutral(action);
-  const total = action.actions;
-  const goodPct = percent(action.good, total);
-  const neutralPct = percent(neutral, total);
-  const badPct = percent(action.bad, total);
-
+function StatFigure({ label, value, tone }: { label: string; value: string; tone?: "positive" | "negative" }) {
   return (
-    <article className={`duel-card duel-card--${tone}`}>
-      <h4 className="duel-card__title">{label}</h4>
-      <p className="duel-card__value">{action.actions}</p>
-      <p className="duel-card__split">
-        {action.actions} actions · {action.good} good · {action.bad} bad
-      </p>
-      <div
-        className="meter"
-        role="img"
-        aria-label={`${label}: ${action.actions} actions, ${action.good} good, ${neutral} neutral, ${action.bad} bad.`}
-      >
-        {total === 0 ? <span className="meter__seg meter__seg--muted" style={{ width: "100%" }} /> : null}
-        {action.good > 0 ? <span className="meter__seg meter__seg--positive" style={{ width: `${goodPct}%` }} /> : null}
-        {neutral > 0 ? <span className="meter__seg meter__seg--muted" style={{ width: `${neutralPct}%` }} /> : null}
-        {action.bad > 0 ? <span className="meter__seg meter__seg--negative" style={{ width: `${badPct}%` }} /> : null}
-      </div>
-      <p className="duel-card__neutral">{neutral} neutral</p>
-    </article>
+    <div className={`stat-figure${tone ? ` stat-figure--${tone}` : ""}`}>
+      <span className="stat-figure__value">{value}</span>
+      <span className="stat-figure__label">{label}</span>
+    </div>
   );
 }
 
-function DuelsBoard({ duels }: { duels: DuelBlock }) {
+function StatsBoard({ summary }: { summary: MatchSummary }) {
+  const groups: {
+    title: string;
+    pair?: boolean;
+    items: { label: string; value: string; tone?: "positive" | "negative" }[];
+  }[] = [
+    {
+      title: "General passing",
+      pair: true,
+      items: [
+        { label: "Total passes", value: String(summary.totalPasses) },
+        { label: "Accuracy", value: `${summary.accuracy}%`, tone: "positive" },
+      ],
+    },
+    {
+      title: "Offensive duels",
+      items: [
+        { label: "Won", value: String(summary.offensiveWon), tone: "positive" },
+        { label: "Lost", value: String(summary.offensiveLost), tone: "negative" },
+        { label: "% won", value: `${summary.offensiveWinRate}%` },
+      ],
+    },
+    {
+      title: "Defensive duels",
+      items: [
+        { label: "Won", value: String(summary.defensiveWon), tone: "positive" },
+        { label: "Lost", value: String(summary.defensiveLost), tone: "negative" },
+        { label: "% won", value: `${summary.defensiveWinRate}%` },
+      ],
+    },
+    {
+      title: "Interceptions & recoveries",
+      items: [
+        { label: "Total", value: String(summary.regains) },
+        { label: "Interceptions", value: String(summary.interceptions) },
+        { label: "Recoveries", value: String(summary.recoveries) },
+      ],
+    },
+  ];
+
   return (
-    <div className="duel-groups">
-      {DUEL_GROUPS.map((group) => (
-        <section key={group.title} className="duel-group">
-          <h3 className="duel-group__title">{group.title}</h3>
-          <div className="duel-grid">
+    <div className="stats-board">
+      {groups.map((group) => (
+        <section key={group.title} className="stats-group">
+          <h3 className="stats-group__title">{group.title}</h3>
+          <div className={`stats-grid${group.pair ? " stats-grid--pair" : ""}`}>
             {group.items.map((item) => (
-              <DuelCard key={item.key} label={item.label} action={duels[item.key]} tone={item.tone} />
+              <StatFigure key={item.label} label={item.label} value={item.value} tone={item.tone} />
             ))}
           </div>
         </section>
@@ -247,25 +241,22 @@ function MatchSwitcher({
   activeId: string;
   onChange: (id: string) => void;
 }) {
-  const session = matches.filter((match) => match.kind === "session");
-  const baseline = matches.find((match) => match.kind === "baseline");
-  const sessionIndex = session.findIndex((match) => match.id === activeId);
-  const onSession = sessionIndex >= 0;
+  const index = matches.findIndex((match) => match.id === activeId);
 
   return (
     <div className="match-nav">
-      <div className="match-nav__session" role="group" aria-label="Session matches">
+      <div className="match-nav__session" role="group" aria-label="Matches">
         <button
           type="button"
           className="match-nav__arrow"
-          onClick={() => onChange(session[sessionIndex - 1].id)}
-          disabled={!onSession || sessionIndex === 0}
+          onClick={() => onChange(matches[index - 1].id)}
+          disabled={index <= 0}
           aria-label="Previous match"
         >
           <span aria-hidden="true">‹</span>
         </button>
         <div className="match-nav__pills">
-          {session.map((match) => (
+          {matches.map((match) => (
             <button
               key={match.id}
               type="button"
@@ -280,23 +271,13 @@ function MatchSwitcher({
         <button
           type="button"
           className="match-nav__arrow"
-          onClick={() => onChange(session[sessionIndex + 1].id)}
-          disabled={!onSession || sessionIndex === session.length - 1}
+          onClick={() => onChange(matches[index + 1].id)}
+          disabled={index < 0 || index === matches.length - 1}
           aria-label="Next match"
         >
           <span aria-hidden="true">›</span>
         </button>
       </div>
-      {baseline ? (
-        <button
-          type="button"
-          className={`btn btn--ghost match-nav__first${baseline.id === activeId ? " is-active" : ""}`}
-          aria-pressed={baseline.id === activeId}
-          onClick={() => onChange(baseline.id)}
-        >
-          First match
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -380,12 +361,13 @@ function buildTopics(match: MatchStats): Topic[] {
     },
   ];
 
-  if (duels) {
+  const summary = matchSummary(match);
+  if (summary) {
     topics.push({
-      id: "duels",
-      title: "Duels",
-      phase: "duels",
-      content: <DuelsBoard duels={duels} />,
+      id: "stats",
+      title: "Stats",
+      phase: "stats",
+      content: <StatsBoard summary={summary} />,
     });
   }
 

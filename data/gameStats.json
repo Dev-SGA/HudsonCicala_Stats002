@@ -13,8 +13,8 @@
     {
       "id": "001",
       "kind": "baseline",
-      "label": "First match",
-      "shortLabel": "Match 001",
+      "label": "vs Club Ohio",
+      "shortLabel": "Club Ohio",
       "passesUnderPressure": {
         "total": 81,
         "underPressure": 51,

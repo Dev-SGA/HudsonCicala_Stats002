@@ -6,13 +6,13 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 
 ## Partidas
 
-- **Chicago Fire** e **Columbus Crew** — navegação entre as duas, com setas e botões.
-- **First match** — a partida do Stats 001, para consulta no mesmo relatório.
-- **Trends** — gráficos de linha com a avaliação contínua dos três jogos.
+- **Club Ohio**, **Chicago Fire** e **Columbus Crew** — as três partidas na mesma navegação, com setas e botões.
+- **Club Ohio** não tem o card Stats.
+- **Trends** — gráficos de linha só com as métricas presentes nas três partidas.
 
 ## O que mudou em relação ao Stats 001
 
-- Card **Duels**, com ações, boas, más e o restante neutro.
+- Card **Stats** nas partidas novas: passe (total e acerto), duelos ofensivos e defensivos (won, lost, % won) e interceptações com recuperações.
 - Lost balls são os duelos ofensivos perdidos.
 - Wrong passes são os passes maus.
 - Turnovers passou a se chamar **Lost Plays**, na cor amarelo queimado. O valor é lost balls + wrong passes.

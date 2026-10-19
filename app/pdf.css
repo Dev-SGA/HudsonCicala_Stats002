@@ -664,8 +664,8 @@
   list-style: none;
 }
 
-.spdf-duel-grid--wide {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+.spdf-duel-grid--pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .spdf-duel {

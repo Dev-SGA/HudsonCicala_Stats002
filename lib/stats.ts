@@ -79,8 +79,60 @@ export function getStatsReport(): StatsReport {
   return gameStats as StatsReport;
 }
 
-export function duelNeutral(action: DuelAction): number {
-  return Math.max(0, action.actions - action.good - action.bad);
+export type MatchSummary = {
+  totalPasses: number;
+  accuracy: number;
+  offensiveWon: number;
+  offensiveLost: number;
+  offensiveWinRate: number;
+  defensiveWon: number;
+  defensiveLost: number;
+  defensiveWinRate: number;
+  interceptions: number;
+  recoveries: number;
+  regains: number;
+};
+
+type SummarySource = {
+  passesUnderPressure: MatchStats["passesUnderPressure"];
+  passResults: MatchStats["passResults"];
+  duels: DuelBlock | null;
+};
+
+function rate(part: number, total: number): number {
+  return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+/** Completed passes (progressive + neutral) as a share of every classified pass. */
+export function passAccuracy(source: SummarySource): number {
+  const parts = [source.passResults.underPressure, source.passResults.notUnderPressure];
+  const completed = parts.reduce((sum, part) => sum + part.progressive + part.neutral, 0);
+  const total = parts.reduce((sum, part) => sum + part.progressive + part.neutral + part.lost, 0);
+  return rate(completed, total);
+}
+
+export function matchSummary(source: SummarySource): MatchSummary | null {
+  if (!source.duels) return null;
+  const offensiveWon = source.duels.offensiveWon.actions;
+  const offensiveLost = source.duels.offensiveLost.actions;
+  const defensiveWon = source.duels.defensiveWon.actions;
+  const defensiveLost = source.duels.defensiveLost.actions;
+  const interceptions = source.duels.interception.actions;
+  const recoveries = source.duels.recovery.actions;
+
+  return {
+    totalPasses: source.passesUnderPressure.total,
+    accuracy: passAccuracy(source),
+    offensiveWon,
+    offensiveLost,
+    offensiveWinRate: rate(offensiveWon, offensiveWon + offensiveLost),
+    defensiveWon,
+    defensiveLost,
+    defensiveWinRate: rate(defensiveWon, defensiveWon + defensiveLost),
+    interceptions,
+    recoveries,
+    regains: interceptions + recoveries,
+  };
 }
 
 export function toGameStats(report: StatsReport, match: MatchStats): GameStats {

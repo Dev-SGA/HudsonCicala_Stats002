@@ -23,7 +23,6 @@ const COLORS = {
   warn: "#e08a4f",
   muted: "#b4bcc6",
   burnt: "#e0a82e",
-  teal: "#5ec8c5",
 } as const;
 
 function niceMax(value: number): number {
@@ -35,9 +34,6 @@ function niceMax(value: number): number {
 }
 
 function chartSpecs(matches: MatchStats[]): ChartSpec[] {
-  const duel = (pick: (match: MatchStats) => number): Point[] =>
-    matches.map((match) => (match.duels ? pick(match) : null));
-
   return [
     {
       id: "pass-volume",
@@ -139,35 +135,6 @@ function chartSpecs(matches: MatchStats[]): ChartSpec[] {
           color: COLORS.burnt,
           values: matches.map((match) => match.possessions.lostPlays),
         },
-      ],
-    },
-    {
-      id: "duels-offensive",
-      title: "Offensive duels",
-      note: "Not tracked in Match 001.",
-      series: [
-        { id: "won", label: "Offensive won", color: COLORS.positive, values: duel((match) => match.duels!.offensiveWon.actions) },
-        { id: "lost", label: "Offensive lost", color: COLORS.negative, values: duel((match) => match.duels!.offensiveLost.actions) },
-        { id: "fouled", label: "Fouled", color: COLORS.warn, values: duel((match) => match.duels!.fouled.actions) },
-      ],
-    },
-    {
-      id: "duels-defensive",
-      title: "Defensive duels",
-      note: "Not tracked in Match 001.",
-      series: [
-        { id: "won", label: "Defensive won", color: COLORS.positive, values: duel((match) => match.duels!.defensiveWon.actions) },
-        { id: "lost", label: "Defensive lost", color: COLORS.negative, values: duel((match) => match.duels!.defensiveLost.actions) },
-        { id: "fouls", label: "Fouls", color: COLORS.warn, values: duel((match) => match.duels!.fouls.actions) },
-      ],
-    },
-    {
-      id: "duels-regain",
-      title: "Interceptions and recoveries",
-      note: "Not tracked in Match 001.",
-      series: [
-        { id: "interception", label: "Interception", color: COLORS.accent, values: duel((match) => match.duels!.interception.actions) },
-        { id: "recovery", label: "Recovery", color: COLORS.teal, values: duel((match) => match.duels!.recovery.actions) },
       ],
     },
   ];
@@ -287,7 +254,7 @@ export function TrendCharts({ matches }: { matches: MatchStats[] }) {
       <div className="trends__intro">
         <h2 className="board__heading">Continuous evaluation</h2>
         <p className="trends__lead">
-          Line charts follow the same metrics from the first match through Chicago Fire and Columbus Crew. Each chart uses its own scale.
+          Line charts follow the metrics recorded in all three matches: Club Ohio, Chicago Fire, and Columbus Crew. Each chart uses its own scale.
         </p>
       </div>
       <div className="trend-grid">

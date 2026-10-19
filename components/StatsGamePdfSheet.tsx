@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-import { duelNeutral, type DuelAction, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { matchSummary, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -134,20 +134,7 @@ function PdfSide({ photoUrl, logoUrl, name, club }: { photoUrl: string; logoUrl:
   );
 }
 
-function DuelPdfCard({ label, action }: { label: string; action: DuelAction }) {
-  const neutral = duelNeutral(action);
-  return (
-    <li className="spdf-duel">
-      <span className="spdf-duel__value">{action.actions}</span>
-      <span className="spdf-duel__label">{label}</span>
-      <span className="spdf-duel__split">
-        {action.good} good · {neutral} neutral · {action.bad} bad
-      </span>
-    </li>
-  );
-}
-
-function DuelsPdfPage({
+function SummaryPdfPage({
   stats,
   photoUrl,
   logoUrl,
@@ -156,25 +143,39 @@ function DuelsPdfPage({
   photoUrl: string;
   logoUrl: string;
 }) {
-  const duels = stats.duels;
-  if (!duels) return null;
-  const groups: { title: string; items: { label: string; action: DuelAction }[] }[] = [
+  const summary = matchSummary(stats);
+  if (!summary) return null;
+  const groups: { title: string; pair?: boolean; items: { label: string; value: string }[] }[] = [
     {
-      title: "Offensive",
+      title: "General passing",
+      pair: true,
       items: [
-        { label: "Offensive won", action: duels.offensiveWon },
-        { label: "Offensive lost", action: duels.offensiveLost },
-        { label: "Fouled", action: duels.fouled },
+        { label: "Total passes", value: String(summary.totalPasses) },
+        { label: "Accuracy", value: `${summary.accuracy}%` },
       ],
     },
     {
-      title: "Defensive",
+      title: "Offensive duels",
       items: [
-        { label: "Defensive won", action: duels.defensiveWon },
-        { label: "Defensive lost", action: duels.defensiveLost },
-        { label: "Fouls", action: duels.fouls },
-        { label: "Interception", action: duels.interception },
-        { label: "Recovery", action: duels.recovery },
+        { label: "Won", value: String(summary.offensiveWon) },
+        { label: "Lost", value: String(summary.offensiveLost) },
+        { label: "% won", value: `${summary.offensiveWinRate}%` },
+      ],
+    },
+    {
+      title: "Defensive duels",
+      items: [
+        { label: "Won", value: String(summary.defensiveWon) },
+        { label: "Lost", value: String(summary.defensiveLost) },
+        { label: "% won", value: `${summary.defensiveWinRate}%` },
+      ],
+    },
+    {
+      title: "Interceptions & recoveries",
+      items: [
+        { label: "Total", value: String(summary.regains) },
+        { label: "Interceptions", value: String(summary.interceptions) },
+        { label: "Recoveries", value: String(summary.recoveries) },
       ],
     },
   ];
@@ -186,7 +187,7 @@ function DuelsPdfPage({
         <header className="spdf-head">
           <div>
             <p className="spdf-head__eyebrow">{BRAND.legal}</p>
-            <h1 className="spdf-head__title">Duels</h1>
+            <h1 className="spdf-head__title">Stats</h1>
           </div>
           <div className="spdf-head__meta">
             <span>{stats.meta.subtitle}</span>
@@ -196,9 +197,12 @@ function DuelsPdfPage({
           {groups.map((group) => (
             <section key={group.title} className="spdf-duel-group">
               <h2 className="spdf-duel-group__title">{group.title}</h2>
-              <ul className={`spdf-duel-grid${group.items.length > 3 ? " spdf-duel-grid--wide" : ""}`}>
+              <ul className={`spdf-duel-grid${group.pair ? " spdf-duel-grid--pair" : ""}`}>
                 {group.items.map((item) => (
-                  <DuelPdfCard key={item.label} label={item.label} action={item.action} />
+                  <li key={item.label} className="spdf-duel">
+                    <span className="spdf-duel__value">{item.value}</span>
+                    <span className="spdf-duel__label">{item.label}</span>
+                  </li>
                 ))}
               </ul>
             </section>
@@ -326,7 +330,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
         </footer>
       </div>
     </article>
-    <DuelsPdfPage stats={stats} photoUrl={photoUrl} logoUrl={logoUrl} />
+    <SummaryPdfPage stats={stats} photoUrl={photoUrl} logoUrl={logoUrl} />
     </>
   );
 }
