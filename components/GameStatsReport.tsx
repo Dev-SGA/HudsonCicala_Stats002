@@ -7,12 +7,12 @@ import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
-import { SeasonBoard } from "@/components/SeasonBoard";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
   combinePassResults,
   matchSummary,
+  seasonMatch,
   toGameStats,
   type GameStats,
   type MatchStats,
@@ -246,23 +246,9 @@ function StatsPanel({
   );
 }
 
-function StatsBoard({ match, summary }: { match: MatchStats; summary: MatchSummary }) {
-  const { underPressure, notUnderPressure } = match.passesUnderPressure;
-
+function StatsBoard({ summary }: { summary: MatchSummary }) {
   return (
     <div className="stats-board">
-      <div className="stats-board__pressure">
-        <SplitMeter
-          title="Pressure context"
-          headline={`${underPressure} under pressure · ${notUnderPressure} not under pressure`}
-          primary={underPressure}
-          secondary={notUnderPressure}
-          primaryLabel="Under pressure"
-          secondaryLabel="Not under pressure"
-          primaryTone="warn"
-          secondaryTone="accent"
-        />
-      </div>
       <StatsPanel
         title="General passing"
         rate={String(summary.totalPasses)}
@@ -379,8 +365,10 @@ function MatchSwitcher({
               aria-pressed={match.id === activeId}
               onClick={() => onChange(match.id)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={match.logo} alt="" className="club-logo club-logo--pill" />
+              {match.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={match.logo} alt="" className="club-logo club-logo--pill" />
+              ) : null}
               {match.shortLabel}
             </button>
           ))}
@@ -401,6 +389,7 @@ function MatchSwitcher({
 
 function buildTopics(match: MatchStats): Topic[] {
   const { passesUnderPressure, passResults, possessions, duels } = match;
+  const scope = match.id === "season" ? "season" : "match";
   const topics: Topic[] = [
     {
       id: "passes-pressure",
@@ -413,7 +402,7 @@ function buildTopics(match: MatchStats): Topic[] {
             <div key="total" className="metric-card metric-card--hero metric-card--compact">
               <h3 className="metric-card__title">Total passes</h3>
               <span className="metric-card__value">{passesUnderPressure.total}</span>
-              <p className="metric-card__caption">Passes tracked in the match</p>
+              <p className="metric-card__caption">Passes tracked in the {scope}</p>
             </div>,
             <SplitMeter
               key="split"
@@ -459,7 +448,7 @@ function buildTopics(match: MatchStats): Topic[] {
           <div className="metric-card metric-card--hero">
             <h3 className="metric-card__title">Total possessions</h3>
             <span className="metric-card__value">{possessions.total}</span>
-            <p className="metric-card__caption">Ball possessions in the match</p>
+            <p className="metric-card__caption">Ball possessions in the {scope}</p>
           </div>
           {duels ? (
             <p className="metric-note">
@@ -490,7 +479,7 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: <StatsBoard match={match} summary={summary} />,
+      content: <StatsBoard summary={summary} />,
     });
   }
 
@@ -499,10 +488,10 @@ function buildTopics(match: MatchStats): Topic[] {
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
   const { player, meta, matches } = report;
+  const options = useMemo(() => [...matches, seasonMatch(matches)], [matches]);
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
-  const [view, setView] = useState<"match" | "season">("match");
-  const match = matches.find((item) => item.id === matchId) ?? matches[0];
+  const match = options.find((item) => item.id === matchId) ?? options[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
   const topics = useMemo(() => buildTopics(match), [match]);
 
@@ -521,15 +510,11 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
             <p className="report-header__eyebrow">{BRAND.legal}</p>
             <h1 className="report-header__title">{meta.title}</h1>
             <p className="report-header__meta">
-              {view === "season" ? (
-                "Season · 3 matches"
-              ) : (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={match.logo} alt="" className="club-logo club-logo--meta" />
-                  {match.label}
-                </>
-              )}
+              {match.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={match.logo} alt="" className="club-logo club-logo--meta" />
+              ) : null}
+              {match.label}
             </p>
           </div>
         </header>
@@ -540,38 +525,10 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           </AthleteProfileCard>
 
           <main className="report-main">
-            <div className="view-tabs" role="tablist" aria-label="Report views">
-              <button
-                type="button"
-                role="tab"
-                id="tab-match"
-                className={`view-tabs__tab${view === "match" ? " is-active" : ""}`}
-                aria-selected={view === "match"}
-                onClick={() => setView("match")}
-              >
-                Match
-              </button>
-              <button
-                type="button"
-                role="tab"
-                id="tab-season"
-                className={`view-tabs__tab${view === "season" ? " is-active" : ""}`}
-                aria-selected={view === "season"}
-                onClick={() => setView("season")}
-              >
-                Season
-              </button>
+            <div className="view-panel">
+              <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId} />
+              <TopicsBoard topics={topics} />
             </div>
-            {view === "match" ? (
-              <div id="panel-match" role="tabpanel" aria-labelledby="tab-match" className="view-panel">
-                <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
-                <TopicsBoard topics={topics} />
-              </div>
-            ) : (
-              <div id="panel-season" role="tabpanel" aria-labelledby="tab-season" className="view-panel">
-                <SeasonBoard matches={matches} />
-              </div>
-            )}
           </main>
         </div>
 

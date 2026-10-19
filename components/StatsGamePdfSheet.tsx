@@ -172,8 +172,10 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
       </div>
       <div className="spdf-head__meta">
         <span className="spdf-head__match">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={opponentLogoUrl} alt="" className="spdf-head__logo" />
+          {opponentLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={opponentLogoUrl} alt="" className="spdf-head__logo" />
+          ) : null}
           <span>{subtitle}</span>
         </span>
       </div>
@@ -246,7 +248,6 @@ function SummaryPdfPage({
 }: StatsGamePdfSheetProps) {
   const summary = matchSummary(stats);
   if (!summary) return null;
-  const { underPressure, notUnderPressure, total } = stats.passesUnderPressure;
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -259,37 +260,6 @@ function SummaryPdfPage({
       />
       <div className="spdf-main">
         <PdfHeader title="Stats" subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
-        <div className="spdf-summary-pressure">
-          <div className="spdf-pressure__context">
-            <p className="spdf-pressure__kicker">Pressure context</p>
-            <p className="spdf-pressure__headline">
-              {underPressure} under pressure · {notUnderPressure} not under pressure
-            </p>
-            <div className="spdf-pressure__track">
-              <span className="spdf-pressure__seg spdf-pressure__seg--warn" style={{ width: `${pct(underPressure, total)}%` }} />
-              <span
-                className="spdf-pressure__seg spdf-pressure__seg--blue"
-                style={{ width: `${pct(notUnderPressure, total)}%` }}
-              />
-            </div>
-            <ul className="spdf-pressure__legend spdf-pressure__legend--row">
-              <li>
-                <span className="spdf-pressure__dot spdf-pressure__dot--warn" />
-                <span>Under pressure</span>
-                <strong>
-                  {underPressure} · {pct(underPressure, total)}%
-                </strong>
-              </li>
-              <li>
-                <span className="spdf-pressure__dot spdf-pressure__dot--blue" />
-                <span>Not under pressure</span>
-                <strong>
-                  {notUnderPressure} · {pct(notUnderPressure, total)}%
-                </strong>
-              </li>
-            </ul>
-          </div>
-        </div>
         <div className="spdf-summary">
           <SummaryCard title="General passing" kpi={String(summary.totalPasses)} unit="Total passes">
             <SummaryMeter
@@ -342,6 +312,7 @@ function SummaryPdfPage({
 export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, opponentLogoUrl }: StatsGamePdfSheetProps) {
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
+  const scope = meta.subtitle === "Season" ? "season" : "match";
 
   return (
     <>
@@ -361,7 +332,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
               <div className="spdf-pressure__total">
                 <span className="spdf-pressure__kicker">Total passes</span>
                 <span className="spdf-pressure__value">{passTotal}</span>
-                <span className="spdf-pressure__caption">Passes tracked in the match</span>
+                <span className="spdf-pressure__caption">Passes tracked in the {scope}</span>
               </div>
               <div className="spdf-pressure__context">
                 <p className="spdf-pressure__kicker">Pressure context</p>

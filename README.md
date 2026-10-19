@@ -11,8 +11,9 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 
 ## O que mudou em relação ao Stats 001
 
-- Card **Stats** nas partidas novas: general passing (accurate e inaccurate), duelos ofensivos e defensivos (won, lost, % won), interceptações com recuperações e a barra de pressure context.
-- A aba **Season** compara os números das três partidas.
+- Card **Stats** nas partidas novas: general passing (accurate e inaccurate), duelos ofensivos e defensivos (won, lost, % won) e interceptações com recuperações.
+- A barra de pressure context fica no card **Pressure context**, dentro de Passes Under Pressure vs Not.
+- **Season** fica ao lado de Columbus Crew e abre os mesmos cards, com os totais das três partidas.
 - **Dispossessed** são os duelos ofensivos perdidos.
 - Wrong passes são os passes maus.
 - Turnovers passou a se chamar **Lost Plays**, na cor amarelo queimado. O valor é dispossessed + wrong passes.

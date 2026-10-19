@@ -1028,37 +1028,6 @@ body::before {
 
 /* ---------- Matches and stats ---------- */
 
-.view-tabs {
-  display: flex;
-  gap: 6px;
-  border-bottom: 1px solid var(--line);
-}
-
-.view-tabs__tab {
-  margin-bottom: -1px;
-  padding: 10px 16px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.view-tabs__tab.is-active {
-  color: var(--text);
-  border-bottom-color: var(--accent);
-}
-
-.view-tabs__tab:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
 .view-panel {
   display: grid;
   gap: 16px;
@@ -1081,6 +1050,7 @@ body::before {
 
 .match-nav__pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -1147,147 +1117,6 @@ body::before {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-}
-
-.stats-board__pressure {
-  grid-column: 1 / -1;
-}
-
-.season {
-  display: grid;
-  gap: 12px;
-}
-
-.season__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.season__legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.season__swatch {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-}
-
-.season__swatch--warn {
-  background: var(--tone-warn);
-}
-
-.season__swatch--accent {
-  background: var(--tone-accent);
-}
-
-.season-scroll {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
-  padding: 6px 12px 10px;
-}
-
-.season-table {
-  width: 100%;
-  min-width: 680px;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-}
-
-.season-table th,
-.season-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--line);
-  text-align: right;
-  vertical-align: middle;
-}
-
-.season-table thead th {
-  vertical-align: bottom;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.season-table tbody th,
-.season-table thead th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  text-align: left;
-  background: color-mix(in srgb, var(--sga-navy) 88%, var(--sga-blue-deep));
-}
-
-.season-table tbody th {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.season-table__metric-label {
-  color: var(--text-faint);
-}
-
-.season-table__club {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.season-table__meter {
-  width: 100%;
-  min-width: 96px;
-}
-
-.season-table__section th {
-  padding-top: 18px;
-  border-bottom: none;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--tone-accent);
-}
-
-.season-table__value {
-  font-weight: 700;
-}
-
-.season-table__value--positive {
-  color: var(--tone-positive);
-  font-weight: 800;
-}
-
-.season-table__value--negative {
-  color: var(--tone-negative);
-  font-weight: 800;
-}
-
-.season-table__value--accent {
-  color: var(--tone-accent);
-  font-weight: 800;
-}
-
-.season-table__value--recover {
-  color: var(--tone-recover);
-  font-weight: 800;
-}
-
-.season-table__value--burnt {
-  color: var(--tone-burnt-yellow);
-  font-weight: 800;
 }
 
 .stats-panel {

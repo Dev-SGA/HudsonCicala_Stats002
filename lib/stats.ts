@@ -160,6 +160,59 @@ export function matchSummary(source: SummarySource): MatchSummary | null {
   };
 }
 
+function addAction(left: DuelAction, right: DuelAction): DuelAction {
+  return {
+    actions: left.actions + right.actions,
+    good: left.good + right.good,
+    bad: left.bad + right.bad,
+  };
+}
+
+function addDuels(left: DuelBlock, right: DuelBlock): DuelBlock {
+  return {
+    offensiveWon: addAction(left.offensiveWon, right.offensiveWon),
+    offensiveLost: addAction(left.offensiveLost, right.offensiveLost),
+    fouled: addAction(left.fouled, right.fouled),
+    defensiveWon: addAction(left.defensiveWon, right.defensiveWon),
+    defensiveLost: addAction(left.defensiveLost, right.defensiveLost),
+    fouls: addAction(left.fouls, right.fouls),
+    interception: addAction(left.interception, right.interception),
+    recovery: addAction(left.recovery, right.recovery),
+  };
+}
+
+/** Same match shape as the individual games, with every recorded number added together. */
+export function seasonMatch(matches: MatchStats[]): MatchStats {
+  const duels = matches.flatMap((match) => (match.duels ? [match.duels] : []));
+
+  return {
+    id: "season",
+    kind: "session",
+    label: "Season",
+    shortLabel: "Season",
+    logo: "",
+    passesUnderPressure: {
+      total: matches.reduce((sum, match) => sum + match.passesUnderPressure.total, 0),
+      underPressure: matches.reduce((sum, match) => sum + match.passesUnderPressure.underPressure, 0),
+      notUnderPressure: matches.reduce((sum, match) => sum + match.passesUnderPressure.notUnderPressure, 0),
+      videoLink: "",
+    },
+    passResults: {
+      underPressure: combinePassResults(...matches.map((match) => match.passResults.underPressure)),
+      notUnderPressure: combinePassResults(...matches.map((match) => match.passResults.notUnderPressure)),
+      videoLink: "",
+    },
+    possessions: {
+      total: matches.reduce((sum, match) => sum + match.possessions.total, 0),
+      lostBalls: matches.reduce((sum, match) => sum + match.possessions.lostBalls, 0),
+      wrongPasses: matches.reduce((sum, match) => sum + match.possessions.wrongPasses, 0),
+      lostPlays: matches.reduce((sum, match) => sum + match.possessions.lostPlays, 0),
+      videoLink: "",
+    },
+    duels: duels.length > 0 ? duels.reduce(addDuels) : null,
+  };
+}
+
 export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
   return {
     meta: {
