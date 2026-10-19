@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { combinePassResults, matchSummary, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
@@ -5,7 +6,11 @@ type StatsGamePdfSheetProps = {
   stats: GameStats;
   photoUrl: string;
   logoUrl: string;
+  clubLogoUrl: string;
+  opponentLogoUrl: string;
 };
+
+type PrintTone = "green" | "yellow" | "blue" | "mint" | "grey";
 
 type Tone = "blue" | "red" | "burnt" | "warn" | "pass-progressive" | "pass-neutral" | "pass-lost";
 
@@ -126,7 +131,19 @@ function PdfSection({
   );
 }
 
-function PdfSide({ photoUrl, logoUrl, name, club }: { photoUrl: string; logoUrl: string; name: string; club: string }) {
+function PdfSide({
+  photoUrl,
+  logoUrl,
+  clubLogoUrl,
+  name,
+  club,
+}: {
+  photoUrl: string;
+  logoUrl: string;
+  clubLogoUrl: string;
+  name: string;
+  club: string;
+}) {
   return (
     <aside className="spdf-side">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -135,77 +152,88 @@ function PdfSide({ photoUrl, logoUrl, name, club }: { photoUrl: string; logoUrl:
       <div className="spdf-side__identity">
         <p className="spdf-side__label">Athlete</p>
         <h2 className="spdf-side__name">{name}</h2>
-        <p className="spdf-side__club">{club}</p>
+        <p className="spdf-side__club">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={clubLogoUrl} alt="" className="spdf-side__club-logo" />
+          {club}
+        </p>
       </div>
       <p className="spdf-side__slogan">{BRAND.slogan}</p>
     </aside>
   );
 }
 
-function SumFigure({ value, label, tone }: { value: string; label: string; tone?: "green" | "yellow" | "blue" }) {
+function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtitle: string; opponentLogoUrl: string }) {
   return (
-    <div className="spdf-sum__figure">
-      <span className={`spdf-sum__value${tone ? ` spdf-sum__value--${tone}` : ""}`}>{value}</span>
-      <span className={`spdf-sum__caption${tone ? ` spdf-sum__caption--${tone}` : ""}`}>{label}</span>
-    </div>
+    <header className="spdf-head">
+      <div>
+        <p className="spdf-head__eyebrow">{BRAND.legal}</p>
+        <h1 className="spdf-head__title">{title}</h1>
+      </div>
+      <div className="spdf-head__meta">
+        <span className="spdf-head__match">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={opponentLogoUrl} alt="" className="spdf-head__logo" />
+          <span>{subtitle}</span>
+        </span>
+      </div>
+    </header>
   );
 }
 
-function SumBar({
-  primary,
-  secondary,
-  primaryTone,
-  secondaryTone,
-}: {
-  primary: number;
-  secondary: number;
-  primaryTone: "green" | "yellow" | "blue" | "grey";
-  secondaryTone: "green" | "yellow" | "blue" | "grey";
-}) {
-  const total = primary + secondary;
-  const primaryPct = total > 0 ? (primary / total) * 100 : 0;
-
+function SummaryCard({ title, kpi, unit, children }: { title: string; kpi: string; unit: string; children: ReactNode }) {
   return (
-    <div className="spdf-sum__bar">
-      {total === 0 ? (
-        <span className="spdf-sum__seg spdf-sum__seg--grey" style={{ width: "100%" }} />
-      ) : (
-        <>
-          <span className={`spdf-sum__seg spdf-sum__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
-          <span className={`spdf-sum__seg spdf-sum__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
-        </>
-      )}
-    </div>
-  );
-}
-
-function SumPanel({
-  title,
-  rate,
-  rateLabel,
-  bar,
-  children,
-}: {
-  title: string;
-  rate?: string;
-  rateLabel?: string;
-  bar: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="spdf-sum">
-      <header className="spdf-sum__head">
-        <h2 className="spdf-sum__title">{title}</h2>
-        {rate ? (
-          <p className="spdf-sum__rate">
-            <strong>{rate}</strong>
-            {rateLabel}
-          </p>
-        ) : null}
-      </header>
-      <div className="spdf-sum__figures">{children}</div>
-      {bar}
+    <section className="spdf-section spdf-section--build-up spdf-section--summary">
+      <div className="spdf-section__top">
+        <p className="spdf-section__phase">Summary</p>
+        <h3 className="spdf-section__title">{title}</h3>
+      </div>
+      <div className="spdf-section__content">
+        <div className="spdf-section__kpi">
+          <span className="spdf-section__value">{kpi}</span>
+          <span className="spdf-section__unit">{unit}</span>
+        </div>
+        <div className="spdf-section__panel">{children}</div>
+      </div>
     </section>
+  );
+}
+
+function SummaryMeter({
+  headline,
+  segments,
+}: {
+  headline: string;
+  segments: { label: string; value: string; share: number; tone: PrintTone }[];
+}) {
+  const total = segments.reduce((sum, segment) => sum + segment.share, 0);
+
+  return (
+    <div className="spdf-pressure__context">
+      <p className="spdf-pressure__headline">{headline}</p>
+      <div className="spdf-pressure__track">
+        {total === 0 ? (
+          <span className="spdf-pressure__seg spdf-pressure__seg--grey" style={{ width: "100%" }} />
+        ) : (
+          segments.map((segment) => (
+            <span
+              key={segment.label}
+              className={`spdf-pressure__seg spdf-pressure__seg--${segment.tone}`}
+              style={{ width: `${(segment.share / total) * 100}%` }}
+            />
+          ))
+        )}
+      </div>
+      <ul className="spdf-pressure__legend">
+        {segments.map((segment) => (
+          <li key={segment.label}>
+            <span className={`spdf-pressure__dot spdf-pressure__dot--${segment.tone}`} />
+            <span>{segment.label}</span>
+            <strong className={`spdf-tone spdf-tone--${segment.tone}`}>{segment.value}</strong>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -213,90 +241,61 @@ function SummaryPdfPage({
   stats,
   photoUrl,
   logoUrl,
-}: {
-  stats: GameStats;
-  photoUrl: string;
-  logoUrl: string;
-}) {
+  clubLogoUrl,
+  opponentLogoUrl,
+}: StatsGamePdfSheetProps) {
   const summary = matchSummary(stats);
   if (!summary) return null;
+  const missed = Math.max(0, 100 - summary.accuracy);
 
   return (
     <article className="stats-pdf" aria-hidden="true">
-      <PdfSide photoUrl={photoUrl} logoUrl={logoUrl} name={stats.player.name} club={stats.player.club} />
+      <PdfSide
+        photoUrl={photoUrl}
+        logoUrl={logoUrl}
+        clubLogoUrl={clubLogoUrl}
+        name={stats.player.name}
+        club={stats.player.club}
+      />
       <div className="spdf-main">
-        <header className="spdf-head">
-          <div>
-            <p className="spdf-head__eyebrow">{BRAND.legal}</p>
-            <h1 className="spdf-head__title">Stats</h1>
-          </div>
-          <div className="spdf-head__meta">
-            <span>{stats.meta.subtitle}</span>
-          </div>
-        </header>
+        <PdfHeader title="Stats" subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
         <div className="spdf-summary">
-          <SumPanel
-            title="General passing"
-            bar={
-              <SumBar
-                primary={summary.accuracy}
-                secondary={Math.max(0, 100 - summary.accuracy)}
-                primaryTone="green"
-                secondaryTone="grey"
-              />
-            }
-          >
-            <SumFigure value={String(summary.totalPasses)} label="Total passes" />
-            <SumFigure value={`${summary.accuracy}%`} label="Accuracy" tone="green" />
-          </SumPanel>
-          <SumPanel
-            title="Interceptions & recoveries"
-            rate={String(summary.regains)}
-            rateLabel="total"
-            bar={
-              <SumBar
-                primary={summary.interceptions}
-                secondary={summary.recoveries}
-                primaryTone="blue"
-                secondaryTone="green"
-              />
-            }
-          >
-            <SumFigure value={String(summary.interceptions)} label="Interceptions" tone="blue" />
-            <SumFigure value={String(summary.recoveries)} label="Recoveries" tone="green" />
-          </SumPanel>
-          <SumPanel
-            title="Offensive duels"
-            rate={`${summary.offensiveWinRate}%`}
-            rateLabel="won"
-            bar={
-              <SumBar
-                primary={summary.offensiveWon}
-                secondary={summary.offensiveLost}
-                primaryTone="green"
-                secondaryTone="yellow"
-              />
-            }
-          >
-            <SumFigure value={String(summary.offensiveWon)} label="Won" tone="green" />
-            <SumFigure value={String(summary.offensiveLost)} label="Lost" tone="yellow" />
-          </SumPanel>
-          <SumPanel
-            title="Defensive duels"
-            rate={`${summary.defensiveWinRate}%`}
-            rateLabel="won"
-            bar={
-              <SumBar
-                primary={summary.defensiveWon}
-                secondary={summary.defensiveLost}
-                primaryTone="green"
-                secondaryTone="yellow"
-              />
-            }
-          >
-            <SumFigure value={String(summary.defensiveWon)} label="Won" tone="green" />
-            <SumFigure value={String(summary.defensiveLost)} label="Lost" tone="yellow" />
-          </SumPanel>
+          <SummaryCard title="General passing" kpi={String(summary.totalPasses)} unit="Total passes">
+            <SummaryMeter
+              headline={`${summary.accuracy}% accuracy`}
+              segments={[
+                { label: "Accuracy", value: `${summary.accuracy}%`, share: summary.accuracy, tone: "green" },
+                { label: "Lost", value: `${missed}%`, share: missed, tone: "grey" },
+              ]}
+            />
+          </SummaryCard>
+          <SummaryCard title="Interceptions & recoveries" kpi={String(summary.regains)} unit="Total">
+            <SummaryMeter
+              headline={`${summary.interceptions} interceptions · ${summary.recoveries} recoveries`}
+              segments={[
+                { label: "Interceptions", value: String(summary.interceptions), share: summary.interceptions, tone: "blue" },
+                { label: "Recoveries", value: String(summary.recoveries), share: summary.recoveries, tone: "mint" },
+              ]}
+            />
+          </SummaryCard>
+          <SummaryCard title="Offensive duels" kpi={`${summary.offensiveWinRate}%`} unit="Won">
+            <SummaryMeter
+              headline={`${summary.offensiveWon} won · ${summary.offensiveLost} lost`}
+              segments={[
+                { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "green" },
+                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "yellow" },
+              ]}
+            />
+          </SummaryCard>
+          <SummaryCard title="Defensive duels" kpi={`${summary.defensiveWinRate}%`} unit="Won">
+            <SummaryMeter
+              headline={`${summary.defensiveWon} won · ${summary.defensiveLost} lost`}
+              segments={[
+                { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "green" },
+                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "yellow" },
+              ]}
+            />
+          </SummaryCard>
         </div>
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
@@ -309,25 +308,17 @@ function SummaryPdfPage({
   );
 }
 
-export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfSheetProps) {
+export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, opponentLogoUrl }: StatsGamePdfSheetProps) {
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
 
   return (
     <>
     <article className="stats-pdf" aria-hidden="true">
-      <PdfSide photoUrl={photoUrl} logoUrl={logoUrl} name={player.name} club={player.club} />
+      <PdfSide photoUrl={photoUrl} logoUrl={logoUrl} clubLogoUrl={clubLogoUrl} name={player.name} club={player.club} />
 
       <div className="spdf-main">
-        <header className="spdf-head">
-          <div>
-            <p className="spdf-head__eyebrow">{BRAND.legal}</p>
-            <h1 className="spdf-head__title">{meta.title}</h1>
-          </div>
-          <div className="spdf-head__meta">
-            <span>{meta.subtitle}</span>
-          </div>
-        </header>
+        <PdfHeader title={meta.title} subtitle={meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
 
         <div className="spdf-stack">
           <section className="spdf-section spdf-section--build-up spdf-section--pressure">
@@ -427,7 +418,13 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
         </footer>
       </div>
     </article>
-    <SummaryPdfPage stats={stats} photoUrl={photoUrl} logoUrl={logoUrl} />
+    <SummaryPdfPage
+      stats={stats}
+      photoUrl={photoUrl}
+      logoUrl={logoUrl}
+      clubLogoUrl={clubLogoUrl}
+      opponentLogoUrl={opponentLogoUrl}
+    />
     </>
   );
 }

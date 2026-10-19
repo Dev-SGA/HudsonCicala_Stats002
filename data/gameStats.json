@@ -7,6 +7,7 @@
   "player": {
     "name": "Hudson Cicala",
     "club": "FC Cincinnati",
+    "clubLogo": "/clubs/fc-cincinnati.png",
     "photo": "/player/hudson-cicala.png"
   },
   "matches": [
@@ -15,6 +16,7 @@
       "kind": "baseline",
       "label": "vs Club Ohio",
       "shortLabel": "Club Ohio",
+      "logo": "/clubs/club-ohio.png",
       "passesUnderPressure": {
         "total": 81,
         "underPressure": 51,
@@ -48,6 +50,7 @@
       "kind": "session",
       "label": "vs Chicago Fire",
       "shortLabel": "Chicago Fire",
+      "logo": "/clubs/chicago-fire.png",
       "passesUnderPressure": {
         "total": 53,
         "underPressure": 24,
@@ -90,6 +93,7 @@
       "kind": "session",
       "label": "vs Columbus Crew",
       "shortLabel": "Columbus Crew",
+      "logo": "/clubs/columbus-crew.png",
       "passesUnderPressure": {
         "total": 69,
         "underPressure": 48,

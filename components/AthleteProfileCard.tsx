@@ -4,11 +4,12 @@ import type { ReactNode } from "react";
 type AthleteProfileCardProps = {
   name: string;
   club: string;
+  clubLogo?: string;
   photoSrc: string;
   children?: ReactNode;
 };
 
-export function AthleteProfileCard({ name, club, photoSrc, children }: AthleteProfileCardProps) {
+export function AthleteProfileCard({ name, club, clubLogo, photoSrc, children }: AthleteProfileCardProps) {
   return (
     <aside className="athlete-column" aria-label="Athlete profile">
       <div className="athlete-photo">
@@ -24,7 +25,13 @@ export function AthleteProfileCard({ name, club, photoSrc, children }: AthletePr
         <div className="athlete-photo__overlay">
           <p className="athlete-photo__label">Athlete</p>
           <h2 className="athlete-photo__name">{name}</h2>
-          <p className="athlete-photo__club">{club}</p>
+          <p className="athlete-photo__club">
+            {clubLogo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={clubLogo} alt="" className="club-logo" />
+            ) : null}
+            {club}
+          </p>
         </div>
       </div>
       {children ? <div className="athlete-column__actions">{children}</div> : null}

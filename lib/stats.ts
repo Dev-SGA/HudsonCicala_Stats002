@@ -30,6 +30,7 @@ export type MatchStats = {
   kind: MatchKind;
   label: string;
   shortLabel: string;
+  logo: string;
   passesUnderPressure: {
     total: number;
     underPressure: number;
@@ -60,6 +61,7 @@ export type StatsReport = {
   player: {
     name: string;
     club: string;
+    clubLogo: string;
     photo: string;
   };
   matches: MatchStats[];
@@ -69,6 +71,7 @@ export type StatsReport = {
 export type GameStats = {
   meta: StatsReport["meta"] & { fileSlug: string };
   player: StatsReport["player"];
+  opponentLogo: string;
   passesUnderPressure: MatchStats["passesUnderPressure"];
   passResults: MatchStats["passResults"];
   possessions: MatchStats["possessions"];
@@ -155,6 +158,7 @@ export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
       fileSlug: `${report.meta.session}-${match.id}`,
     },
     player: report.player,
+    opponentLogo: match.logo,
     passesUnderPressure: match.passesUnderPressure,
     passResults: match.passResults,
     possessions: match.possessions,

@@ -166,7 +166,15 @@ function PossessionStat({
   );
 }
 
-function StatFigure({ label, value, tone }: { label: string; value: string; tone?: "positive" | "negative" | "accent" }) {
+function StatFigure({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone?: "positive" | "negative" | "accent" | "recover";
+}) {
   return (
     <div className={`stat-figure${tone ? ` stat-figure--${tone}` : ""}`}>
       <span className="stat-figure__value">{value}</span>
@@ -267,14 +275,14 @@ function StatsBoard({ summary }: { summary: MatchSummary }) {
             primary={summary.interceptions}
             secondary={summary.recoveries}
             primaryTone="accent"
-            secondaryTone="positive"
+            secondaryTone="recover"
             label={`${summary.interceptions} interceptions and ${summary.recoveries} recoveries`}
           />
         }
         figures={
           <>
             <StatFigure label="Interceptions" value={String(summary.interceptions)} tone="accent" />
-            <StatFigure label="Recoveries" value={String(summary.recoveries)} tone="positive" />
+            <StatFigure label="Recoveries" value={String(summary.recoveries)} tone="recover" />
           </>
         }
       />
@@ -354,6 +362,8 @@ function MatchSwitcher({
               aria-pressed={match.id === activeId}
               onClick={() => onChange(match.id)}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={match.logo} alt="" className="club-logo club-logo--pill" />
               {match.shortLabel}
             </button>
           ))}
@@ -492,12 +502,16 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           <div className="report-header__intro">
             <p className="report-header__eyebrow">{BRAND.legal}</p>
             <h1 className="report-header__title">{meta.title}</h1>
-            <p className="report-header__meta">{match.label}</p>
+            <p className="report-header__meta">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={match.logo} alt="" className="club-logo club-logo--meta" />
+              {match.label}
+            </p>
           </div>
         </header>
 
         <div className="report-grid">
-          <AthleteProfileCard name={player.name} club={player.club} photoSrc={player.photo}>
+          <AthleteProfileCard name={player.name} club={player.club} clubLogo={player.clubLogo} photoSrc={player.photo}>
             <ExportPdfButton stats={exportStats} />
           </AthleteProfileCard>
 
