@@ -84,6 +84,8 @@ export function getStatsReport(): StatsReport {
 
 export type MatchSummary = {
   totalPasses: number;
+  accurate: number;
+  inaccurate: number;
   accuracy: number;
   offensiveWon: number;
   offensiveLost: number;
@@ -117,12 +119,18 @@ function rate(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
 }
 
-/** Completed passes (progressive + neutral) as a share of every classified pass. */
-export function passAccuracy(source: SummarySource): number {
-  const parts = [source.passResults.underPressure, source.passResults.notUnderPressure];
-  const completed = parts.reduce((sum, part) => sum + part.progressive + part.neutral, 0);
-  const total = parts.reduce((sum, part) => sum + part.progressive + part.neutral + part.lost, 0);
-  return rate(completed, total);
+export type PassTotals = PassResultBreakdown & {
+  accurate: number;
+  inaccurate: number;
+  total: number;
+};
+
+/** Accurate passes are progressive plus neutral. Inaccurate passes are the lost ones. */
+export function passTotals(source: { passResults: MatchStats["passResults"] }): PassTotals {
+  const combined = combinePassResults(source.passResults.underPressure, source.passResults.notUnderPressure);
+  const accurate = combined.progressive + combined.neutral;
+  const inaccurate = combined.lost;
+  return { ...combined, accurate, inaccurate, total: accurate + inaccurate };
 }
 
 export function matchSummary(source: SummarySource): MatchSummary | null {
@@ -133,10 +141,13 @@ export function matchSummary(source: SummarySource): MatchSummary | null {
   const defensiveLost = source.duels.defensiveLost.actions;
   const interceptions = source.duels.interception.actions;
   const recoveries = source.duels.recovery.actions;
+  const passes = passTotals(source);
 
   return {
     totalPasses: source.passesUnderPressure.total,
-    accuracy: passAccuracy(source),
+    accurate: passes.accurate,
+    inaccurate: passes.inaccurate,
+    accuracy: rate(passes.accurate, passes.total),
     offensiveWon,
     offensiveLost,
     offensiveWinRate: rate(offensiveWon, offensiveWon + offensiveLost),

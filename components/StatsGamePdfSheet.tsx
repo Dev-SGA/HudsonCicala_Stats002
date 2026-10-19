@@ -246,7 +246,7 @@ function SummaryPdfPage({
 }: StatsGamePdfSheetProps) {
   const summary = matchSummary(stats);
   if (!summary) return null;
-  const missed = Math.max(0, 100 - summary.accuracy);
+  const { underPressure, notUnderPressure, total } = stats.passesUnderPressure;
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -259,13 +259,44 @@ function SummaryPdfPage({
       />
       <div className="spdf-main">
         <PdfHeader title="Stats" subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
+        <div className="spdf-summary-pressure">
+          <div className="spdf-pressure__context">
+            <p className="spdf-pressure__kicker">Pressure context</p>
+            <p className="spdf-pressure__headline">
+              {underPressure} under pressure · {notUnderPressure} not under pressure
+            </p>
+            <div className="spdf-pressure__track">
+              <span className="spdf-pressure__seg spdf-pressure__seg--warn" style={{ width: `${pct(underPressure, total)}%` }} />
+              <span
+                className="spdf-pressure__seg spdf-pressure__seg--blue"
+                style={{ width: `${pct(notUnderPressure, total)}%` }}
+              />
+            </div>
+            <ul className="spdf-pressure__legend spdf-pressure__legend--row">
+              <li>
+                <span className="spdf-pressure__dot spdf-pressure__dot--warn" />
+                <span>Under pressure</span>
+                <strong>
+                  {underPressure} · {pct(underPressure, total)}%
+                </strong>
+              </li>
+              <li>
+                <span className="spdf-pressure__dot spdf-pressure__dot--blue" />
+                <span>Not under pressure</span>
+                <strong>
+                  {notUnderPressure} · {pct(notUnderPressure, total)}%
+                </strong>
+              </li>
+            </ul>
+          </div>
+        </div>
         <div className="spdf-summary">
           <SummaryCard title="General passing" kpi={String(summary.totalPasses)} unit="Total passes">
             <SummaryMeter
-              headline={`${summary.accuracy}% accuracy`}
+              headline={`${summary.accurate} accurate · ${summary.inaccurate} inaccurate`}
               segments={[
-                { label: "Accuracy", value: `${summary.accuracy}%`, share: summary.accuracy, tone: "green" },
-                { label: "Lost", value: `${missed}%`, share: missed, tone: "grey" },
+                { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "green" },
+                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "yellow" },
               ]}
             />
           </SummaryCard>
@@ -386,7 +417,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             <StatTiles
               items={[
                 {
-                  label: "Lost balls",
+                  label: "Dispossessed",
                   value: possessions.lostBalls,
                   tone: "burnt",
                   detail: `${pct(possessions.lostBalls, possessions.total)}%`,

@@ -7,6 +7,7 @@ import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
+import { SeasonBoard } from "@/components/SeasonBoard";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
@@ -245,24 +246,40 @@ function StatsPanel({
   );
 }
 
-function StatsBoard({ summary }: { summary: MatchSummary }) {
+function StatsBoard({ match, summary }: { match: MatchStats; summary: MatchSummary }) {
+  const { underPressure, notUnderPressure } = match.passesUnderPressure;
+
   return (
     <div className="stats-board">
+      <div className="stats-board__pressure">
+        <SplitMeter
+          title="Pressure context"
+          headline={`${underPressure} under pressure · ${notUnderPressure} not under pressure`}
+          primary={underPressure}
+          secondary={notUnderPressure}
+          primaryLabel="Under pressure"
+          secondaryLabel="Not under pressure"
+          primaryTone="warn"
+          secondaryTone="accent"
+        />
+      </div>
       <StatsPanel
         title="General passing"
+        rate={String(summary.totalPasses)}
+        rateLabel="passes"
         bar={
           <BalanceBar
-            primary={summary.accuracy}
-            secondary={Math.max(0, 100 - summary.accuracy)}
+            primary={summary.accurate}
+            secondary={summary.inaccurate}
             primaryTone="positive"
-            secondaryTone="muted"
-            label={`Accuracy ${summary.accuracy} percent`}
+            secondaryTone="negative"
+            label={`${summary.accurate} accurate and ${summary.inaccurate} inaccurate`}
           />
         }
         figures={
           <>
-            <StatFigure label="Total passes" value={String(summary.totalPasses)} />
-            <StatFigure label="Accuracy" value={`${summary.accuracy}%`} tone="positive" />
+            <StatFigure label="Accurate" value={String(summary.accurate)} tone="positive" />
+            <StatFigure label="Inaccurate" value={String(summary.inaccurate)} tone="negative" />
           </>
         }
       />
@@ -446,12 +463,12 @@ function buildTopics(match: MatchStats): Topic[] {
           </div>
           {duels ? (
             <p className="metric-note">
-              Lost balls are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
+              Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
             </p>
           ) : null}
           <MetricFlow
             items={[
-              <PossessionStat key="lb" label="Lost balls" value={possessions.lostBalls} total={possessions.total} />,
+              <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
               <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
               <PossessionStat
                 key="lp"
@@ -473,7 +490,7 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: <StatsBoard summary={summary} />,
+      content: <StatsBoard match={match} summary={summary} />,
     });
   }
 
@@ -484,6 +501,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const { player, meta, matches } = report;
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
+  const [view, setView] = useState<"match" | "season">("match");
   const match = matches.find((item) => item.id === matchId) ?? matches[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
   const topics = useMemo(() => buildTopics(match), [match]);
@@ -503,9 +521,15 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
             <p className="report-header__eyebrow">{BRAND.legal}</p>
             <h1 className="report-header__title">{meta.title}</h1>
             <p className="report-header__meta">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={match.logo} alt="" className="club-logo club-logo--meta" />
-              {match.label}
+              {view === "season" ? (
+                "Season · 3 matches"
+              ) : (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={match.logo} alt="" className="club-logo club-logo--meta" />
+                  {match.label}
+                </>
+              )}
             </p>
           </div>
         </header>
@@ -516,10 +540,38 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           </AthleteProfileCard>
 
           <main className="report-main">
-            <div className="view-panel">
-              <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
-              <TopicsBoard topics={topics} />
+            <div className="view-tabs" role="tablist" aria-label="Report views">
+              <button
+                type="button"
+                role="tab"
+                id="tab-match"
+                className={`view-tabs__tab${view === "match" ? " is-active" : ""}`}
+                aria-selected={view === "match"}
+                onClick={() => setView("match")}
+              >
+                Match
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-season"
+                className={`view-tabs__tab${view === "season" ? " is-active" : ""}`}
+                aria-selected={view === "season"}
+                onClick={() => setView("season")}
+              >
+                Season
+              </button>
             </div>
+            {view === "match" ? (
+              <div id="panel-match" role="tabpanel" aria-labelledby="tab-match" className="view-panel">
+                <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
+                <TopicsBoard topics={topics} />
+              </div>
+            ) : (
+              <div id="panel-season" role="tabpanel" aria-labelledby="tab-season" className="view-panel">
+                <SeasonBoard matches={matches} />
+              </div>
+            )}
           </main>
         </div>
 
