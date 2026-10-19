@@ -547,10 +547,34 @@ body::before {
 }
 
 .metric-card__headline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin: 0 0 12px;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.1;
+}
+
+.metric-card__per-game {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.metric-total {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.metric-total__per {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
 }
 
 .share-list {
@@ -1150,14 +1174,16 @@ body::before {
 .stats-panel__rate {
   display: inline-flex;
   align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 6px;
+  row-gap: 2px;
   margin: 0;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted);
-  white-space: nowrap;
 }
 
 .stats-panel__rate strong {
@@ -1167,6 +1193,29 @@ body::before {
   text-transform: none;
   color: var(--text);
   font-variant-numeric: tabular-nums;
+}
+
+.stats-panel__rate strong.stats-panel__accuracy {
+  color: var(--tone-positive);
+}
+
+.stats-panel__per {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
+.stats-panel__dot {
+  color: var(--text-faint);
+}
+
+.stats-panel__pair {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .stats-bar {

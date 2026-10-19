@@ -266,12 +266,25 @@
   color: #297cc1;
 }
 
+.spdf-pressure__figure {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .spdf-pressure__value {
   margin-top: 2px;
   font-size: 34px;
   font-weight: 800;
   line-height: 0.95;
   color: #072334;
+}
+
+.spdf-pressure__per {
+  font-size: 12px;
+  font-weight: 800;
+  color: #6b8192;
+  white-space: nowrap;
 }
 
 .spdf-pressure__caption {
@@ -469,6 +482,35 @@
   border-right: 1px solid #d4dee7;
 }
 
+.spdf-section__kpi--aside {
+  flex-basis: 148px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
+.spdf-section__aside {
+  font-size: 11px;
+  font-weight: 800;
+  color: #6b8192;
+  white-space: nowrap;
+}
+
+.spdf-section__kpi--aside .spdf-section__unit,
+.spdf-section__kpi--aside .spdf-section__detail {
+  flex-basis: 100%;
+}
+
+.spdf-section__detail {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #05712d;
+}
+
 .spdf-section__value {
   font-size: 36px;
   font-weight: 800;
@@ -553,6 +595,10 @@
 
 .spdf-section--summary .spdf-section__kpi {
   flex-basis: 92px;
+}
+
+.spdf-section--summary .spdf-section__kpi--aside {
+  flex-basis: 128px;
 }
 
 .spdf-section--summary .spdf-section__panel {

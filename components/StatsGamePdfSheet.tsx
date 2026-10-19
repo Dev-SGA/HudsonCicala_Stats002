@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
-import { combinePassResults, matchSummary, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { combinePassResults, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -102,6 +102,7 @@ function PdfSection({
   title,
   kpi,
   unit,
+  aside,
   children,
   footer,
   size = "md",
@@ -109,6 +110,7 @@ function PdfSection({
   title: string;
   kpi: number;
   unit: string;
+  aside?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: "md" | "lg";
@@ -120,8 +122,9 @@ function PdfSection({
         <h3 className="spdf-section__title">{title}</h3>
       </div>
       <div className="spdf-section__content">
-        <div className="spdf-section__kpi">
+        <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
           <span className="spdf-section__value">{kpi}</span>
+          {aside ? <span className="spdf-section__aside">{aside}</span> : null}
           <span className="spdf-section__unit">{unit}</span>
         </div>
         <div className="spdf-section__panel">{children}</div>
@@ -183,7 +186,21 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
   );
 }
 
-function SummaryCard({ title, kpi, unit, children }: { title: string; kpi: string; unit: string; children: ReactNode }) {
+function SummaryCard({
+  title,
+  kpi,
+  unit,
+  aside,
+  detail,
+  children,
+}: {
+  title: string;
+  kpi: string;
+  unit: string;
+  aside?: string;
+  detail?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="spdf-section spdf-section--build-up spdf-section--summary">
       <div className="spdf-section__top">
@@ -191,9 +208,11 @@ function SummaryCard({ title, kpi, unit, children }: { title: string; kpi: strin
         <h3 className="spdf-section__title">{title}</h3>
       </div>
       <div className="spdf-section__content">
-        <div className="spdf-section__kpi">
+        <div className={`spdf-section__kpi${aside || detail ? " spdf-section__kpi--aside" : ""}`}>
           <span className="spdf-section__value">{kpi}</span>
+          {aside ? <span className="spdf-section__aside">{aside}</span> : null}
           <span className="spdf-section__unit">{unit}</span>
+          {detail ? <span className="spdf-section__detail">{detail}</span> : null}
         </div>
         <div className="spdf-section__panel">{children}</div>
       </div>
@@ -248,6 +267,7 @@ function SummaryPdfPage({
 }: StatsGamePdfSheetProps) {
   const summary = matchSummary(stats);
   if (!summary) return null;
+  const games = stats.meta.games;
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -261,7 +281,13 @@ function SummaryPdfPage({
       <div className="spdf-main">
         <PdfHeader title="Stats" subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
         <div className="spdf-summary">
-          <SummaryCard title="General passing" kpi={String(summary.totalPasses)} unit="Total passes">
+          <SummaryCard
+            title="General passing"
+            kpi={String(summary.totalPasses)}
+            unit="Total passes"
+            aside={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
+            detail={`${summary.accuracy}% accurate`}
+          >
             <SummaryMeter
               headline={`${summary.accurate} accurate · ${summary.inaccurate} inaccurate`}
               segments={[
@@ -270,7 +296,12 @@ function SummaryPdfPage({
               ]}
             />
           </SummaryCard>
-          <SummaryCard title="Interceptions & recoveries" kpi={String(summary.regains)} unit="Total">
+          <SummaryCard
+            title="Interceptions & recoveries"
+            kpi={String(summary.regains)}
+            unit="Total"
+            aside={games ? `${perGame(summary.regains, games)} per game` : undefined}
+          >
             <SummaryMeter
               headline={`${summary.interceptions} interceptions · ${summary.recoveries} recoveries`}
               segments={[
@@ -313,6 +344,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
   const scope = meta.subtitle === "Season" ? "season" : "match";
+  const games = meta.games;
 
   return (
     <>
@@ -331,7 +363,10 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             <div className="spdf-pressure">
               <div className="spdf-pressure__total">
                 <span className="spdf-pressure__kicker">Total passes</span>
-                <span className="spdf-pressure__value">{passTotal}</span>
+                <span className="spdf-pressure__figure">
+                  <span className="spdf-pressure__value">{passTotal}</span>
+                  {games ? <span className="spdf-pressure__per">{perGame(passTotal, games)} per game</span> : null}
+                </span>
                 <span className="spdf-pressure__caption">Passes tracked in the {scope}</span>
               </div>
               <div className="spdf-pressure__context">
@@ -370,7 +405,13 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             </div>
           </section>
 
-          <PdfSection title="Pass Results" kpi={passTotal} unit="Passes" size="lg">
+          <PdfSection
+            title="Pass Results"
+            kpi={passTotal}
+            unit="Passes"
+            size="lg"
+            aside={games ? `${perGame(passTotal, games)} per game` : undefined}
+          >
             <div className="spdf-pass-stack">
               <PassResultPanel
                 title="Total passes"
@@ -384,7 +425,12 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             </div>
           </PdfSection>
 
-          <PdfSection title="Possessions" kpi={possessions.total} unit="Total possessions">
+          <PdfSection
+            title="Possessions"
+            kpi={possessions.total}
+            unit="Total possessions"
+            aside={games ? `${perGame(possessions.total, games)} per game` : undefined}
+          >
             <StatTiles
               items={[
                 {

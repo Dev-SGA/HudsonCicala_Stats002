@@ -50,6 +50,7 @@ export type MatchStats = {
     videoLink: string;
   };
   duels: DuelBlock | null;
+  games?: number;
 };
 
 export type StatsReport = {
@@ -69,7 +70,7 @@ export type StatsReport = {
 
 /** Shape consumed by the PDF export of a single match. */
 export type GameStats = {
-  meta: StatsReport["meta"] & { fileSlug: string };
+  meta: StatsReport["meta"] & { fileSlug: string; games?: number };
   player: StatsReport["player"];
   opponentLogo: string;
   passesUnderPressure: MatchStats["passesUnderPressure"];
@@ -117,6 +118,13 @@ export function combinePassResults(...parts: PassResultBreakdown[]): PassResultB
 
 function rate(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+/** Average per recorded game, with one decimal when it is not a whole number. */
+export function perGame(total: number, games: number): string {
+  const value = games > 0 ? total / games : 0;
+  const rounded = Math.round(value * 10) / 10;
+  return rounded.toFixed(1).replace(/\.0$/, "");
 }
 
 export type PassTotals = PassResultBreakdown & {
@@ -210,6 +218,7 @@ export function seasonMatch(matches: MatchStats[]): MatchStats {
       videoLink: "",
     },
     duels: duels.length > 0 ? duels.reduce(addDuels) : null,
+    games: matches.length,
   };
 }
 
@@ -220,6 +229,7 @@ export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
       subtitle: match.label,
       session: match.kind === "baseline" ? "001" : report.meta.session,
       fileSlug: `${report.meta.session}-${match.id}`,
+      games: match.games,
     },
     player: report.player,
     opponentLogo: match.logo,

@@ -12,6 +12,7 @@ import { BRAND } from "@/lib/brand";
 import {
   combinePassResults,
   matchSummary,
+  perGame,
   seasonMatch,
   toGameStats,
   type GameStats,
@@ -99,7 +100,15 @@ function SplitMeter({
   );
 }
 
-function PassResultsMeter({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
+function PassResultsMeter({
+  title,
+  breakdown,
+  games,
+}: {
+  title: string;
+  breakdown: PassResultBreakdown;
+  games?: number;
+}) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
@@ -108,7 +117,10 @@ function PassResultsMeter({ title, breakdown }: { title: string; breakdown: Pass
   return (
     <div className="metric-card">
       <h3 className="metric-card__title">{title}</h3>
-      <p className="metric-card__headline">{total} passes</p>
+      <p className="metric-card__headline">
+        <span>{total} passes</span>
+        {games ? <span className="metric-card__per-game">{perGame(total, games)} per game</span> : null}
+      </p>
       <div
         className="meter"
         role="img"
@@ -214,10 +226,20 @@ function BalanceBar({
   );
 }
 
+function TotalFigure({ value, games }: { value: number; games?: number }) {
+  return (
+    <span className="metric-total">
+      <span className="metric-card__value">{value}</span>
+      {games ? <span className="metric-total__per">{perGame(value, games)} per game</span> : null}
+    </span>
+  );
+}
+
 function StatsPanel({
   title,
   rate,
   rateLabel,
+  extra,
   bar,
   figures,
   single,
@@ -225,6 +247,7 @@ function StatsPanel({
   title: string;
   rate?: string;
   rateLabel?: string;
+  extra?: ReactNode;
   bar: ReactNode;
   figures: ReactNode;
   single?: boolean;
@@ -237,6 +260,7 @@ function StatsPanel({
           <p className="stats-panel__rate">
             <strong>{rate}</strong>
             {rateLabel}
+            {extra}
           </p>
         ) : null}
         </header>
@@ -246,13 +270,25 @@ function StatsPanel({
   );
 }
 
-function StatsBoard({ summary }: { summary: MatchSummary }) {
+function StatsBoard({ summary, games }: { summary: MatchSummary; games?: number }) {
   return (
     <div className="stats-board">
       <StatsPanel
         title="General passing"
         rate={String(summary.totalPasses)}
         rateLabel="passes"
+        extra={
+          <>
+            {games ? <span className="stats-panel__per">{perGame(summary.totalPasses, games)} per game</span> : null}
+            <span className="stats-panel__pair">
+              <span className="stats-panel__dot" aria-hidden="true">
+                ·
+              </span>
+              <strong className="stats-panel__accuracy">{summary.accuracy}%</strong>
+              accurate
+            </span>
+          </>
+        }
         bar={
           <BalanceBar
             primary={summary.accurate}
@@ -273,6 +309,7 @@ function StatsBoard({ summary }: { summary: MatchSummary }) {
         title="Interceptions & recoveries"
         rate={String(summary.regains)}
         rateLabel="total"
+        extra={games ? <span className="stats-panel__per">{perGame(summary.regains, games)} per game</span> : null}
         bar={
           <BalanceBar
             primary={summary.interceptions}
@@ -388,7 +425,7 @@ function MatchSwitcher({
 }
 
 function buildTopics(match: MatchStats): Topic[] {
-  const { passesUnderPressure, passResults, possessions, duels } = match;
+  const { passesUnderPressure, passResults, possessions, duels, games } = match;
   const scope = match.id === "season" ? "season" : "match";
   const topics: Topic[] = [
     {
@@ -401,7 +438,7 @@ function buildTopics(match: MatchStats): Topic[] {
           items={[
             <div key="total" className="metric-card metric-card--hero metric-card--compact">
               <h3 className="metric-card__title">Total passes</h3>
-              <span className="metric-card__value">{passesUnderPressure.total}</span>
+              <TotalFigure value={passesUnderPressure.total} games={games} />
               <p className="metric-card__caption">Passes tracked in the {scope}</p>
             </div>,
             <SplitMeter
@@ -429,6 +466,7 @@ function buildTopics(match: MatchStats): Topic[] {
           <PassResultsMeter
             title="Total passes"
             breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+            games={games}
           />
           <MetricFlow
             items={[
@@ -447,7 +485,7 @@ function buildTopics(match: MatchStats): Topic[] {
         <>
           <div className="metric-card metric-card--hero">
             <h3 className="metric-card__title">Total possessions</h3>
-            <span className="metric-card__value">{possessions.total}</span>
+            <TotalFigure value={possessions.total} games={games} />
             <p className="metric-card__caption">Ball possessions in the {scope}</p>
           </div>
           {duels ? (
@@ -479,7 +517,7 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: <StatsBoard summary={summary} />,
+      content: <StatsBoard summary={summary} games={games} />,
     });
   }
 
