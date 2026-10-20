@@ -105,6 +105,41 @@ function PassResultPanel({
   );
 }
 
+/** Total passes: one horizontal bar per category (Progressive, Neutral, Lost). */
+function PassResultRowBars({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
+  const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
+  const rows = [
+    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
+    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
+    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
+  ];
+
+  return (
+    <div className="spdf-pass-panel spdf-pass-panel--rows">
+      <div className="spdf-pass-panel__head">
+        <p className="spdf-pass-panel__title">{title}</p>
+        <span className="spdf-pass-panel__total">{total} passes</span>
+      </div>
+      <ul className="spdf-pass-rows">
+        {rows.map((row) => (
+          <li key={row.label} className="spdf-pass-row-bar">
+            <span className="spdf-pass-row-bar__label">{row.label}</span>
+            <span className="spdf-pass-row-bar__track">
+              <span
+                className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
+                style={{ width: `${pct(row.value, total)}%` }}
+              />
+            </span>
+            <strong className="spdf-pass-row-bar__value">
+              {row.value} · {pct(row.value, total)}%
+            </strong>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function PdfSection({
   title,
   kpi,
@@ -438,7 +473,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             aside={games ? `${perGame(passTotal, games)} per game` : undefined}
           >
             <div className="spdf-pass-layout">
-              <PassResultPanel
+              <PassResultRowBars
                 title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
               />
