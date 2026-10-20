@@ -19,19 +19,19 @@
       "logo": "/clubs/chicago-fire.png",
       "passesUnderPressure": {
         "total": 53,
-        "underPressure": 24,
-        "notUnderPressure": 29,
+        "underPressure": 33,
+        "notUnderPressure": 20,
         "videoLink": ""
       },
       "passResults": {
         "underPressure": {
-          "progressive": 4,
-          "neutral": 13,
+          "progressive": 8,
+          "neutral": 18,
           "lost": 7
         },
         "notUnderPressure": {
-          "progressive": 11,
-          "neutral": 15,
+          "progressive": 7,
+          "neutral": 10,
           "lost": 3
         },
         "videoLink": ""
@@ -44,7 +44,7 @@
         "videoLink": ""
       },
       "duels": {
-        "offensiveWon": { "actions": 4, "good": 0, "bad": 0 },
+        "offensiveWon": { "actions": 5, "good": 0, "bad": 0 },
         "offensiveLost": { "actions": 2, "good": 0, "bad": 0 },
         "fouled": { "actions": 3, "good": 0, "bad": 0 },
         "defensiveWon": { "actions": 9, "good": 0, "bad": 0 },
@@ -62,20 +62,20 @@
       "logo": "/clubs/columbus-crew.png",
       "passesUnderPressure": {
         "total": 69,
-        "underPressure": 48,
-        "notUnderPressure": 21,
+        "underPressure": 56,
+        "notUnderPressure": 13,
         "videoLink": ""
       },
       "passResults": {
         "underPressure": {
-          "progressive": 8,
-          "neutral": 36,
-          "lost": 4
+          "progressive": 10,
+          "neutral": 41,
+          "lost": 5
         },
         "notUnderPressure": {
-          "progressive": 6,
-          "neutral": 13,
-          "lost": 2
+          "progressive": 5,
+          "neutral": 7,
+          "lost": 1
         },
         "videoLink": ""
       },
