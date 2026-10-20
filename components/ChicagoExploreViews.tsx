@@ -167,7 +167,7 @@ function StatsSplit({
   const total = primary + secondary;
 
   return (
-    <div className="stats-split">
+    <div className="stats-viz">
       <ExploreBar
         primary={primary}
         secondary={secondary}
@@ -175,7 +175,7 @@ function StatsSplit({
         secondaryTone={secondaryTone}
         label={`${primaryLabel} ${primary}. ${secondaryLabel} ${secondary}.`}
       />
-      <ul className="stats-split__legend">
+      <ul className="stats-viz__legend">
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span>{primaryLabel}</span>
