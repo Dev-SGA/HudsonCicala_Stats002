@@ -140,6 +140,61 @@ function PassResultRowBars({ title, breakdown }: { title: string; breakdown: Pas
   );
 }
 
+type PdfPossessionSegTone = "retained" | "lost-plays" | "dispossessed" | "wrong-pass";
+
+function PdfPossessionSplit({
+  title,
+  headline,
+  primary,
+  secondary,
+  primaryLabel,
+  secondaryLabel,
+  primaryTone,
+  secondaryTone,
+}: {
+  title: string;
+  headline: string;
+  primary: number;
+  secondary: number;
+  primaryLabel: string;
+  secondaryLabel: string;
+  primaryTone: PdfPossessionSegTone;
+  secondaryTone: PdfPossessionSegTone;
+}) {
+  const total = primary + secondary;
+  const primaryPct = pct(primary, total);
+
+  return (
+    <div className="spdf-pass-panel spdf-possession-split">
+      <p className="spdf-pass-panel__title">{title}</p>
+      <p className="spdf-possession-split__headline">{headline}</p>
+      <div className="spdf-pass-panel__track">
+        <span className={`spdf-pass-panel__seg spdf-pass-panel__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
+        <span
+          className={`spdf-pass-panel__seg spdf-pass-panel__seg--${secondaryTone}`}
+          style={{ width: `${100 - primaryPct}%` }}
+        />
+      </div>
+      <ul className="spdf-pass-panel__legend">
+        <li>
+          <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${primaryTone}`} />
+          <span className="spdf-pass-panel__legend-label">{primaryLabel}</span>
+          <strong>
+            {primary} · {pct(primary, total)}%
+          </strong>
+        </li>
+        <li>
+          <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${secondaryTone}`} />
+          <span className="spdf-pass-panel__legend-label">{secondaryLabel}</span>
+          <strong>
+            {secondary} · {pct(secondary, total)}%
+          </strong>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
 function PdfSection({
   title,
   kpi,
@@ -473,10 +528,16 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             aside={games ? `${perGame(passTotal, games)} per game` : undefined}
           >
             <div className="spdf-pass-layout">
-              <PassResultRowBars
-                title="Total Passes"
-                breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
-              />
+              <div className="spdf-pass-layout__center">
+                <PassResultRowBars
+                  title="Total Passes"
+                  breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+                />
+              </div>
+              <div className="spdf-pass-layout__arrows" aria-hidden="true">
+                <span className="spdf-pass-arrow" />
+                <span className="spdf-pass-arrow" />
+              </div>
               <div className="spdf-pass-split-stack">
                 <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
                 <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
@@ -490,29 +551,28 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             unit="Total possessions"
             aside={games ? `${perGame(possessions.total, games)} per game` : undefined}
           >
-            <StatTiles
-              items={[
-                {
-                  label: "Dispossessed",
-                  value: possessions.lostBalls,
-                  tone: "burnt",
-                  detail: `${pct(possessions.lostBalls, possessions.total)}%`,
-                },
-                {
-                  label: "Wrong passes",
-                  value: possessions.wrongPasses,
-                  tone: "warn",
-                  detail: `${pct(possessions.wrongPasses, possessions.total)}%`,
-                },
-                {
-                  label: "Lost plays",
-                  value: possessions.lostPlays,
-                  tone: "burnt",
-                  detail: `${pct(possessions.lostPlays, possessions.total)}%`,
-                  emphasizeDetail: true,
-                },
-              ]}
-            />
+            <div className="spdf-possession-pair">
+              <PdfPossessionSplit
+                title="Possession outcomes"
+                headline={`${Math.max(possessions.total - possessions.lostPlays, 0)} retained · ${possessions.lostPlays} lost plays`}
+                primary={Math.max(possessions.total - possessions.lostPlays, 0)}
+                secondary={possessions.lostPlays}
+                primaryLabel="Retained"
+                secondaryLabel="Lost plays"
+                primaryTone="retained"
+                secondaryTone="lost-plays"
+              />
+              <PdfPossessionSplit
+                title="Lost play breakdown"
+                headline={`${possessions.lostBalls} dispossessed · ${possessions.wrongPasses} wrong passes`}
+                primary={possessions.lostBalls}
+                secondary={possessions.wrongPasses}
+                primaryLabel="Dispossessed"
+                secondaryLabel="Wrong passes"
+                primaryTone="dispossessed"
+                secondaryTone="wrong-pass"
+              />
+            </div>
           </PdfSection>
 
         </div>

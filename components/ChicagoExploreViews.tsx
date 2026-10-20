@@ -118,38 +118,33 @@ export function PossessionBoard({
   const parts = possessionParts(possessions);
 
   return (
-    <>
-      <div className="possessions-board">
-        <div className="metric-card metric-card--hero metric-card--compact">
-          <h3 className="metric-card__title">Total possessions</h3>
-          {totalFigure}
-          <p className="metric-card__caption">Ball possessions in the {scopeLabel}</p>
-        </div>
-        <ExploreSplit
-          title="Possession outcomes"
-          headline={`${parts.retained} retained · ${parts.lostPlays} lost plays`}
-          primary={parts.retained}
-          secondary={parts.lostPlays}
-          primaryLabel="Retained"
-          secondaryLabel="Lost plays"
-          primaryTone="positive"
-          secondaryTone="negative"
-        />
-        <ExploreSplit
-          title="Lost play breakdown"
-          headline={`${parts.dispossessed} dispossessed · ${parts.wrongPasses} wrong passes`}
-          primary={parts.dispossessed}
-          secondary={parts.wrongPasses}
-          primaryLabel="Dispossessed"
-          secondaryLabel="Wrong passes"
-          primaryTone="negative"
-          secondaryTone="warn"
-        />
+    <div className="possessions-board">
+      <div className="metric-card metric-card--hero metric-card--compact">
+        <h3 className="metric-card__title">Total possessions</h3>
+        {totalFigure}
+        <p className="metric-card__caption">Ball possessions in the {scopeLabel}</p>
       </div>
-      <p className="metric-note metric-note--compact">
-        Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
-      </p>
-    </>
+      <ExploreSplit
+        title="Possession outcomes"
+        headline={`${parts.retained} retained · ${parts.lostPlays} lost plays`}
+        primary={parts.retained}
+        secondary={parts.lostPlays}
+        primaryLabel="Retained"
+        secondaryLabel="Lost plays"
+        primaryTone="positive"
+        secondaryTone="negative"
+      />
+      <ExploreSplit
+        title="Lost play breakdown"
+        headline={`${parts.dispossessed} dispossessed · ${parts.wrongPasses} wrong passes`}
+        primary={parts.dispossessed}
+        secondary={parts.wrongPasses}
+        primaryLabel="Dispossessed"
+        secondaryLabel="Wrong passes"
+        primaryTone="negative"
+        secondaryTone="warn"
+      />
+    </div>
   );
 }
 
