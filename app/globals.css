@@ -823,6 +823,125 @@ body::before {
   background: var(--surface-sunken);
 }
 
+.possession-chart-stack {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.possession-chart-stack .possession-chart {
+  grid-column: auto;
+}
+
+.possession-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.possession-row {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.possession-row__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.possession-row__track {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sga-white) 8%, transparent);
+  overflow: hidden;
+}
+
+.possession-row__fill {
+  position: relative;
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.possession-row__fill--yellow-deep {
+  background: #c4960c;
+}
+
+.possession-row__fill--yellow-mid {
+  background: #f0c48a;
+}
+
+.possession-row__inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.possession-row__inner--pass-turnover {
+  background: #e07a2f;
+}
+
+.possession-row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.possession-turnover {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, #e07a2f 35%, var(--line));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #e07a2f 10%, var(--surface-sunken));
+}
+
+.possession-turnover__label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e7c3a2;
+}
+
+.possession-turnover__track {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sga-white) 8%, transparent);
+  overflow: hidden;
+}
+
+.possession-turnover__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #e07a2f;
+}
+
+.possession-turnover__note {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.possession-turnover strong {
+  font-variant-numeric: tabular-nums;
+  color: #f0d2b8;
+}
+
 .possession-chart__title {
   margin: 0 0 12px;
   font-size: 15px;
@@ -1296,6 +1415,18 @@ body::before {
   display: block;
   height: 100%;
   border-radius: 999px;
+}
+
+.meter__seg--host {
+  position: relative;
+  overflow: hidden;
+}
+
+.meter__seg-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
 }
 
 .meter__seg--accent,

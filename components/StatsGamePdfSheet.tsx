@@ -48,12 +48,10 @@ function PassResultPanel({
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
-  const inaccurateOnly = breakdown.lost - turnovers;
   const bar = [
-    { key: "progressive", value: breakdown.progressive, tone: "pass-progressive" },
-    { key: "other", value: breakdown.neutral, tone: "pass-neutral" },
-    { key: "inaccurate", value: inaccurateOnly, tone: "pass-inaccurate" },
-    { key: "turnover", value: turnovers, tone: "pass-turnover" },
+    { key: "progressive", value: breakdown.progressive, tone: "pass-progressive", host: false },
+    { key: "other", value: breakdown.neutral, tone: "pass-neutral", host: false },
+    { key: "inaccurate", value: breakdown.lost, tone: "pass-inaccurate", host: true },
   ].filter((segment) => segment.value > 0);
   const legend = [
     { key: "progressive", label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive", nested: false },
@@ -91,9 +89,13 @@ function PassResultPanel({
             {bar.map((segment) => (
               <span
                 key={segment.key}
-                className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
+                className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}${segment.host ? " spdf-pass-panel__seg--host" : ""}`}
                 style={{ width: `${pct(segment.value, total)}%` }}
-              />
+              >
+                {segment.host && turnovers > 0 ? (
+                  <span className="spdf-pass-panel__seg-inner spdf-pass-panel__seg--pass-turnover" style={{ width: `${pct(turnovers, segment.value)}%` }} />
+                ) : null}
+              </span>
             ))}
           </div>
           <ul className="spdf-pass-panel__legend">
@@ -197,37 +199,47 @@ function PdfPossessionStatCard({
 
 function PdfPossessionSplit({
   title,
-  segments,
+  rows,
+  turnover,
+  turnoverScale,
 }: {
   title: string;
-  segments: { label: string; note?: string; value: number; tone: PdfPossessionSegTone }[];
+  rows: { label: string; value: number; inner: number; tone: "lost-yellow-deep" | "lost-yellow-mid" }[];
+  turnover: number;
+  turnoverScale: number;
 }) {
-  const total = segments.reduce((sum, segment) => sum + segment.value, 0);
+  const scale = Math.max(
+    rows.reduce((sum, row) => sum + row.value, 0),
+    1,
+  );
 
   return (
-    <div className="spdf-pass-panel spdf-possession-split">
-      <p className="spdf-pass-panel__title">{title}</p>
-      <div className="spdf-pass-panel__track">
-        {segments.map((segment) => (
-          <span
-            key={segment.label}
-            className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
-            style={{ width: `${pct(segment.value, total)}%` }}
-          />
-        ))}
+    <div className="spdf-possession-breakdown">
+      <div className="spdf-pass-panel spdf-possession-split">
+        <p className="spdf-pass-panel__title">{title}</p>
+        <ul className="spdf-possession-rows">
+          {rows.map((row) => (
+            <li key={row.label} className="spdf-possession-row">
+              <span className="spdf-possession-row__label">{row.label}</span>
+              <span className="spdf-possession-row__track">
+                <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }}>
+                  {row.inner > 0 ? (
+                    <span className="spdf-possession-row__inner spdf-pass-panel__seg--pass-turnover" style={{ width: `${pct(row.inner, row.value)}%` }} />
+                  ) : null}
+                </span>
+              </span>
+              <strong>{row.value}</strong>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="spdf-pass-panel__legend">
-        {segments.map((segment) => (
-          <li key={segment.label}>
-            <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
-            <span className="spdf-pass-panel__legend-label">
-              {segment.label}
-              {segment.note ? <span className="spdf-pass-panel__legend-note">{segment.note}</span> : null}
-            </span>
-            <strong>{segment.value}</strong>
-          </li>
-        ))}
-      </ul>
+      <div className="spdf-turnover-bar">
+        <span className="spdf-turnover-bar__label">Turnover</span>
+        <span className="spdf-turnover-bar__track">
+          <span className="spdf-turnover-bar__fill" style={{ width: `${pct(turnover, Math.max(turnoverScale, turnover, 1))}%` }} />
+        </span>
+        <strong>{turnover}</strong>
+      </div>
     </div>
   );
 }
@@ -580,14 +592,20 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
               </div>
               <PdfPossessionSplit
                 title="Lost play breakdown"
-                segments={[
-                  { label: "Lost Duels", value: possessions.lostBalls, tone: "lost-yellow-deep" },
-                  { label: "Inaccurate Pass", value: possessions.wrongPasses, tone: "lost-yellow-mid" },
+                turnover={(possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0)}
+                turnoverScale={possessions.lostPlays}
+                rows={[
                   {
-                    label: "Turnover",
-                    note: "Pass Turnover + Duel Turnover",
-                    value: (possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0),
-                    tone: "lost-yellow-light",
+                    label: "Lost Duels",
+                    value: possessions.lostBalls,
+                    inner: Math.min(possessions.duelTurnover ?? 0, possessions.lostBalls),
+                    tone: "lost-yellow-deep",
+                  },
+                  {
+                    label: "Inaccurate Pass",
+                    value: possessions.wrongPasses,
+                    inner: Math.min(possessions.passTurnover ?? 0, possessions.wrongPasses),
+                    tone: "lost-yellow-mid",
                   },
                 ]}
               />

@@ -68,10 +68,8 @@ function PassResultsMeter({
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
-  const inaccurateOnly = breakdown.lost - turnovers;
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
-  const inaccuratePct = percent(inaccurateOnly, total);
   const turnoverPct = percent(turnovers, total);
 
   return (
@@ -91,8 +89,11 @@ function PassResultsMeter({
       >
         <span className="meter__seg meter__seg--pass-progressive" style={{ width: `${progressivePct}%` }} />
         <span className="meter__seg meter__seg--pass-neutral" style={{ width: `${neutralPct}%` }} />
-        <span className="meter__seg meter__seg--pass-inaccurate" style={{ width: `${inaccuratePct}%` }} />
-        <span className="meter__seg meter__seg--pass-turnover" style={{ width: `${turnoverPct}%` }} />
+        <span className="meter__seg meter__seg--pass-inaccurate meter__seg--host" style={{ width: `${percent(breakdown.lost, total)}%` }}>
+          {turnovers > 0 ? (
+            <span className="meter__seg-inner meter__seg--pass-turnover" style={{ width: `${percent(turnovers, breakdown.lost)}%` }} />
+          ) : null}
+        </span>
       </div>
       <ul className="legend">
         <li>
