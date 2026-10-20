@@ -841,16 +841,23 @@
 
 .spdf-possession-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.35fr);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 8px;
   width: 100%;
   align-items: stretch;
 }
 
 .spdf-possession-stat-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.spdf-possession-breakdowns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
 .spdf-possession-stat {
@@ -866,13 +873,6 @@
   text-align: center;
 }
 
-.spdf-possession-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
 .spdf-possession-rows {
   display: flex;
   flex-direction: column;
@@ -884,7 +884,7 @@
 
 .spdf-possession-row {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) auto;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
 }
@@ -906,65 +906,15 @@
 }
 
 .spdf-possession-row__fill {
-  position: relative;
   display: block;
   height: 100%;
-  min-width: 2px;
   border-radius: 999px;
-  overflow: hidden;
-}
-
-.spdf-possession-row__inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
 }
 
 .spdf-possession-row strong {
   font-size: 11px;
   font-weight: 800;
   color: #072334;
-}
-
-.spdf-turnover-bar {
-  display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: center;
-  padding: 6px 10px;
-  border: 1px solid #f0c48a;
-  border-radius: 6px;
-  background: #fff8f1;
-}
-
-.spdf-turnover-bar__label {
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #a85a16;
-}
-
-.spdf-turnover-bar__track {
-  display: block;
-  height: 7px;
-  border-radius: 999px;
-  background: #f3e6d4;
-  overflow: hidden;
-}
-
-.spdf-turnover-bar__fill {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: #e07a2f;
-}
-
-.spdf-turnover-bar strong {
-  font-size: 11px;
-  font-weight: 800;
-  color: #a85a16;
 }
 
 .spdf-possession-stat__label {
@@ -989,6 +939,16 @@
 
 .spdf-possession-stat--lost-plays .spdf-possession-stat__value {
   color: #a97412;
+}
+
+.spdf-possession-stat--turnovers {
+  border-color: #e7b48a;
+  background: #fff6ee;
+}
+
+.spdf-possession-stat--turnovers .spdf-possession-stat__label,
+.spdf-possession-stat--turnovers .spdf-possession-stat__value {
+  color: #c45c12;
 }
 
 .spdf-possession-stat__pct {

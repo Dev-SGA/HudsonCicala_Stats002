@@ -35,7 +35,7 @@ function PossessionStat({
   label: string;
   value: number;
   detail?: string;
-  tone?: "retained" | "lost";
+  tone?: "retained" | "lost" | "turnover";
   games?: number;
   unit?: string;
 }) {
@@ -94,26 +94,25 @@ export function PossessionBoard({
   videos?: MatchStats["videos"];
 }) {
   const parts = possessionParts(possessions);
-  const scale = Math.max(parts.dispossessed + parts.inaccuratePasses, 1);
-  const duelInside = Math.min(parts.duelTurnover, parts.dispossessed);
-  const passInside = Math.min(parts.passTurnover, parts.inaccuratePasses);
-  const rows = [
+  const lostScale = Math.max(parts.dispossessed + parts.inaccuratePasses, 1);
+  const turnoverScale = Math.max(parts.duelTurnover + parts.passTurnover, 1);
+  const lostRows = [
     {
       label: "Lost Duels",
       value: parts.dispossessed,
       tone: "yellow-deep",
-      inner: duelInside,
-      innerTone: "pass-turnover",
       href: clipUrl(videos, "Off. Duels Lost", "Off Duels Lost"),
     },
     {
       label: "Inaccurate Pass",
       value: parts.inaccuratePasses,
       tone: "yellow-mid",
-      inner: passInside,
-      innerTone: "pass-turnover",
       href: clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass"),
     },
+  ];
+  const turnoverRows = [
+    { label: "Turnover Duel", value: parts.duelTurnover, tone: "yellow-deep" },
+    { label: "Turnover Pass", value: parts.passTurnover, tone: "yellow-mid" },
   ];
 
   return (
@@ -136,42 +135,45 @@ export function PossessionBoard({
         detail={`${percent(parts.lostPlays, parts.total)}% of possessions`}
         tone="lost"
       />
-      <div className="possession-chart-stack">
-        <div className="possession-chart">
-          <h3 className="possession-chart__title">Lost play breakdown</h3>
-          <ul className="possession-rows">
-            {rows.map((row) => (
-              <li key={row.label} className="possession-row">
-                <span className="possession-row__label">
-                  <ClipLabel label={row.label} href={row.href} />
-                </span>
-                <span className="possession-row__track">
-                  <span className={`possession-row__fill possession-row__fill--${row.tone}`} style={{ width: `${percent(row.value, scale)}%` }}>
-                    {row.inner > 0 ? (
-                      <span
-                        className={`possession-row__inner possession-row__inner--${row.innerTone}`}
-                        style={{ width: `${percent(row.inner, row.value)}%` }}
-                      />
-                    ) : null}
-                  </span>
-                </span>
-                <strong>{row.value}</strong>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="possession-turnover">
-          <span className="possession-turnover__label">Turnover</span>
-          <span className="possession-turnover__track">
-            <span
-              className="possession-turnover__fill"
-              style={{ width: `${percent(parts.turnover, Math.max(parts.lostPlays, parts.turnover, 1))}%` }}
-            />
-          </span>
-          <strong>{parts.turnover}</strong>
-          <span className="possession-turnover__note">Pass Turnover + Duel Turnover</span>
-        </div>
+      <PossessionStat
+        label="Turnovers"
+        value={parts.turnover}
+        detail={`${percent(parts.turnover, parts.total)}% of possessions`}
+        tone="turnover"
+      />
+      <div className="possession-charts">
+        <PossessionBreakdown title="Lost play breakdown" rows={lostRows} scale={lostScale} />
+        <PossessionBreakdown title="Turnover breakdown" rows={turnoverRows} scale={turnoverScale} />
       </div>
+    </div>
+  );
+}
+
+function PossessionBreakdown({
+  title,
+  rows,
+  scale,
+}: {
+  title: string;
+  rows: { label: string; value: number; tone: string; href?: string }[];
+  scale: number;
+}) {
+  return (
+    <div className="possession-chart">
+      <h3 className="possession-chart__title">{title}</h3>
+      <ul className="possession-rows">
+        {rows.map((row) => (
+          <li key={row.label} className="possession-row">
+            <span className="possession-row__label">
+              <ClipLabel label={row.label} href={row.href} />
+            </span>
+            <span className="possession-row__track">
+              <span className={`possession-row__fill possession-row__fill--${row.tone}`} style={{ width: `${percent(row.value, scale)}%` }} />
+            </span>
+            <strong>{row.value}</strong>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

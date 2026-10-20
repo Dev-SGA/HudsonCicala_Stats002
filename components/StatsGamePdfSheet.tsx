@@ -50,14 +50,14 @@ function PassResultPanel({
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
   const bar = [
     { key: "progressive", value: breakdown.progressive, tone: "pass-progressive", host: false },
-    { key: "other", value: breakdown.neutral, tone: "pass-neutral", host: false },
     { key: "inaccurate", value: breakdown.lost, tone: "pass-inaccurate", host: true },
+    { key: "other", value: breakdown.neutral, tone: "pass-neutral", host: false },
   ].filter((segment) => segment.value > 0);
   const legend = [
     { key: "progressive", label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive", nested: false },
-    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false },
     { key: "inaccurate", label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate", nested: false },
-    { key: "turnover", label: "Pass Turnovers", value: turnovers, tone: "pass-turnover", nested: true },
+    { key: "turnover", label: "Turnover Pass", value: turnovers, tone: "pass-turnover", nested: true },
+    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false },
   ].filter((segment) => segment.value > 0);
 
   return (
@@ -71,8 +71,10 @@ function PassResultPanel({
           {bar.map((segment) => (
             <span key={segment.key} className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`} />
           ))}
-          {legend.map((segment) => (
-            <div key={`${segment.key}-caption`} className={`spdf-pass-panel__cap${segment.nested ? " is-nested" : ""}`}>
+          {legend
+            .filter((segment) => !segment.nested)
+            .map((segment) => (
+            <div key={`${segment.key}-caption`} className="spdf-pass-panel__cap">
               <span className="spdf-pass-panel__cap-label">
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
                 {segment.label}
@@ -115,15 +117,15 @@ function PassResultPanel({
   );
 }
 
-/** Total passes: one horizontal bar per category (Progressive Pass, Other, Inaccurate Pass). */
+/** Total passes: Progressive Pass, Inaccurate Pass with Turnover Pass inside, then Other. */
 function PassResultRowBars({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
   const rows = [
     { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const, nested: false },
-    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const, nested: false },
     { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate" as const, nested: false, turnovers },
-    { label: "Pass Turnovers", value: turnovers, tone: "pass-turnover" as const, nested: true },
+    { label: "Turnover Pass", value: turnovers, tone: "pass-turnover" as const, nested: true },
+    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const, nested: false },
   ];
 
   return (
@@ -186,7 +188,7 @@ function PdfPossessionStatCard({
   label: string;
   value: number;
   share: number;
-  tone: "retained" | "lost-plays";
+  tone: "retained" | "lost-plays" | "turnovers";
 }) {
   return (
     <div className={`spdf-possession-stat spdf-possession-stat--${tone}`}>
@@ -200,13 +202,9 @@ function PdfPossessionStatCard({
 function PdfPossessionSplit({
   title,
   rows,
-  turnover,
-  turnoverScale,
 }: {
   title: string;
-  rows: { label: string; value: number; inner: number; tone: "lost-yellow-deep" | "lost-yellow-mid" }[];
-  turnover: number;
-  turnoverScale: number;
+  rows: { label: string; value: number; tone: "lost-yellow-deep" | "lost-yellow-mid" }[];
 }) {
   const scale = Math.max(
     rows.reduce((sum, row) => sum + row.value, 0),
@@ -214,32 +212,19 @@ function PdfPossessionSplit({
   );
 
   return (
-    <div className="spdf-possession-breakdown">
-      <div className="spdf-pass-panel spdf-possession-split">
-        <p className="spdf-pass-panel__title">{title}</p>
-        <ul className="spdf-possession-rows">
-          {rows.map((row) => (
-            <li key={row.label} className="spdf-possession-row">
-              <span className="spdf-possession-row__label">{row.label}</span>
-              <span className="spdf-possession-row__track">
-                <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }}>
-                  {row.inner > 0 ? (
-                    <span className="spdf-possession-row__inner spdf-pass-panel__seg--pass-turnover" style={{ width: `${pct(row.inner, row.value)}%` }} />
-                  ) : null}
-                </span>
-              </span>
-              <strong>{row.value}</strong>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="spdf-turnover-bar">
-        <span className="spdf-turnover-bar__label">Turnover</span>
-        <span className="spdf-turnover-bar__track">
-          <span className="spdf-turnover-bar__fill" style={{ width: `${pct(turnover, Math.max(turnoverScale, turnover, 1))}%` }} />
-        </span>
-        <strong>{turnover}</strong>
-      </div>
+    <div className="spdf-pass-panel spdf-possession-split">
+      <p className="spdf-pass-panel__title">{title}</p>
+      <ul className="spdf-possession-rows">
+        {rows.map((row) => (
+          <li key={row.label} className="spdf-possession-row">
+            <span className="spdf-possession-row__label">{row.label}</span>
+            <span className="spdf-possession-row__track">
+              <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }} />
+            </span>
+            <strong>{row.value}</strong>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -589,26 +574,29 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                   share={pct(possessions.lostPlays, possessions.total)}
                   tone="lost-plays"
                 />
+                <PdfPossessionStatCard
+                  label="Turnovers"
+                  value={(possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0)}
+                  share={pct((possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0), possessions.total)}
+                  tone="turnovers"
+                />
               </div>
-              <PdfPossessionSplit
-                title="Lost play breakdown"
-                turnover={(possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0)}
-                turnoverScale={possessions.lostPlays}
-                rows={[
-                  {
-                    label: "Lost Duels",
-                    value: possessions.lostBalls,
-                    inner: Math.min(possessions.duelTurnover ?? 0, possessions.lostBalls),
-                    tone: "lost-yellow-deep",
-                  },
-                  {
-                    label: "Inaccurate Pass",
-                    value: possessions.wrongPasses,
-                    inner: Math.min(possessions.passTurnover ?? 0, possessions.wrongPasses),
-                    tone: "lost-yellow-mid",
-                  },
-                ]}
-              />
+              <div className="spdf-possession-breakdowns">
+                <PdfPossessionSplit
+                  title="Lost play breakdown"
+                  rows={[
+                    { label: "Lost Duels", value: possessions.lostBalls, tone: "lost-yellow-deep" },
+                    { label: "Inaccurate Pass", value: possessions.wrongPasses, tone: "lost-yellow-mid" },
+                  ]}
+                />
+                <PdfPossessionSplit
+                  title="Turnover breakdown"
+                  rows={[
+                    { label: "Turnover Duel", value: possessions.duelTurnover ?? 0, tone: "lost-yellow-deep" },
+                    { label: "Turnover Pass", value: possessions.passTurnover ?? 0, tone: "lost-yellow-mid" },
+                  ]}
+                />
+              </div>
             </div>
           </PdfSection>
         </div>

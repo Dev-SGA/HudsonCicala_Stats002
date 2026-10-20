@@ -761,7 +761,7 @@ body::before {
 
 .possessions-board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
 }
@@ -796,6 +796,15 @@ body::before {
   color: #e4d7b0;
 }
 
+.possession-stat--turnover {
+  border-color: color-mix(in srgb, #e07a2f 42%, var(--line));
+  background: color-mix(in srgb, #e07a2f 12%, var(--surface-sunken));
+}
+
+.possession-stat--turnover .possession-stat__label {
+  color: #f0c4a0;
+}
+
 .possession-stat__value {
   font-size: 48px;
   font-weight: 800;
@@ -809,6 +818,10 @@ body::before {
   color: #f0e6c8;
 }
 
+.possession-stat--turnover .possession-stat__value {
+  color: #f3c7a4;
+}
+
 .possession-stat__detail {
   font-size: 13px;
   font-weight: 700;
@@ -816,22 +829,18 @@ body::before {
 }
 
 .possession-chart {
-  grid-column: 1 / -1;
+  min-width: 0;
   padding: 16px 18px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--surface-sunken);
 }
 
-.possession-chart-stack {
+.possession-charts {
   grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.possession-chart-stack .possession-chart {
-  grid-column: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .possession-rows {
@@ -865,12 +874,9 @@ body::before {
 }
 
 .possession-row__fill {
-  position: relative;
   display: block;
   height: 100%;
-  min-width: 2px;
   border-radius: 999px;
-  overflow: hidden;
 }
 
 .possession-row__fill--yellow-deep {
@@ -881,65 +887,8 @@ body::before {
   background: #f0c48a;
 }
 
-.possession-row__inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-}
-
-.possession-row__inner--pass-turnover {
-  background: #e07a2f;
-}
-
 .possession-row strong {
   font-variant-numeric: tabular-nums;
-}
-
-.possession-turnover {
-  display: grid;
-  grid-template-columns: 118px minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
-  padding: 8px 12px;
-  border: 1px solid color-mix(in srgb, #e07a2f 35%, var(--line));
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, #e07a2f 10%, var(--surface-sunken));
-}
-
-.possession-turnover__label {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #e7c3a2;
-}
-
-.possession-turnover__track {
-  display: block;
-  height: 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sga-white) 8%, transparent);
-  overflow: hidden;
-}
-
-.possession-turnover__fill {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: #e07a2f;
-}
-
-.possession-turnover__note {
-  grid-column: 1 / -1;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-faint);
-}
-
-.possession-turnover strong {
-  font-variant-numeric: tabular-nums;
-  color: #f0d2b8;
 }
 
 .possession-chart__title {
@@ -1886,6 +1835,11 @@ body::before {
   .topic__body {
     padding: 16px;
   }
+
+  .possessions-board,
+  .possession-charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ---------- Matches and stats ---------- */
@@ -2165,6 +2119,7 @@ body::before {
   }
 
   .possessions-board,
+  .possession-charts,
   .stats-topic__panel,
   .stats-topic__panel--pair {
     grid-template-columns: 1fr;

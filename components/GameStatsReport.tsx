@@ -85,15 +85,15 @@ function PassResultsMeter({
       <div
         className="meter"
         role="img"
-        aria-label={`Progressive Pass: ${breakdown.progressive}. Other: ${breakdown.neutral}. Inaccurate Pass: ${breakdown.lost}. Pass Turnovers: ${turnovers}.`}
+        aria-label={`Progressive Pass: ${breakdown.progressive}. Inaccurate Pass: ${breakdown.lost}. Turnover Pass: ${turnovers}. Other: ${breakdown.neutral}.`}
       >
         <span className="meter__seg meter__seg--pass-progressive" style={{ width: `${progressivePct}%` }} />
-        <span className="meter__seg meter__seg--pass-neutral" style={{ width: `${neutralPct}%` }} />
         <span className="meter__seg meter__seg--pass-inaccurate meter__seg--host" style={{ width: `${percent(breakdown.lost, total)}%` }}>
           {turnovers > 0 ? (
             <span className="meter__seg-inner meter__seg--pass-turnover" style={{ width: `${percent(turnovers, breakdown.lost)}%` }} />
           ) : null}
         </span>
+        <span className="meter__seg meter__seg--pass-neutral" style={{ width: `${neutralPct}%` }} />
       </div>
       <ul className="legend">
         <li>
@@ -105,13 +105,6 @@ function PassResultsMeter({
           />
           <strong>
             {breakdown.progressive} · {progressivePct}%
-          </strong>
-        </li>
-        <li>
-          <span className="legend__dot legend__dot--pass-neutral" />
-          <PassPlayTip label="Other" tip={PASS_PLAY_TIPS.neutral} />
-          <strong>
-            {breakdown.neutral} · {neutralPct}%
           </strong>
         </li>
         <li>
@@ -128,12 +121,19 @@ function PassResultsMeter({
         {turnovers > 0 ? (
           <li className="legend__nested">
             <span className="legend__dot legend__dot--pass-turnover" />
-            <span className="legend__label">Pass Turnovers</span>
+            <span className="legend__label">Turnover Pass</span>
             <strong>
               {turnovers} · {turnoverPct}%
             </strong>
           </li>
         ) : null}
+        <li>
+          <span className="legend__dot legend__dot--pass-neutral" />
+          <PassPlayTip label="Other" tip={PASS_PLAY_TIPS.neutral} />
+          <strong>
+            {breakdown.neutral} · {neutralPct}%
+          </strong>
+        </li>
       </ul>
     </div>
   );
