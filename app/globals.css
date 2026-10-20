@@ -797,12 +797,12 @@ body::before {
 }
 
 .possession-stat--turnover {
-  border-color: color-mix(in srgb, #e07a2f 42%, var(--line));
-  background: color-mix(in srgb, #e07a2f 12%, var(--surface-sunken));
+  border-color: color-mix(in srgb, #f0d34a 48%, var(--line));
+  background: color-mix(in srgb, #f0d34a 14%, var(--surface-sunken));
 }
 
 .possession-stat--turnover .possession-stat__label {
-  color: #f0c4a0;
+  color: #f6e7a4;
 }
 
 .possession-stat__value {
@@ -819,7 +819,7 @@ body::before {
 }
 
 .possession-stat--turnover .possession-stat__value {
-  color: #f3c7a4;
+  color: #f8edb4;
 }
 
 .possession-stat__detail {
@@ -1430,7 +1430,7 @@ body::before {
 
 .meter__seg--pass-turnover,
 .legend__dot--pass-turnover {
-  background: #e07a2f;
+  background: #f0d34a;
 }
 
 .meter__seg--yellow-deep,

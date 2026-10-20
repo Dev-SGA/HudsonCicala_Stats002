@@ -891,13 +891,13 @@
 }
 
 .spdf-possession-stat--turnovers {
-  border-color: #e6d27a;
-  background: #fbf8e8;
+  border-color: #ead56a;
+  background: #fffbe6;
 }
 
 .spdf-possession-stat--turnovers .spdf-possession-stat__label,
 .spdf-possession-stat--turnovers .spdf-possession-stat__value {
-  color: #a88412;
+  color: #c6a20e;
 }
 
 .spdf-possession-stat__pct {
@@ -1118,7 +1118,7 @@
 
 .spdf-pass-panel__seg--pass-turnover,
 .spdf-pass-panel__dot--pass-turnover {
-  background: #e0b423;
+  background: #f0d34a;
 }
 
 .spdf-pass-panel__legend {
