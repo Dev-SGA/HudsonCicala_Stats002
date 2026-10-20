@@ -153,62 +153,96 @@ export function PossessionBoard({
   );
 }
 
-function StatsMetricCard({
-  title,
-  value,
-  unit,
-  rate,
-  extra,
+function StatsBarCard({
   primary,
   secondary,
   primaryLabel,
   secondaryLabel,
   primaryTone,
   secondaryTone,
-  className,
 }: {
-  title: string;
-  value: string;
-  unit: string;
-  rate?: string;
-  extra?: ReactNode;
   primary: number;
   secondary: number;
   primaryLabel: string;
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
-  className?: string;
 }) {
   return (
-    <section className={`stats-metric-card stats-hero-row${className ? ` ${className}` : ""}`}>
-      <div className="stats-hero-row__lead">
-        <h3 className="stats-hero-row__title">{title}</h3>
-        <p className="stats-hero-row__value">{value}</p>
-        <p className="stats-hero-row__unit">{unit}</p>
-        {rate ? <p className="stats-metric-card__rate">{rate}</p> : null}
-        {extra ? <div className="stats-hero-row__meta">{extra}</div> : null}
-      </div>
-      <div className="stats-hero-row__chart">
-        <ExploreBar
+    <div className="stats-stat-card stats-stat-card--bars">
+      <ExploreBar
+        primary={primary}
+        secondary={secondary}
+        primaryTone={primaryTone}
+        secondaryTone={secondaryTone}
+        label={`${primaryLabel} ${primary}. ${secondaryLabel} ${secondary}.`}
+      />
+      <ul className="stats-stat-card__legend">
+        <li>
+          <span className={`legend__dot legend__dot--${primaryTone}`} />
+          <span>{primaryLabel}</span>
+          <strong>{primary}</strong>
+        </li>
+        <li>
+          <span className={`legend__dot legend__dot--${secondaryTone}`} />
+          <span>{secondaryLabel}</span>
+          <strong>{secondary}</strong>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+function StatsRateTopic({
+  title,
+  total,
+  totalUnit,
+  rate,
+  rateUnit,
+  totalExtra,
+  primary,
+  secondary,
+  primaryLabel,
+  secondaryLabel,
+  primaryTone,
+  secondaryTone,
+}: {
+  title: string;
+  total: number;
+  totalUnit: string;
+  rate: number;
+  rateUnit: string;
+  totalExtra?: ReactNode;
+  primary: number;
+  secondary: number;
+  primaryLabel: string;
+  secondaryLabel: string;
+  primaryTone: Tone;
+  secondaryTone: Tone;
+}) {
+  return (
+    <section className="stats-topic">
+      <h3 className="stats-topic__title">{title}</h3>
+      <div className="stats-topic__cards">
+        <div className="stats-stat-card stats-stat-card--total">
+          <span className="stats-stat-card__kicker">Total</span>
+          <span className="stats-stat-card__value">{total}</span>
+          <span className="stats-stat-card__unit">{totalUnit}</span>
+          {totalExtra ? <div className="stats-stat-card__extra">{totalExtra}</div> : null}
+        </div>
+        <div className="stats-stat-card stats-stat-card--rate">
+          <span className="stats-stat-card__kicker">Rate</span>
+          <span className="stats-stat-card__value">{rate}%</span>
+          <span className="stats-stat-card__unit">{rateUnit}</span>
+        </div>
+        <StatsBarCard
           primary={primary}
           secondary={secondary}
+          primaryLabel={primaryLabel}
+          secondaryLabel={secondaryLabel}
           primaryTone={primaryTone}
           secondaryTone={secondaryTone}
-          label={`${primaryLabel} ${primary}. ${secondaryLabel} ${secondary}.`}
         />
-        <ul className="stats-hero-row__legend">
-          <li>
-            <span className={`legend__dot legend__dot--${primaryTone}`} />
-            <span>{primaryLabel}</span>
-            <strong>{primary}</strong>
-          </li>
-          <li>
-            <span className={`legend__dot legend__dot--${secondaryTone}`} />
-            <span>{secondaryLabel}</span>
-            <strong>{secondary}</strong>
-          </li>
-        </ul>
       </div>
     </section>
   );
@@ -219,13 +253,14 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
   const defensiveTotal = summary.defensiveWon + summary.defensiveLost;
 
   return (
-    <div className="stats-metric-grid">
-      <StatsMetricCard
+    <div className="stats-board-v2">
+      <StatsRateTopic
         title="General Passing"
-        value={String(summary.totalPasses)}
-        unit="Total passes"
-        rate={`${summary.accuracy}% accurate`}
-        extra={games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
+        total={summary.totalPasses}
+        totalUnit="Total passes"
+        rate={summary.accuracy}
+        rateUnit="Accurate"
+        totalExtra={games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
         primary={summary.accurate}
         secondary={summary.inaccurate}
         primaryLabel="Accurate"
@@ -233,11 +268,12 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryTone="positive"
         secondaryTone="negative"
       />
-      <StatsMetricCard
+      <StatsRateTopic
         title="Offensive Duels"
-        value={String(offensiveTotal)}
-        unit="Total duels"
-        rate={`${summary.offensiveWinRate}% won rate`}
+        total={offensiveTotal}
+        totalUnit="Total duels"
+        rate={summary.offensiveWinRate}
+        rateUnit="Won rate"
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
@@ -245,11 +281,12 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryTone="positive"
         secondaryTone="negative"
       />
-      <StatsMetricCard
+      <StatsRateTopic
         title="Defensive Duels"
-        value={String(defensiveTotal)}
-        unit="Total duels"
-        rate={`${summary.defensiveWinRate}% won rate`}
+        total={defensiveTotal}
+        totalUnit="Total duels"
+        rate={summary.defensiveWinRate}
+        rateUnit="Won rate"
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
@@ -257,19 +294,29 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryTone="positive"
         secondaryTone="negative"
       />
-      <StatsMetricCard
-        className="stats-metric-card--regains"
-        title="Regains"
-        value={String(summary.regains)}
-        unit="Total regains"
-        extra={games ? <PerGameBadge total={summary.regains} games={games} /> : null}
-        primary={summary.interceptions}
-        secondary={summary.recoveries}
-        primaryLabel="Interceptions"
-        secondaryLabel="Recoveries"
-        primaryTone="accent"
-        secondaryTone="recover"
-      />
+      <section className="stats-topic">
+        <h3 className="stats-topic__title">Regains</h3>
+        <div className="stats-topic__cards stats-topic__cards--pair">
+          <div className="stats-stat-card stats-stat-card--total">
+            <span className="stats-stat-card__kicker">Total</span>
+            <span className="stats-stat-card__value">{summary.regains}</span>
+            <span className="stats-stat-card__unit">Total regains</span>
+            {games ? (
+              <div className="stats-stat-card__extra">
+                <PerGameBadge total={summary.regains} games={games} />
+              </div>
+            ) : null}
+          </div>
+          <StatsBarCard
+            primary={summary.interceptions}
+            secondary={summary.recoveries}
+            primaryLabel="Interceptions"
+            secondaryLabel="Recoveries"
+            primaryTone="accent"
+            secondaryTone="recover"
+          />
+        </div>
+      </section>
     </div>
   );
 }
