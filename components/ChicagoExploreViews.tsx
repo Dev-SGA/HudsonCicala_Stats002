@@ -17,7 +17,8 @@ function possessionParts(possessions: PossessionSource) {
     retained,
     lostPlays,
     dispossessed: possessions.lostBalls,
-    wrongPasses: possessions.wrongPasses,
+    inaccuratePasses: possessions.wrongPasses,
+    turnover: (possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0),
   };
 }
 
@@ -89,7 +90,12 @@ export function PossessionBoard({
   games?: number;
 }) {
   const parts = possessionParts(possessions);
-  const breakdownTotal = parts.dispossessed + parts.wrongPasses;
+  const breakdown = [
+    { label: "Lost Duels", value: parts.dispossessed, tone: "yellow-deep" },
+    { label: "Inaccurate Pass", value: parts.inaccuratePasses, tone: "yellow-mid" },
+    { label: "Turnover", value: parts.turnover, tone: "yellow-light", note: "Pass Turnover + Duel Turnover" },
+  ];
+  const breakdownTotal = breakdown.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <div className="possessions-board">
@@ -116,32 +122,29 @@ export function PossessionBoard({
         <div
           className="meter"
           role="img"
-          aria-label={`Dispossessed: ${parts.dispossessed}. Inaccurate passes: ${parts.wrongPasses}.`}
+          aria-label={breakdown.map((item) => `${item.label}: ${item.value}`).join(". ")}
         >
-          <span
-            className="meter__seg meter__seg--yellow-deep"
-            style={{ width: `${percent(parts.dispossessed, breakdownTotal)}%` }}
-          />
-          <span
-            className="meter__seg meter__seg--yellow-light"
-            style={{ width: `${percent(parts.wrongPasses, breakdownTotal)}%` }}
-          />
+          {breakdown.map((item) => (
+            <span
+              key={item.label}
+              className={`meter__seg meter__seg--${item.tone}`}
+              style={{ width: `${percent(item.value, breakdownTotal)}%` }}
+            />
+          ))}
         </div>
         <ul className="legend">
-          <li>
-            <span className="legend__dot legend__dot--yellow-deep" />
-            <span className="legend__label">Dispossessed</span>
-            <strong>
-              {parts.dispossessed} · {percent(parts.dispossessed, breakdownTotal)}%
-            </strong>
-          </li>
-          <li>
-            <span className="legend__dot legend__dot--yellow-light" />
-            <span className="legend__label">Inaccurate passes</span>
-            <strong>
-              {parts.wrongPasses} · {percent(parts.wrongPasses, breakdownTotal)}%
-            </strong>
-          </li>
+          {breakdown.map((item) => (
+            <li key={item.label}>
+              <span className={`legend__dot legend__dot--${item.tone}`} />
+              <span className="legend__label">
+                {item.label}
+                {item.note ? <span className="legend__note">{item.note}</span> : null}
+              </span>
+              <strong>
+                {item.value} · {percent(item.value, breakdownTotal)}%
+              </strong>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

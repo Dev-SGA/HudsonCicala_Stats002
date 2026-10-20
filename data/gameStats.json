@@ -41,6 +41,8 @@
         "lostBalls": 2,
         "wrongPasses": 10,
         "lostPlays": 12,
+        "passTurnover": 0,
+        "duelTurnover": 0,
         "videoLink": ""
       },
       "videos": [
@@ -94,6 +96,8 @@
         "lostBalls": 2,
         "wrongPasses": 6,
         "lostPlays": 8,
+        "passTurnover": 0,
+        "duelTurnover": 0,
         "videoLink": ""
       },
       "videos": [

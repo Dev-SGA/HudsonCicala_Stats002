@@ -47,6 +47,8 @@ export type MatchStats = {
     lostBalls: number;
     wrongPasses: number;
     lostPlays: number;
+    passTurnover?: number;
+    duelTurnover?: number;
     videoLink: string;
   };
   videos?: { label: string; url: string }[];
@@ -224,6 +226,8 @@ export function seasonMatch(matches: MatchStats[]): MatchStats {
       lostBalls: matches.reduce((sum, match) => sum + match.possessions.lostBalls, 0),
       wrongPasses: matches.reduce((sum, match) => sum + match.possessions.wrongPasses, 0),
       lostPlays: matches.reduce((sum, match) => sum + match.possessions.lostPlays, 0),
+      passTurnover: matches.reduce((sum, match) => sum + (match.possessions.passTurnover ?? 0), 0),
+      duelTurnover: matches.reduce((sum, match) => sum + (match.possessions.duelTurnover ?? 0), 0),
       videoLink: "",
     },
     duels: duels.length > 0 ? duels.reduce(addDuels) : null,

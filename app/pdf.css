@@ -916,6 +916,11 @@
   background: #c4960c;
 }
 
+.spdf-pass-panel__seg--lost-yellow-mid,
+.spdf-pass-panel__dot--lost-yellow-mid {
+  background: #e0c878;
+}
+
 .spdf-pass-panel__seg--lost-yellow-light,
 .spdf-pass-panel__dot--lost-yellow-light {
   background: #f0d998;
@@ -1109,12 +1114,24 @@
 }
 
 .spdf-pass-panel__legend-label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.2;
   color: #6b8192;
+}
+
+.spdf-pass-panel__legend-note {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #8a9dab;
 }
 
 .spdf-pass-panel__legend strong {

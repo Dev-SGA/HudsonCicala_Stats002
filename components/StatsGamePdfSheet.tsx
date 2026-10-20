@@ -145,6 +145,7 @@ type PdfPossessionSegTone =
   | "dispossessed"
   | "wrong-pass"
   | "lost-yellow-deep"
+  | "lost-yellow-mid"
   | "lost-yellow-light";
 
 function PdfPossessionStatCard({
@@ -169,48 +170,36 @@ function PdfPossessionStatCard({
 
 function PdfPossessionSplit({
   title,
-  headline,
-  primary,
-  secondary,
-  primaryLabel,
-  secondaryLabel,
-  primaryTone,
-  secondaryTone,
+  segments,
 }: {
   title: string;
-  headline?: string;
-  primary: number;
-  secondary: number;
-  primaryLabel: string;
-  secondaryLabel: string;
-  primaryTone: PdfPossessionSegTone;
-  secondaryTone: PdfPossessionSegTone;
+  segments: { label: string; note?: string; value: number; tone: PdfPossessionSegTone }[];
 }) {
-  const total = primary + secondary;
-  const primaryPct = pct(primary, total);
+  const total = segments.reduce((sum, segment) => sum + segment.value, 0);
 
   return (
     <div className="spdf-pass-panel spdf-possession-split">
       <p className="spdf-pass-panel__title">{title}</p>
-      {headline ? <p className="spdf-possession-split__headline">{headline}</p> : null}
       <div className="spdf-pass-panel__track">
-        <span className={`spdf-pass-panel__seg spdf-pass-panel__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
-        <span
-          className={`spdf-pass-panel__seg spdf-pass-panel__seg--${secondaryTone}`}
-          style={{ width: `${100 - primaryPct}%` }}
-        />
+        {segments.map((segment) => (
+          <span
+            key={segment.label}
+            className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
+            style={{ width: `${pct(segment.value, total)}%` }}
+          />
+        ))}
       </div>
       <ul className="spdf-pass-panel__legend">
-        <li>
-          <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${primaryTone}`} />
-          <span className="spdf-pass-panel__legend-label">{primaryLabel}</span>
-          <strong>{primary}</strong>
-        </li>
-        <li>
-          <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${secondaryTone}`} />
-          <span className="spdf-pass-panel__legend-label">{secondaryLabel}</span>
-          <strong>{secondary}</strong>
-        </li>
+        {segments.map((segment) => (
+          <li key={segment.label}>
+            <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
+            <span className="spdf-pass-panel__legend-label">
+              {segment.label}
+              {segment.note ? <span className="spdf-pass-panel__legend-note">{segment.note}</span> : null}
+            </span>
+            <strong>{segment.value}</strong>
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -603,12 +592,16 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
               </div>
               <PdfPossessionSplit
                 title="Lost play breakdown"
-                primary={possessions.lostBalls}
-                secondary={possessions.wrongPasses}
-                primaryLabel="Dispossessed"
-                secondaryLabel="Inaccurate passes"
-                primaryTone="lost-yellow-deep"
-                secondaryTone="lost-yellow-light"
+                segments={[
+                  { label: "Lost Duels", value: possessions.lostBalls, tone: "lost-yellow-deep" },
+                  { label: "Inaccurate Pass", value: possessions.wrongPasses, tone: "lost-yellow-mid" },
+                  {
+                    label: "Turnover",
+                    note: "Pass Turnover + Duel Turnover",
+                    value: (possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0),
+                    tone: "lost-yellow-light",
+                  },
+                ]}
               />
             </div>
           </PdfSection>
