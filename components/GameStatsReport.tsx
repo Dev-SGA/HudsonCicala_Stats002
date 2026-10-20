@@ -51,6 +51,15 @@ function PassPlayTip({ label, tip, href }: { label: string; tip: string; href?: 
   );
 }
 
+function ClipLegendLabel({ label, href }: { label: string; href?: string }) {
+  if (!href) return <span className="legend__label">{label}</span>;
+  return (
+    <a className="legend__label clip-link" href={href} target="_blank" rel="noreferrer">
+      {label}
+    </a>
+  );
+}
+
 function percent(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
 }
@@ -121,7 +130,7 @@ function PassResultsMeter({
         {turnovers > 0 ? (
           <li className="legend__nested">
             <span className="legend__dot legend__dot--pass-turnover" />
-            <span className="legend__label">Turnover Pass</span>
+            <ClipLegendLabel label="Turnover Pass" href={clipUrl(videos, "Turnover Passes", "Turnover Pass")} />
             <strong>
               {turnovers} · {turnoverPct}%
             </strong>

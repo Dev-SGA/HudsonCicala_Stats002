@@ -111,8 +111,18 @@ export function PossessionBoard({
     },
   ];
   const turnoverRows = [
-    { label: "Turnover Duel", value: parts.duelTurnover, tone: "yellow-deep" },
-    { label: "Turnover Pass", value: parts.passTurnover, tone: "yellow-mid" },
+    {
+      label: "Turnover Duel",
+      value: parts.duelTurnover,
+      tone: "yellow-deep",
+      href: clipUrl(videos, "Turnover Duels", "Turnover Duel"),
+    },
+    {
+      label: "Turnover Pass",
+      value: parts.passTurnover,
+      tone: "yellow-mid",
+      href: clipUrl(videos, "Turnover Passes", "Turnover Pass"),
+    },
   ];
 
   return (
@@ -363,6 +373,7 @@ export function StatsHeroSideboard({
         primaryTone="positive"
         secondaryTone="muted"
         primaryHref={clipUrl(videos, "Off. Duels Won", "Off Duels Won")}
+        secondaryHref={clipUrl(videos, "Off. Duels Lost", "Off Duels Lost")}
         showShare={false}
       />
       <StatsRateTopic
