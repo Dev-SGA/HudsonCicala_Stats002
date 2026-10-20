@@ -105,35 +105,6 @@ function PassResultPanel({
   );
 }
 
-function PassResultColumnChart({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
-  const columns = [
-    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
-    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
-    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
-  ];
-  const max = Math.max(...columns.map((column) => column.value), 1);
-
-  return (
-    <div className="spdf-pass-columns">
-      <p className="spdf-pass-columns__title">{title}</p>
-      <div className="spdf-pass-columns__chart">
-        {columns.map((column) => (
-          <div key={column.label} className="spdf-pass-columns__item">
-            <strong className={`spdf-pass-columns__value spdf-pass-columns__value--${column.tone}`}>{column.value}</strong>
-            <span className="spdf-pass-columns__bar-wrap">
-              <span
-                className={`spdf-pass-columns__bar spdf-pass-columns__bar--${column.tone}`}
-                style={{ height: `${(column.value / max) * 100}%` }}
-              />
-            </span>
-            <span className="spdf-pass-columns__label">{column.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function PdfSection({
   title,
   kpi,
@@ -142,6 +113,7 @@ function PdfSection({
   children,
   footer,
   size = "md",
+  className,
 }: {
   title: string;
   kpi: number;
@@ -150,9 +122,12 @@ function PdfSection({
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: "md" | "lg";
+  className?: string;
 }) {
   return (
-    <section className={`spdf-section spdf-section--build-up spdf-section--${size}`}>
+    <section
+      className={`spdf-section spdf-section--build-up spdf-section--${size}${className ? ` ${className}` : ""}`}
+    >
       <div className="spdf-section__top">
         <p className="spdf-section__phase">Build-Up</p>
         <h3 className="spdf-section__title">{title}</h3>
@@ -459,10 +434,11 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             kpi={passTotal}
             unit="Passes"
             size="lg"
+            className="spdf-section--pass-results"
             aside={games ? `${perGame(passTotal, games)} per game` : undefined}
           >
             <div className="spdf-pass-layout">
-              <PassResultColumnChart
+              <PassResultPanel
                 title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
               />

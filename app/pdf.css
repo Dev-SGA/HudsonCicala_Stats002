@@ -216,11 +216,20 @@
 }
 
 .spdf-stack .spdf-section--md {
-  flex: 0.9 1 0;
+  flex: 0.82 1 0;
 }
 
 .spdf-stack .spdf-section--lg {
-  flex: 1.2 1 0;
+  flex: 1.35 1 0;
+}
+
+.spdf-section--pass-results {
+  min-height: 172px;
+}
+
+.spdf-section--pass-results .spdf-section__panel {
+  align-self: stretch;
+  justify-content: flex-start;
 }
 
 .spdf-pressure {
@@ -643,109 +652,39 @@
   align-items: stretch;
   width: 100%;
   min-height: 0;
+  height: 100%;
+}
+
+.spdf-pass-layout > .spdf-pass-panel:first-child {
+  flex: 0 0 42%;
 }
 
 .spdf-pass-split-stack {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
+  min-height: 0;
 }
 
-.spdf-pass-columns {
-  flex: 0 0 38%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  padding: 10px 12px 8px;
-  border: 1px solid #d4e8f7;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-.spdf-pass-columns__title {
-  margin: 0;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #044f80;
-}
-
-.spdf-pass-columns__chart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 12px;
-  flex: 1 1 auto;
-  min-height: 96px;
-  padding-top: 4px;
-}
-
-.spdf-pass-columns__item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+.spdf-pass-split-stack .spdf-pass-panel {
   flex: 1 1 0;
-  max-width: 72px;
+  min-height: 0;
+  padding: 7px 10px 6px;
+  gap: 4px;
 }
 
-.spdf-pass-columns__bar-wrap {
-  display: flex;
-  align-items: flex-end;
-  width: 100%;
-  height: 72px;
+.spdf-pass-split-stack .spdf-pass-panel__legend {
+  gap: 2px;
 }
 
-.spdf-pass-columns__bar {
-  display: block;
-  width: 100%;
-  min-height: 4px;
-  border-radius: 4px 4px 2px 2px;
-}
-
-.spdf-pass-columns__bar--pass-progressive {
-  background: #4d8f6e;
-}
-
-.spdf-pass-columns__bar--pass-neutral {
-  background: #b4bcc6;
-}
-
-.spdf-pass-columns__bar--pass-lost {
-  background: #e0a82e;
-}
-
-.spdf-pass-columns__value {
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1;
-  color: #072334;
-}
-
-.spdf-pass-columns__value--pass-progressive {
-  color: #4d8f6e;
-}
-
-.spdf-pass-columns__value--pass-neutral {
-  color: #8a96a3;
-}
-
-.spdf-pass-columns__value--pass-lost {
-  color: #a97412;
-}
-
-.spdf-pass-columns__label {
+.spdf-pass-split-stack .spdf-pass-panel__legend-label {
   font-size: 7px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.2;
-  color: #6b8192;
+}
+
+.spdf-pass-split-stack .spdf-pass-panel__legend strong {
+  font-size: 10px;
 }
 
 .spdf-summary {
