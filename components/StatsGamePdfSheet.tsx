@@ -117,59 +117,6 @@ function PassResultPanel({
   );
 }
 
-/** Total passes: Progressive Pass, Inaccurate Pass with Turnover Pass inside, then Other. */
-function PassResultRowBars({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
-  const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
-  const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
-  const rows = [
-    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const, nested: false },
-    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate" as const, nested: false, turnovers },
-    { label: "Turnover Pass", value: turnovers, tone: "pass-turnover" as const, nested: true },
-    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const, nested: false },
-  ];
-
-  return (
-    <div className="spdf-pass-panel spdf-pass-panel--rows">
-      <div className="spdf-pass-panel__head">
-        <p className="spdf-pass-panel__title">{title}</p>
-        <span className="spdf-pass-panel__total">{total} passes</span>
-      </div>
-      <ul className="spdf-pass-rows">
-        {rows
-          .filter((row) => row.value > 0)
-          .map((row) => (
-          <li key={row.label} className={`spdf-pass-row-bar${row.nested ? " is-nested" : ""}`}>
-            <span className="spdf-pass-row-bar__label">{row.label}</span>
-            <span className="spdf-pass-row-bar__track">
-              {row.nested ? (
-                <span
-                  className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
-                  style={{ width: `${pct(row.value, total)}%` }}
-                />
-              ) : row.label === "Inaccurate Pass" && turnovers > 0 ? (
-                <span className="spdf-pass-row-bar__fill spdf-pass-panel__seg--pass-inaccurate" style={{ width: `${pct(row.value, total)}%` }}>
-                  <span
-                    className="spdf-pass-row-bar__inner spdf-pass-panel__seg--pass-turnover"
-                    style={{ width: `${pct(turnovers, row.value)}%` }}
-                  />
-                </span>
-              ) : (
-                <span
-                  className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
-                  style={{ width: `${pct(row.value, total)}%` }}
-                />
-              )}
-            </span>
-            <strong className="spdf-pass-row-bar__value">
-              {row.value} · {pct(row.value, total)}%
-            </strong>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 type PdfPossessionSegTone =
   | "retained"
   | "lost-plays"
@@ -543,15 +490,13 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             panelOnly
             className="spdf-section--pass-results"
           >
-            <div className="spdf-pass-results-app">
-              <PassResultRowBars
+            <div className="spdf-pass-results-app spdf-pass-results-app--trio">
+              <PassResultPanel
                 title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
               />
-              <div className="spdf-pass-row">
-                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
-                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
-              </div>
+              <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
+              <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
             </div>
           </PdfSection>
 

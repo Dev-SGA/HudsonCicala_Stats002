@@ -242,7 +242,7 @@
 }
 
 .spdf-stack .spdf-section--md {
-  flex: 0.78 1 0;
+  flex: 1.05 1 0;
 }
 
 .spdf-stack .spdf-section--lg {
@@ -250,8 +250,8 @@
 }
 
 .spdf-section--pass-results {
-  flex: 1.72 1 0 !important;
-  min-height: 200px;
+  flex: 0 0 auto !important;
+  min-height: 0;
 }
 
 .spdf-section--panel-only .spdf-section__content {
@@ -271,13 +271,25 @@
   height: 100%;
 }
 
-.spdf-pass-results-app > .spdf-pass-panel--rows {
-  flex: 1 1 auto;
+.spdf-pass-results-app--trio {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  height: auto;
 }
 
-.spdf-pass-results-app > .spdf-pass-row {
-  flex: 1 1 auto;
-  min-height: 0;
+.spdf-pass-results-app--trio .spdf-pass-panel {
+  padding: 8px 10px 6px;
+  gap: 6px;
+}
+
+.spdf-pass-results-app--trio .spdf-pass-panel__legend {
+  gap: 2px;
+}
+
+.spdf-pass-results-app--trio .spdf-pass-panel__legend-label {
+  font-size: 8px;
+  letter-spacing: 0.02em;
 }
 
 .spdf-pass-results-app .spdf-pass-panel {
@@ -692,12 +704,6 @@
   white-space: nowrap;
 }
 
-.spdf-pass-row {
-  display: flex;
-  gap: 10px;
-  align-items: stretch;
-}
-
 .spdf-pass-layout {
   display: flex;
   gap: 6px;
@@ -741,74 +747,6 @@
   border-top: 2px solid #297cc1;
   border-right: 2px solid #297cc1;
   transform: translateY(-50%) rotate(45deg);
-}
-
-.spdf-pass-panel--rows {
-  justify-content: center;
-  padding: 12px 12px 10px;
-}
-
-.spdf-pass-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-  margin: 0;
-  padding: 4px 0 0;
-  list-style: none;
-  flex: 1 1 auto;
-}
-
-.spdf-pass-row-bar {
-  display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-}
-
-.spdf-pass-row-bar__label {
-  font-size: 7px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  line-height: 1.2;
-  color: #6b8192;
-}
-
-.spdf-pass-row-bar__track {
-  display: block;
-  height: 13px;
-  border-radius: 999px;
-  background: #e3eaf0;
-  overflow: hidden;
-}
-
-.spdf-pass-row-bar__fill {
-  position: relative;
-  display: block;
-  height: 100%;
-  min-width: 2px;
-  border-radius: 999px;
-}
-
-.spdf-pass-row-bar__inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  border-radius: inherit;
-}
-
-.spdf-pass-row-bar.is-nested {
-  padding-left: 14px;
-}
-
-.spdf-pass-row-bar__value {
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.15;
-  color: #072334;
-  white-space: nowrap;
 }
 
 .spdf-pass-split-stack {
@@ -860,13 +798,18 @@
   min-width: 0;
 }
 
+.spdf-possession-breakdowns .spdf-possession-split {
+  padding: 7px 10px 6px;
+  gap: 5px;
+}
+
 .spdf-possession-stat {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
-  min-height: 100%;
-  padding: 12px 10px;
+  gap: 2px;
+  min-height: 0;
+  padding: 8px 8px;
   border: 1px solid #d4e8f7;
   border-radius: 6px;
   background: #ffffff;
@@ -876,7 +819,7 @@
 .spdf-possession-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -942,13 +885,13 @@
 }
 
 .spdf-possession-stat--turnovers {
-  border-color: #e7b48a;
-  background: #fff6ee;
+  border-color: #e6d27a;
+  background: #fbf8e8;
 }
 
 .spdf-possession-stat--turnovers .spdf-possession-stat__label,
 .spdf-possession-stat--turnovers .spdf-possession-stat__value {
-  color: #c45c12;
+  color: #a88412;
 }
 
 .spdf-possession-stat__pct {
@@ -1169,7 +1112,7 @@
 
 .spdf-pass-panel__seg--pass-turnover,
 .spdf-pass-panel__dot--pass-turnover {
-  background: #e07a2f;
+  background: #e0b423;
 }
 
 .spdf-pass-panel__legend {
@@ -1677,10 +1620,8 @@
 .stats-pdf--page1 .spdf-pass-panel__total { font-size: 10px; }
 .stats-pdf--page1 .spdf-pass-panel__legend-label { font-size: 9px; }
 .stats-pdf--page1 .spdf-pass-panel__legend strong { font-size: 12px; }
-.stats-pdf--page1 .spdf-pass-row-bar__label { font-size: 8px; }
-.stats-pdf--page1 .spdf-pass-row-bar__value { font-size: 11px; }
 .stats-pdf--page1 .spdf-possession-stat__label { font-size: 9px; }
-.stats-pdf--page1 .spdf-possession-stat__value { font-size: 29px; }
+.stats-pdf--page1 .spdf-possession-stat__value { font-size: 22px; }
 .stats-pdf--page1 .spdf-possession-stat__pct { font-size: 10px; }
 .stats-pdf--page1 .spdf-foot { font-size: 11px; }
 
