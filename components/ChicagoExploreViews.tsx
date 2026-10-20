@@ -1,11 +1,17 @@
+import { MatchTrendTip } from "@/components/MatchTrendTip";
+import type { ReactNode } from "react";
+import { PerGameBadge } from "@/components/PerGameBadge";
 import type { MatchStats, MatchSummary } from "@/lib/stats";
-import { perGame } from "@/lib/stats";
-
-export type ChicagoExploreView = "classic" | "v2" | "v3";
+import type { TrendMetric } from "@/lib/matchTrends";
 
 type PossessionSource = MatchStats["possessions"];
 
 type Tone = "positive" | "negative" | "accent" | "recover" | "warn" | "muted";
+
+type TrendContext = {
+  matches: MatchStats[];
+  activeMatchId: string;
+};
 
 function percent(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
@@ -32,6 +38,9 @@ function ExploreSplit({
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  primaryMetric,
+  secondaryMetric,
+  trend,
 }: {
   title: string;
   headline: string;
@@ -41,6 +50,9 @@ function ExploreSplit({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  primaryMetric: TrendMetric;
+  secondaryMetric: TrendMetric;
+  trend: TrendContext;
 }) {
   const total = primary + secondary;
   const primaryPct = percent(primary, total);
@@ -61,16 +73,20 @@ function ExploreSplit({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span className="legend__label">{primaryLabel}</span>
-          <strong>
-            {primary} · {percent(primary, total)}%
-          </strong>
+          <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {primary} · {percent(primary, total)}%
+            </strong>
+          </MatchTrendTip>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span className="legend__label">{secondaryLabel}</span>
-          <strong>
-            {secondary} · {percent(secondary, total)}%
-          </strong>
+          <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {secondary} · {percent(secondary, total)}%
+            </strong>
+          </MatchTrendTip>
         </li>
       </ul>
     </div>
@@ -107,8 +123,15 @@ function ExploreBar({
   );
 }
 
-/** v2: retained vs lost, then how the lost plays split. */
-export function PossessionSplitView({ possessions }: { possessions: PossessionSource }) {
+export function PossessionSplitView({
+  possessions,
+  trend,
+  scopeLabel = "match",
+}: {
+  possessions: PossessionSource;
+  trend: TrendContext;
+  scopeLabel?: string;
+}) {
   const parts = possessionParts(possessions);
 
   return (
@@ -122,6 +145,9 @@ export function PossessionSplitView({ possessions }: { possessions: PossessionSo
         secondaryLabel="Lost plays"
         primaryTone="positive"
         secondaryTone="negative"
+        primaryMetric="possessions-retained"
+        secondaryMetric="possessions-lost-plays"
+        trend={trend}
       />
       <ExploreSplit
         title="Lost play breakdown"
@@ -132,60 +158,13 @@ export function PossessionSplitView({ possessions }: { possessions: PossessionSo
         secondaryLabel="Wrong passes"
         primaryTone="negative"
         secondaryTone="warn"
+        primaryMetric="possessions-dispossessed"
+        secondaryMetric="possessions-wrong-passes"
+        trend={trend}
       />
       <p className="metric-note metric-note--compact">
-        {parts.total} possessions in the match. Dispossessed are offensive duels lost. Wrong passes are the bad passes.
+        {parts.total} possessions in the {scopeLabel}. Dispossessed are offensive duels lost. Wrong passes are the bad passes.
       </p>
-    </div>
-  );
-}
-
-/** v3: hero on retained, share-list for the rest. */
-export function PossessionShareView({ possessions }: { possessions: PossessionSource }) {
-  const parts = possessionParts(possessions);
-  const rows = [
-    {
-      label: "Dispossessed",
-      value: parts.dispossessed,
-      tone: "negative" as const,
-    },
-    {
-      label: "Wrong passes",
-      value: parts.wrongPasses,
-      tone: "warn" as const,
-    },
-    {
-      label: "Lost plays",
-      value: parts.lostPlays,
-      tone: "negative" as const,
-      emphasize: true,
-    },
-  ];
-
-  return (
-    <div className="explore-stack">
-      <div className="metric-card metric-card--hero metric-card--retained">
-        <h3 className="metric-card__title">Retained possessions</h3>
-        <span className="metric-card__value">{parts.retained}</span>
-        <span className="metric-card__pct">{percent(parts.retained, parts.total)}% of {parts.total} possessions</span>
-      </div>
-      <ul className="share-list share-list--possessions">
-        {rows.map((row) => (
-          <li key={row.label} className={`share-list__item${row.emphasize ? " share-list__item--lost-plays" : ""}`}>
-            <div className="share-list__row">
-              <span className="share-list__label">{row.label}</span>
-              <span className="share-list__track">
-                <span
-                  className={`share-list__fill share-list__fill--${row.tone}`}
-                  style={{ width: `${percent(row.value, parts.total)}%` }}
-                />
-              </span>
-              <span className="share-list__value">{row.value}</span>
-              <span className="share-list__pct">{percent(row.value, parts.total)}%</span>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -194,32 +173,47 @@ function StatsHeroRow({
   title,
   value,
   unit,
-  detail,
+  valueMetric,
+  meta,
   primary,
   secondary,
   primaryLabel,
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  primaryMetric,
+  secondaryMetric,
+  trend,
 }: {
   title: string;
   value: string;
   unit: string;
-  detail?: string;
+  valueMetric: TrendMetric;
+  meta?: ReactNode;
   primary: number;
   secondary: number;
   primaryLabel: string;
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  primaryMetric: TrendMetric;
+  secondaryMetric: TrendMetric;
+  trend: TrendContext;
 }) {
   return (
     <section className="stats-hero-row">
       <div className="stats-hero-row__lead">
         <h3 className="stats-hero-row__title">{title}</h3>
-        <p className="stats-hero-row__value">{value}</p>
+        <MatchTrendTip
+          metric={valueMetric}
+          matches={trend.matches}
+          activeMatchId={trend.activeMatchId}
+          className="trend-tip--hero-value"
+        >
+          <span className="stats-hero-row__value">{value}</span>
+        </MatchTrendTip>
         <p className="stats-hero-row__unit">{unit}</p>
-        {detail ? <p className="stats-hero-row__detail">{detail}</p> : null}
+        {meta ? <div className="stats-hero-row__meta">{meta}</div> : null}
       </div>
       <div className="stats-hero-row__chart">
         <ExploreBar
@@ -233,12 +227,16 @@ function StatsHeroRow({
           <li>
             <span className={`legend__dot legend__dot--${primaryTone}`} />
             <span>{primaryLabel}</span>
-            <strong>{primary}</strong>
+            <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+              <strong>{primary}</strong>
+            </MatchTrendTip>
           </li>
           <li>
             <span className={`legend__dot legend__dot--${secondaryTone}`} />
             <span>{secondaryLabel}</span>
-            <strong>{secondary}</strong>
+            <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+              <strong>{secondary}</strong>
+            </MatchTrendTip>
           </li>
         </ul>
       </div>
@@ -246,144 +244,85 @@ function StatsHeroRow({
   );
 }
 
-/** v2 stats: large title and total on the left, breakdown chart on the right. */
-export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; games?: number }) {
+export function StatsHeroSideboard({
+  summary,
+  games,
+  trend,
+}: {
+  summary: MatchSummary;
+  games?: number;
+  trend: TrendContext;
+}) {
   return (
     <div className="stats-hero-board">
       <StatsHeroRow
         title="General passing"
         value={String(summary.totalPasses)}
         unit="Total passes"
-        detail={`${summary.accuracy}% accurate${games ? ` · ${perGame(summary.totalPasses, games)} per game` : ""}`}
+        valueMetric="stats-total-passes"
+        meta={
+          <>
+            <MatchTrendTip metric="stats-accuracy" matches={trend.matches} activeMatchId={trend.activeMatchId}>
+              <span className="stats-accuracy-pill">{summary.accuracy}% accurate</span>
+            </MatchTrendTip>
+            {games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
+          </>
+        }
         primary={summary.accurate}
         secondary={summary.inaccurate}
         primaryLabel="Accurate"
         secondaryLabel="Inaccurate"
         primaryTone="positive"
         secondaryTone="negative"
+        primaryMetric="pass-accurate"
+        secondaryMetric="pass-inaccurate"
+        trend={trend}
       />
       <StatsHeroRow
         title="Interceptions & recoveries"
         value={String(summary.regains)}
         unit="Total regains"
-        detail={games ? `${perGame(summary.regains, games)} per game` : undefined}
+        valueMetric="stats-regains"
+        meta={games ? <PerGameBadge total={summary.regains} games={games} /> : null}
         primary={summary.interceptions}
         secondary={summary.recoveries}
         primaryLabel="Interceptions"
         secondaryLabel="Recoveries"
         primaryTone="accent"
         secondaryTone="recover"
+        primaryMetric="stats-interceptions"
+        secondaryMetric="stats-recoveries"
+        trend={trend}
       />
       <StatsHeroRow
         title="Offensive duels"
         value={`${summary.offensiveWinRate}%`}
         unit="Won rate"
+        valueMetric="stats-offensive-won-rate"
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
+        primaryMetric="stats-offensive-won"
+        secondaryMetric="stats-offensive-lost"
+        trend={trend}
       />
       <StatsHeroRow
         title="Defensive duels"
         value={`${summary.defensiveWinRate}%`}
         unit="Won rate"
+        valueMetric="stats-defensive-won-rate"
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
-      />
-    </div>
-  );
-}
-
-function StatsColumnPanel({
-  title,
-  kpi,
-  unit,
-  detail,
-  bars,
-}: {
-  title: string;
-  kpi: string;
-  unit: string;
-  detail?: string;
-  bars: { label: string; value: number; tone: Tone }[];
-}) {
-  const max = Math.max(...bars.map((bar) => bar.value), 1);
-
-  return (
-    <section className="stats-panel stats-panel--columns">
-      <header className="stats-panel__head stats-panel__head--stack">
-        <h3 className="stats-panel__title stats-panel__title--large">{title}</h3>
-        <p className="stats-panel__rate stats-panel__rate--hero">
-          <strong>{kpi}</strong>
-          {unit}
-        </p>
-        {detail ? <p className="stats-panel__detail">{detail}</p> : null}
-      </header>
-      <div className="stats-column-chart">
-        {bars.map((bar) => (
-          <div key={bar.label} className="stats-column-chart__item">
-            <span className={`stats-column-chart__value stats-column-chart__value--${bar.tone}`}>{bar.value}</span>
-            <span className="stats-column-chart__bar-wrap">
-              <span
-                className={`stats-column-chart__bar stats-column-chart__bar--${bar.tone}`}
-                style={{ height: `${(bar.value / max) * 100}%` }}
-              />
-            </span>
-            <span className="stats-column-chart__label">{bar.label}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/** v3 stats: emphasized header band with column detail beside each total. */
-export function StatsColumnBoard({ summary, games }: { summary: MatchSummary; games?: number }) {
-  return (
-    <div className="stats-board stats-board--columns">
-      <StatsColumnPanel
-        title="General passing"
-        kpi={String(summary.totalPasses)}
-        unit="passes"
-        detail={`${summary.accuracy}% accurate${games ? ` · ${perGame(summary.totalPasses, games)} per game` : ""}`}
-        bars={[
-          { label: "Accurate", value: summary.accurate, tone: "positive" },
-          { label: "Inaccurate", value: summary.inaccurate, tone: "negative" },
-        ]}
-      />
-      <StatsColumnPanel
-        title="Interceptions & recoveries"
-        kpi={String(summary.regains)}
-        unit="total"
-        detail={games ? `${perGame(summary.regains, games)} per game` : undefined}
-        bars={[
-          { label: "Interceptions", value: summary.interceptions, tone: "accent" },
-          { label: "Recoveries", value: summary.recoveries, tone: "recover" },
-        ]}
-      />
-      <StatsColumnPanel
-        title="Offensive duels"
-        kpi={`${summary.offensiveWinRate}%`}
-        unit="won"
-        bars={[
-          { label: "Won", value: summary.offensiveWon, tone: "positive" },
-          { label: "Lost", value: summary.offensiveLost, tone: "negative" },
-        ]}
-      />
-      <StatsColumnPanel
-        title="Defensive duels"
-        kpi={`${summary.defensiveWinRate}%`}
-        unit="won"
-        bars={[
-          { label: "Won", value: summary.defensiveWon, tone: "positive" },
-          { label: "Lost", value: summary.defensiveLost, tone: "negative" },
-        ]}
+        primaryMetric="stats-defensive-won"
+        secondaryMetric="stats-defensive-lost"
+        trend={trend}
       />
     </div>
   );

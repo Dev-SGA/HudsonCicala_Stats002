@@ -1,30 +1,25 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { AthleteProfileCard } from "@/components/AthleteProfileCard";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
-import {
-  type ChicagoExploreView,
-  PossessionShareView,
-  PossessionSplitView,
-  StatsColumnBoard,
-  StatsHeroSideboard,
-} from "@/components/ChicagoExploreViews";
+import { PossessionSplitView, StatsHeroSideboard } from "@/components/ChicagoExploreViews";
+import { MatchTrendTip } from "@/components/MatchTrendTip";
+import { PerGameBadge } from "@/components/PerGameBadge";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
+import type { TrendMetric } from "@/lib/matchTrends";
 import { BRAND } from "@/lib/brand";
 import {
   combinePassResults,
   matchSummary,
-  perGame,
   seasonMatch,
   toGameStats,
   type GameStats,
   type MatchStats,
-  type MatchSummary,
   type PassResultBreakdown,
   type StatsReport,
 } from "@/lib/stats";
@@ -34,6 +29,11 @@ type GameStatsReportProps = {
 };
 
 type BarTone = "accent" | "positive" | "negative" | "muted" | "warn";
+
+type TrendContext = {
+  matches: MatchStats[];
+  activeMatchId: string;
+};
 
 const PASS_PLAY_TIPS = {
   progressive:
@@ -65,6 +65,9 @@ function SplitMeter({
   secondaryTone,
   headline,
   major,
+  primaryMetric,
+  secondaryMetric,
+  trend,
 }: {
   title: string;
   primary: number;
@@ -75,6 +78,9 @@ function SplitMeter({
   secondaryTone: BarTone;
   headline: string;
   major?: boolean;
+  primaryMetric: TrendMetric;
+  secondaryMetric: TrendMetric;
+  trend: TrendContext;
 }) {
   const total = primary + secondary;
   const primaryPct = percent(primary, total);
@@ -91,31 +97,66 @@ function SplitMeter({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span className="legend__label">{primaryLabel}</span>
-          <strong>
-            {primary} · {percent(primary, total)}%
-          </strong>
+          <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {primary} · {percent(primary, total)}%
+            </strong>
+          </MatchTrendTip>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span className="legend__label">{secondaryLabel}</span>
-          <strong>
-            {secondary} · {percent(secondary, total)}%
-          </strong>
+          <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {secondary} · {percent(secondary, total)}%
+            </strong>
+          </MatchTrendTip>
         </li>
       </ul>
     </div>
   );
 }
 
+type PassResultsTrendScope = "combined" | "underPressure" | "notUnderPressure";
+
+const PASS_RESULTS_TREND: Record<
+  PassResultsTrendScope,
+  { total: TrendMetric; progressive: TrendMetric; neutral: TrendMetric; lost: TrendMetric }
+> = {
+  combined: {
+    total: "pass-results-total",
+    progressive: "pass-progressive",
+    neutral: "pass-neutral",
+    lost: "pass-lost",
+  },
+  underPressure: {
+    total: "pass-up-total",
+    progressive: "pass-up-progressive",
+    neutral: "pass-up-neutral",
+    lost: "pass-up-lost",
+  },
+  notUnderPressure: {
+    total: "pass-nop-total",
+    progressive: "pass-nop-progressive",
+    neutral: "pass-nop-neutral",
+    lost: "pass-nop-lost",
+  },
+};
+
 function PassResultsMeter({
   title,
   breakdown,
   games,
+  trendScope,
+  trend,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
   games?: number;
+  trendScope: PassResultsTrendScope;
+  trend: TrendContext;
 }) {
+  const trendMetrics = PASS_RESULTS_TREND[trendScope];
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
@@ -124,9 +165,11 @@ function PassResultsMeter({
   return (
     <div className="metric-card">
       <h3 className="metric-card__title">{title}</h3>
-      <p className="metric-card__headline">
-        <span>{total} passes</span>
-        {games ? <span className="metric-card__per-game">{perGame(total, games)} per game</span> : null}
+      <p className="metric-card__headline metric-card__headline--stack">
+        <MatchTrendTip metric={trendMetrics.total} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+          <span>{total} passes</span>
+        </MatchTrendTip>
+        {games ? <PerGameBadge total={total} games={games} className="per-game-badge--inline" /> : null}
       </p>
       <div
         className="meter"
@@ -141,239 +184,53 @@ function PassResultsMeter({
         <li>
           <span className="legend__dot legend__dot--pass-progressive" />
           <PassPlayTip label="Progressive plays" tip={PASS_PLAY_TIPS.progressive} />
-          <strong>
-            {breakdown.progressive} · {progressivePct}%
-          </strong>
+          <MatchTrendTip metric={trendMetrics.progressive} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {breakdown.progressive} · {progressivePct}%
+            </strong>
+          </MatchTrendTip>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-neutral" />
           <PassPlayTip label="Neutral plays" tip={PASS_PLAY_TIPS.neutral} />
-          <strong>
-            {breakdown.neutral} · {neutralPct}%
-          </strong>
+          <MatchTrendTip metric={trendMetrics.neutral} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {breakdown.neutral} · {neutralPct}%
+            </strong>
+          </MatchTrendTip>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-lost" />
           <PassPlayTip label="Lost plays" tip={PASS_PLAY_TIPS.lost} />
-          <strong>
-            {breakdown.lost} · {lostPct}%
-          </strong>
+          <MatchTrendTip metric={trendMetrics.lost} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+            <strong>
+              {breakdown.lost} · {lostPct}%
+            </strong>
+          </MatchTrendTip>
         </li>
       </ul>
     </div>
   );
 }
 
-function PossessionStat({
-  label,
+function TotalFigure({
   value,
-  total,
-  variant,
+  games,
+  metric,
+  trend,
 }: {
-  label: string;
   value: number;
-  total: number;
-  variant?: "lost-plays";
-}) {
-  const pctLabel = `${percent(value, total)}% of possessions`;
-
-  return (
-    <div className={`metric-card${variant === "lost-plays" ? " metric-card--lost-plays" : ""}`}>
-      <h3 className="metric-card__title">{label}</h3>
-      <span className="metric-card__value">{value}</span>
-      <span className={`metric-card__pct${variant === "lost-plays" ? " metric-card__pct--lost-plays" : ""}`}>{pctLabel}</span>
-    </div>
-  );
-}
-
-function StatFigure({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "positive" | "negative" | "accent" | "recover";
+  games?: number;
+  metric: TrendMetric;
+  trend: TrendContext;
 }) {
   return (
-    <div className={`stat-figure${tone ? ` stat-figure--${tone}` : ""}`}>
-      <span className="stat-figure__value">{value}</span>
-      <span className="stat-figure__label">{label}</span>
-    </div>
-  );
-}
-
-function BalanceBar({
-  primary,
-  secondary,
-  primaryTone,
-  secondaryTone,
-  label,
-}: {
-  primary: number;
-  secondary: number;
-  primaryTone: "positive" | "negative" | "accent" | "recover" | "muted";
-  secondaryTone: "positive" | "negative" | "accent" | "recover" | "muted";
-  label: string;
-}) {
-  const total = primary + secondary;
-  const primaryPct = total > 0 ? (primary / total) * 100 : 0;
-
-  return (
-    <div className="stats-bar" role="img" aria-label={label}>
-      {total === 0 ? (
-        <span className="stats-bar__seg stats-bar__seg--muted" style={{ width: "100%" }} />
-      ) : (
-        <>
-          <span className={`stats-bar__seg stats-bar__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
-          <span className={`stats-bar__seg stats-bar__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
-        </>
-      )}
-    </div>
-  );
-}
-
-function TotalFigure({ value, games }: { value: number; games?: number }) {
-  return (
-    <span className="metric-total">
-      <span className="metric-card__value">{value}</span>
-      {games ? <span className="metric-total__per">{perGame(value, games)} per game</span> : null}
+    <span className="metric-total metric-total--stack">
+      <MatchTrendTip metric={metric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
+        <span className="metric-card__value">{value}</span>
+      </MatchTrendTip>
+      {games ? <PerGameBadge total={value} games={games} /> : null}
     </span>
-  );
-}
-
-function StatsPanel({
-  title,
-  rate,
-  rateLabel,
-  extra,
-  bar,
-  figures,
-  single,
-}: {
-  title: string;
-  rate?: string;
-  rateLabel?: string;
-  extra?: ReactNode;
-  bar: ReactNode;
-  figures: ReactNode;
-  single?: boolean;
-}) {
-  return (
-    <section className="stats-panel">
-      <header className="stats-panel__head">
-        <h3 className="stats-panel__title">{title}</h3>
-        {rate ? (
-          <p className="stats-panel__rate">
-            <strong>{rate}</strong>
-            {rateLabel}
-            {extra}
-          </p>
-        ) : null}
-        </header>
-      <div className={`stats-split${single ? " stats-split--single" : ""}`}>{figures}</div>
-      {bar}
-    </section>
-  );
-}
-
-function StatsBoard({ summary, games }: { summary: MatchSummary; games?: number }) {
-  return (
-    <div className="stats-board">
-      <StatsPanel
-        title="General passing"
-        rate={String(summary.totalPasses)}
-        rateLabel="passes"
-        extra={
-          <>
-            {games ? <span className="stats-panel__per">{perGame(summary.totalPasses, games)} per game</span> : null}
-            <span className="stats-panel__pair">
-              <span className="stats-panel__dot" aria-hidden="true">
-                ·
-              </span>
-              <strong className="stats-panel__accuracy">{summary.accuracy}%</strong>
-              accurate
-            </span>
-          </>
-        }
-        bar={
-          <BalanceBar
-            primary={summary.accurate}
-            secondary={summary.inaccurate}
-            primaryTone="positive"
-            secondaryTone="negative"
-            label={`${summary.accurate} accurate and ${summary.inaccurate} inaccurate`}
-          />
-        }
-        figures={
-          <>
-            <StatFigure label="Accurate" value={String(summary.accurate)} tone="positive" />
-            <StatFigure label="Inaccurate" value={String(summary.inaccurate)} tone="negative" />
-          </>
-        }
-      />
-      <StatsPanel
-        title="Interceptions & recoveries"
-        rate={String(summary.regains)}
-        rateLabel="total"
-        extra={games ? <span className="stats-panel__per">{perGame(summary.regains, games)} per game</span> : null}
-        bar={
-          <BalanceBar
-            primary={summary.interceptions}
-            secondary={summary.recoveries}
-            primaryTone="accent"
-            secondaryTone="recover"
-            label={`${summary.interceptions} interceptions and ${summary.recoveries} recoveries`}
-          />
-        }
-        figures={
-          <>
-            <StatFigure label="Interceptions" value={String(summary.interceptions)} tone="accent" />
-            <StatFigure label="Recoveries" value={String(summary.recoveries)} tone="recover" />
-          </>
-        }
-      />
-      <StatsPanel
-        title="Offensive duels"
-        rate={`${summary.offensiveWinRate}%`}
-        rateLabel="won"
-        bar={
-          <BalanceBar
-            primary={summary.offensiveWon}
-            secondary={summary.offensiveLost}
-            primaryTone="positive"
-            secondaryTone="negative"
-            label={`${summary.offensiveWon} won and ${summary.offensiveLost} lost`}
-          />
-        }
-        figures={
-          <>
-            <StatFigure label="Won" value={String(summary.offensiveWon)} tone="positive" />
-            <StatFigure label="Lost" value={String(summary.offensiveLost)} tone="negative" />
-          </>
-        }
-      />
-      <StatsPanel
-        title="Defensive duels"
-        rate={`${summary.defensiveWinRate}%`}
-        rateLabel="won"
-        bar={
-          <BalanceBar
-            primary={summary.defensiveWon}
-            secondary={summary.defensiveLost}
-            primaryTone="positive"
-            secondaryTone="negative"
-            label={`${summary.defensiveWon} won and ${summary.defensiveLost} lost`}
-          />
-        }
-        figures={
-          <>
-            <StatFigure label="Won" value={String(summary.defensiveWon)} tone="positive" />
-            <StatFigure label="Lost" value={String(summary.defensiveLost)} tone="negative" />
-          </>
-        }
-      />
-    </div>
   );
 }
 
@@ -431,85 +288,11 @@ function MatchSwitcher({
   );
 }
 
-const CHICAGO_EXPLORE_MATCH_ID = "chicago-fire";
-
-function buildPossessionsContent(
-  match: MatchStats,
-  exploreView: ChicagoExploreView,
-): ReactNode {
-  const { possessions, duels, games } = match;
+function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
+  const { passesUnderPressure, passResults, possessions, games } = match;
   const scope = match.id === "season" ? "season" : "match";
+  const trend: TrendContext = { matches: sessionMatches, activeMatchId: match.id };
 
-  if (exploreView === "v2") {
-    return (
-      <>
-        <div className="metric-card metric-card--hero metric-card--compact">
-          <h3 className="metric-card__title">Total possessions</h3>
-          <TotalFigure value={possessions.total} games={games} />
-          <p className="metric-card__caption">Ball possessions in the {scope}</p>
-        </div>
-        <PossessionSplitView possessions={possessions} />
-      </>
-    );
-  }
-
-  if (exploreView === "v3") {
-    return (
-      <>
-        <div className="metric-card metric-card--hero metric-card--compact">
-          <h3 className="metric-card__title">Total possessions</h3>
-          <TotalFigure value={possessions.total} games={games} />
-          <p className="metric-card__caption">Ball possessions in the {scope}</p>
-        </div>
-        <PossessionShareView possessions={possessions} />
-      </>
-    );
-  }
-
-  return (
-    <>
-      <div className="metric-card metric-card--hero">
-        <h3 className="metric-card__title">Total possessions</h3>
-        <TotalFigure value={possessions.total} games={games} />
-        <p className="metric-card__caption">Ball possessions in the {scope}</p>
-      </div>
-      {duels ? (
-        <p className="metric-note">
-          Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
-        </p>
-      ) : null}
-      <MetricFlow
-        items={[
-          <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
-          <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
-          <PossessionStat
-            key="lp"
-            label="Lost Plays"
-            value={possessions.lostPlays}
-            total={possessions.total}
-            variant="lost-plays"
-          />,
-        ]}
-      />
-    </>
-  );
-}
-
-function buildStatsContent(match: MatchStats, exploreView: ChicagoExploreView, summary: MatchSummary): ReactNode {
-  const { games } = match;
-  if (exploreView === "v2") {
-    return <StatsHeroSideboard summary={summary} games={games} />;
-  }
-  if (exploreView === "v3") {
-    return <StatsColumnBoard summary={summary} games={games} />;
-  }
-  return <StatsBoard summary={summary} games={games} />;
-}
-
-function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "classic"): Topic[] {
-  const { passesUnderPressure, passResults, games } = match;
-  const chicagoExplore = match.id === CHICAGO_EXPLORE_MATCH_ID ? exploreView : "classic";
-  const scope = match.id === "season" ? "season" : "match";
   const topics: Topic[] = [
     {
       id: "passes-pressure",
@@ -521,7 +304,12 @@ function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "class
           items={[
             <div key="total" className="metric-card metric-card--hero metric-card--compact">
               <h3 className="metric-card__title">Total passes</h3>
-              <TotalFigure value={passesUnderPressure.total} games={games} />
+              <TotalFigure
+                value={passesUnderPressure.total}
+                games={games}
+                metric="passes-total"
+                trend={trend}
+              />
               <p className="metric-card__caption">Passes tracked in the {scope}</p>
             </div>,
             <SplitMeter
@@ -534,6 +322,9 @@ function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "class
               secondaryLabel="Not under pressure"
               primaryTone="warn"
               secondaryTone="accent"
+              primaryMetric="passes-under-pressure"
+              secondaryMetric="passes-not-under-pressure"
+              trend={trend}
               major
             />,
           ]}
@@ -550,11 +341,25 @@ function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "class
             title="Total passes"
             breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
             games={games}
+            trendScope="combined"
+            trend={trend}
           />
           <MetricFlow
             items={[
-              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} />,
-              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} />,
+              <PassResultsMeter
+                key="up"
+                title="Under pressure"
+                breakdown={passResults.underPressure}
+                trendScope="underPressure"
+                trend={trend}
+              />,
+              <PassResultsMeter
+                key="nop"
+                title="Not under pressure"
+                breakdown={passResults.notUnderPressure}
+                trendScope="notUnderPressure"
+                trend={trend}
+              />,
             ]}
           />
         </>
@@ -564,7 +369,16 @@ function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "class
       id: "possessions",
       title: "Possessions",
       phase: "build-up",
-      content: buildPossessionsContent(match, chicagoExplore),
+      content: (
+        <>
+          <div className="metric-card metric-card--hero metric-card--compact">
+            <h3 className="metric-card__title">Total possessions</h3>
+            <TotalFigure value={possessions.total} games={games} metric="possessions-total" trend={trend} />
+            <p className="metric-card__caption">Ball possessions in the {scope}</p>
+          </div>
+          <PossessionSplitView possessions={possessions} trend={trend} scopeLabel={scope} />
+        </>
+      ),
     },
   ];
 
@@ -574,42 +388,11 @@ function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "class
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: buildStatsContent(match, chicagoExplore, summary),
+      content: <StatsHeroSideboard summary={summary} games={games} trend={trend} />,
     });
   }
 
   return topics;
-}
-
-function ChicagoExploreTabs({
-  view,
-  onChange,
-}: {
-  view: ChicagoExploreView;
-  onChange: (view: ChicagoExploreView) => void;
-}) {
-  const tabs: { id: ChicagoExploreView; label: string }[] = [
-    { id: "classic", label: "Classic" },
-    { id: "v2", label: "v2" },
-    { id: "v3", label: "v3" },
-  ];
-
-  return (
-    <div className="view-tabs" role="tablist" aria-label="Chicago Fire layout alternatives">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          role="tab"
-          className={`view-tabs__tab${view === tab.id ? " is-active" : ""}`}
-          aria-selected={view === tab.id}
-          onClick={() => onChange(tab.id)}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
@@ -617,20 +400,9 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const options = useMemo(() => [...matches, seasonMatch(matches)], [matches]);
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
-  const [chicagoExploreView, setChicagoExploreView] = useState<ChicagoExploreView>("classic");
   const match = options.find((item) => item.id === matchId) ?? options[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
-  const topics = useMemo(
-    () => buildTopics(match, match.id === CHICAGO_EXPLORE_MATCH_ID ? chicagoExploreView : "classic"),
-    [match, chicagoExploreView],
-  );
-
-  function handleMatchChange(id: string) {
-    setMatchId(id);
-    if (id !== CHICAGO_EXPLORE_MATCH_ID) {
-      setChicagoExploreView("classic");
-    }
-  }
+  const topics = useMemo(() => buildTopics(match, matches), [match, matches]);
 
   return (
     <VideoLinksProvider
@@ -663,10 +435,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
 
           <main className="report-main">
             <div className="view-panel">
-              <MatchSwitcher matches={options} activeId={match.id} onChange={handleMatchChange} />
-              {match.id === CHICAGO_EXPLORE_MATCH_ID ? (
-                <ChicagoExploreTabs view={chicagoExploreView} onChange={setChicagoExploreView} />
-              ) : null}
+              <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId} />
               <TopicsBoard topics={topics} />
             </div>
           </main>
