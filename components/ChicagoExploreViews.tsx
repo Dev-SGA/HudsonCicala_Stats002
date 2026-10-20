@@ -1,5 +1,5 @@
 import { CountLine } from "@/components/CountLine";
-import type { MatchStats, MatchSummary } from "@/lib/stats";
+import { clipUrl, type MatchStats, type MatchSummary } from "@/lib/stats";
 
 type PossessionSource = MatchStats["possessions"];
 
@@ -148,6 +148,15 @@ export function PossessionBoard({
   );
 }
 
+function ClipLabel({ label, href }: { label: string; href?: string }) {
+  if (!href) return <span>{label}</span>;
+  return (
+    <a className="clip-link" href={href} target="_blank" rel="noreferrer">
+      {label}
+    </a>
+  );
+}
+
 function StatsSplit({
   primary,
   secondary,
@@ -155,6 +164,8 @@ function StatsSplit({
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  primaryHref,
+  secondaryHref,
   showShare = true,
 }: {
   primary: number;
@@ -163,6 +174,8 @@ function StatsSplit({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  primaryHref?: string;
+  secondaryHref?: string;
   showShare?: boolean;
 }) {
   const total = primary + secondary;
@@ -180,12 +193,12 @@ function StatsSplit({
       <ul className="stats-viz__legend">
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
-          <span>{primaryLabel}</span>
+          <ClipLabel label={primaryLabel} href={primaryHref} />
           <strong>{figure(primary)}</strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
-          <span>{secondaryLabel}</span>
+          <ClipLabel label={secondaryLabel} href={secondaryHref} />
           <strong>{figure(secondary)}</strong>
         </li>
       </ul>
@@ -232,6 +245,8 @@ function StatsRateTopic({
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  primaryHref,
+  secondaryHref,
   showShare = true,
 }: {
   title: string;
@@ -247,6 +262,8 @@ function StatsRateTopic({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  primaryHref?: string;
+  secondaryHref?: string;
   showShare?: boolean;
 }) {
   return (
@@ -262,6 +279,8 @@ function StatsRateTopic({
           secondaryLabel={secondaryLabel}
           primaryTone={primaryTone}
           secondaryTone={secondaryTone}
+          primaryHref={primaryHref}
+          secondaryHref={secondaryHref}
           showShare={showShare}
         />
       </div>
@@ -269,7 +288,15 @@ function StatsRateTopic({
   );
 }
 
-export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; games?: number }) {
+export function StatsHeroSideboard({
+  summary,
+  games,
+  videos,
+}: {
+  summary: MatchSummary;
+  games?: number;
+  videos?: MatchStats["videos"];
+}) {
   const offensiveTotal = summary.offensiveWon + summary.offensiveLost;
   const defensiveTotal = summary.defensiveWon + summary.defensiveLost;
 
@@ -289,6 +316,7 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         secondaryLabel="Inaccurate"
         primaryTone="positive"
         secondaryTone="muted"
+        secondaryHref={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
         showShare={false}
       />
       <StatsRateTopic
@@ -305,6 +333,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="muted"
+        primaryHref={clipUrl(videos, "Off. Duels Won", "Off Duels Won")}
+        secondaryHref={clipUrl(videos, "Off. Duels Lost", "Off Duels Lost")}
         showShare={false}
       />
       <StatsRateTopic
@@ -321,12 +351,14 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="muted"
+        primaryHref={clipUrl(videos, "Def. Duels Won", "Def Duels Won")}
+        secondaryHref={clipUrl(videos, "Def. Duels Lost", "Def Duels Lost")}
         showShare={false}
       />
       <section className="stats-topic">
-        <h3 className="stats-topic__title">Regains</h3>
+        <h3 className="stats-topic__title">Tackles</h3>
         <div className="stats-topic__panel stats-topic__panel--pair">
-          <StatsFigure label="Total regains" value={summary.regains} unit="regains" games={games} />
+          <StatsFigure label="Total tackles" value={summary.regains} unit="tackles" games={games} />
           <StatsSplit
             primary={summary.interceptions}
             secondary={summary.recoveries}
@@ -334,6 +366,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
             secondaryLabel="Recoveries"
             primaryTone="accent"
             secondaryTone="recover"
+            primaryHref={clipUrl(videos, "Interceptions")}
+            secondaryHref={clipUrl(videos, "Recoveries")}
           />
         </div>
       </section>

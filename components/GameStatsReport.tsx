@@ -12,6 +12,7 @@ import { CountLine } from "@/components/CountLine";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
+  clipUrl,
   combinePassResults,
   matchSummary,
   seasonMatch,
@@ -26,19 +27,25 @@ type GameStatsReportProps = {
   report: StatsReport;
 };
 
-type BarTone = "accent" | "positive" | "negative" | "muted" | "warn";
-
 const PASS_PLAY_TIPS = {
   progressive:
-    "Progressive Play — Finding a teammate with a clear opportunity to progress the ball, create a scoring opportunity, or a pass that break defensive lines.",
+    "Progressive Pass — Finding a teammate with a clear opportunity to progress the ball, create a scoring opportunity, or a pass that breaks defensive lines.",
   neutral:
-    "Neutral Play — Finding a teammate without a clear opportunity to progress the ball, but with a clear option to maintain possession.",
-  lost: "Lost Play — Losing possession through an inaccurate pass or finding a teammate who is immediately under pressure and at high risk of losing possession.",
+    "Other — Finding a teammate without a clear opportunity to progress the ball, but with a clear option to maintain possession.",
+  lost: "Inaccurate Pass — Losing possession through an inaccurate pass or finding a teammate who is immediately under pressure and at high risk of losing possession.",
 } as const;
 
-function PassPlayTip({ label, tip }: { label: string; tip: string }) {
+function PassPlayTip({ label, tip, href }: { label: string; tip: string; href?: string }) {
+  const className = `pass-play-tip legend__label${href ? " pass-play-tip--clip" : ""}`;
+  if (href) {
+    return (
+      <a className={className} href={href} target="_blank" rel="noreferrer" data-tip={tip} aria-label={`${label}. ${tip}`}>
+        <span className="pass-play-tip__label">{label}</span>
+      </a>
+    );
+  }
   return (
-    <button type="button" className="pass-play-tip legend__label" data-tip={tip} aria-label={`${label}. ${tip}`}>
+    <button type="button" className={className} data-tip={tip} aria-label={`${label}. ${tip}`}>
       <span className="pass-play-tip__label">{label}</span>
     </button>
   );
@@ -48,66 +55,16 @@ function percent(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
 }
 
-function SplitMeter({
-  title,
-  primary,
-  secondary,
-  primaryLabel,
-  secondaryLabel,
-  primaryTone,
-  secondaryTone,
-  headline,
-  major,
-}: {
-  title: string;
-  primary: number;
-  secondary: number;
-  primaryLabel: string;
-  secondaryLabel: string;
-  primaryTone: BarTone;
-  secondaryTone: BarTone;
-  headline: string;
-  major?: boolean;
-}) {
-  const total = primary + secondary;
-  const primaryPct = percent(primary, total);
-
-  return (
-    <div className={`metric-card${major ? " metric-card--major" : " metric-card--compact"}`}>
-      <h3 className="metric-card__title">{title}</h3>
-      <p className="metric-card__headline">{headline}</p>
-      <div className="meter" role="img" aria-label={`${primaryLabel}: ${primary}. ${secondaryLabel}: ${secondary}.`}>
-        <span className={`meter__seg meter__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
-        <span className={`meter__seg meter__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
-      </div>
-      <ul className="legend">
-        <li>
-          <span className={`legend__dot legend__dot--${primaryTone}`} />
-          <span className="legend__label">{primaryLabel}</span>
-          <strong>
-            {primary} · {percent(primary, total)}%
-          </strong>
-        </li>
-        <li>
-          <span className={`legend__dot legend__dot--${secondaryTone}`} />
-          <span className="legend__label">{secondaryLabel}</span>
-          <strong>
-            {secondary} · {percent(secondary, total)}%
-          </strong>
-        </li>
-      </ul>
-    </div>
-  );
-}
-
 function PassResultsMeter({
   title,
   breakdown,
   games,
+  videos,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
   games?: number;
+  videos?: MatchStats["videos"];
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const progressivePct = percent(breakdown.progressive, total);
@@ -127,7 +84,7 @@ function PassResultsMeter({
       <div
         className="meter"
         role="img"
-        aria-label={`Progressive: ${breakdown.progressive}. Neutral: ${breakdown.neutral}. Lost: ${breakdown.lost}.`}
+        aria-label={`Progressive Pass: ${breakdown.progressive}. Other: ${breakdown.neutral}. Inaccurate Pass: ${breakdown.lost}.`}
       >
         <span className="meter__seg meter__seg--pass-progressive" style={{ width: `${progressivePct}%` }} />
         <span className="meter__seg meter__seg--pass-neutral" style={{ width: `${neutralPct}%` }} />
@@ -136,21 +93,29 @@ function PassResultsMeter({
       <ul className="legend">
         <li>
           <span className="legend__dot legend__dot--pass-progressive" />
-          <PassPlayTip label="Progressive plays" tip={PASS_PLAY_TIPS.progressive} />
+          <PassPlayTip
+            label="Progressive Pass"
+            tip={PASS_PLAY_TIPS.progressive}
+            href={clipUrl(videos, "Progressive Passes", "Progressive Pass")}
+          />
           <strong>
             {breakdown.progressive} · {progressivePct}%
           </strong>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-neutral" />
-          <PassPlayTip label="Neutral plays" tip={PASS_PLAY_TIPS.neutral} />
+          <PassPlayTip label="Other" tip={PASS_PLAY_TIPS.neutral} />
           <strong>
             {breakdown.neutral} · {neutralPct}%
           </strong>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-lost" />
-          <PassPlayTip label="Lost plays" tip={PASS_PLAY_TIPS.lost} />
+          <PassPlayTip
+            label="Inaccurate Pass"
+            tip={PASS_PLAY_TIPS.lost}
+            href={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
+          />
           <strong>
             {breakdown.lost} · {lostPct}%
           </strong>
@@ -158,11 +123,6 @@ function PassResultsMeter({
       </ul>
     </div>
   );
-}
-
-function TotalFigure({ value, games, unit }: { value: number; games?: number; unit: string }) {
-  if (games) return <CountLine value={value} unit={unit} games={games} />;
-  return <span className="metric-card__value">{value}</span>;
 }
 
 function MatchSwitcher({
@@ -220,39 +180,21 @@ function MatchSwitcher({
 }
 
 function buildTopics(match: MatchStats): Topic[] {
-  const { passesUnderPressure, passResults, possessions, games } = match;
+  const { passResults, possessions, games, videos } = match;
   const scope = match.id === "season" ? "season" : "match";
+  const topics: Topic[] = [];
+  const summary = matchSummary(match);
 
-  const topics: Topic[] = [
-    {
-      id: "passes-pressure",
-      title: "Passes Under Pressure vs Not",
-      phase: "build-up",
-      content: (
-        <MetricFlow
-          className="metric-flow--pressure"
-          items={[
-            <div key="total" className="metric-card metric-card--hero metric-card--compact">
-              <h3 className="metric-card__title">Total passes</h3>
-              <TotalFigure value={passesUnderPressure.total} games={games} unit="passes" />
-              <p className="metric-card__caption">Passes tracked in the {scope}</p>
-            </div>,
-            <SplitMeter
-              key="split"
-              title="Pressure context"
-              headline={`${passesUnderPressure.underPressure} under pressure · ${passesUnderPressure.notUnderPressure} not under pressure`}
-              primary={passesUnderPressure.underPressure}
-              secondary={passesUnderPressure.notUnderPressure}
-              primaryLabel="Under pressure"
-              secondaryLabel="Not under pressure"
-              primaryTone="warn"
-              secondaryTone="accent"
-              major
-            />,
-          ]}
-        />
-      ),
-    },
+  if (summary) {
+    topics.push({
+      id: "stats",
+      title: "Stats",
+      phase: "stats",
+      content: <StatsHeroSideboard summary={summary} games={games} videos={videos} />,
+    });
+  }
+
+  topics.push(
     {
       id: "pass-results",
       title: "Pass Results",
@@ -263,11 +205,24 @@ function buildTopics(match: MatchStats): Topic[] {
             title="Total passes"
             breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
             games={games}
+            videos={videos}
           />
           <MetricFlow
             items={[
-              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} games={games} />,
-              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} games={games} />,
+              <PassResultsMeter
+                key="up"
+                title="Under pressure"
+                breakdown={passResults.underPressure}
+                games={games}
+                videos={videos}
+              />,
+              <PassResultsMeter
+                key="nop"
+                title="Not under pressure"
+                breakdown={passResults.notUnderPressure}
+                games={games}
+                videos={videos}
+              />,
             ]}
           />
         </>
@@ -277,21 +232,9 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "possessions",
       title: "Possessions",
       phase: "build-up",
-      content: (
-        <PossessionBoard possessions={possessions} scopeLabel={scope} games={games} />
-      ),
+      content: <PossessionBoard possessions={possessions} scopeLabel={scope} games={games} />,
     },
-  ];
-
-  const summary = matchSummary(match);
-  if (summary) {
-    topics.push({
-      id: "stats",
-      title: "Stats",
-      phase: "stats",
-      content: <StatsHeroSideboard summary={summary} games={games} />,
-    });
-  }
+  );
 
   return topics;
 }

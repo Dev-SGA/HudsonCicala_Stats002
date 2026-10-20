@@ -122,6 +122,13 @@ function rate(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
 }
 
+export function clipUrl(videos: { label: string; url: string }[] | undefined, ...aliases: string[]): string | undefined {
+  if (!videos?.length) return undefined;
+  const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const keys = new Set(aliases.map(normalize));
+  return videos.find((video) => keys.has(normalize(video.label)))?.url;
+}
+
 /** Average per recorded game, with one decimal when it is not a whole number. */
 export function perGame(total: number, games: number): string {
   const value = games > 0 ? total / games : 0;

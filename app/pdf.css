@@ -760,7 +760,7 @@
 
 .spdf-pass-row-bar {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) auto;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   min-width: 0;

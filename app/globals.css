@@ -1361,6 +1361,21 @@ body::before {
   list-style: none;
 }
 
+.pass-play-tip--clip {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.clip-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.clip-link:hover,
+.pass-play-tip--clip:hover .pass-play-tip__label {
+  color: var(--tone-accent);
+}
+
 .pass-play-tip {
   position: relative;
   display: block;

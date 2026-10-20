@@ -48,9 +48,9 @@ function PassResultPanel({
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const segments = [
-    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
-    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
-    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
+    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const },
+    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const },
+    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-lost" as const },
   ].filter((segment) => segment.value > 0);
 
   return (
@@ -104,13 +104,13 @@ function PassResultPanel({
   );
 }
 
-/** Total passes: one horizontal bar per category (Progressive, Neutral, Lost). */
+/** Total passes: one horizontal bar per category (Progressive Pass, Other, Inaccurate Pass). */
 function PassResultRowBars({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const rows = [
-    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
-    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
-    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
+    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const },
+    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const },
+    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-lost" as const },
   ];
 
   return (
@@ -466,9 +466,9 @@ function SummaryPdfPage({
             ]}
           />
           <SummaryStatCard
-            title="Regains"
+            title="Tackles"
             total={summary.regains}
-            totalLabel="Total regains"
+            totalLabel="Total tackles"
             perGameLabel={games ? `${perGame(summary.regains, games)} per game` : undefined}
             segments={[
               { label: "Interceptions", value: String(summary.interceptions), share: summary.interceptions, tone: "blue" },
