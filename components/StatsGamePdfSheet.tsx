@@ -475,7 +475,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
   const scope = meta.subtitle === "Season" ? "season" : "match";
-  const games = meta.games;
 
   return (
     <>
@@ -496,7 +495,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                 <span className="spdf-pressure__kicker">Total passes</span>
                 <span className="spdf-pressure__figure">
                   <span className="spdf-pressure__value">{passTotal}</span>
-                  {games ? <span className="spdf-pressure__per">{perGame(passTotal, games)} per game</span> : null}
                 </span>
                 <span className="spdf-pressure__caption">Passes tracked in the {scope}</span>
               </div>
@@ -556,7 +554,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             title="Possessions"
             kpi={possessions.total}
             unit="Total possessions"
-            aside={games ? `${perGame(possessions.total, games)} per game` : undefined}
           >
             <div className="spdf-possession-layout">
               <div className="spdf-possession-stat-cards">
