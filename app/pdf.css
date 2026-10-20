@@ -886,18 +886,19 @@
   background: #fbf8ef;
 }
 
+.spdf-possession-stat--lost-plays .spdf-possession-stat__label,
 .spdf-possession-stat--lost-plays .spdf-possession-stat__value {
   color: #a97412;
 }
 
 .spdf-possession-stat--turnovers {
-  border-color: #ead56a;
-  background: #fffbe6;
+  border-color: #d4bc6a;
+  background: #fbf6e2;
 }
 
 .spdf-possession-stat--turnovers .spdf-possession-stat__label,
 .spdf-possession-stat--turnovers .spdf-possession-stat__value {
-  color: #c6a20e;
+  color: #8f6c0e;
 }
 
 .spdf-possession-stat__pct {
@@ -1118,7 +1119,7 @@
 
 .spdf-pass-panel__seg--pass-turnover,
 .spdf-pass-panel__dot--pass-turnover {
-  background: #f0d34a;
+  background: #b08a14;
 }
 
 .spdf-pass-panel__legend {
