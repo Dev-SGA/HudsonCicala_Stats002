@@ -10,7 +10,7 @@ type StatsGamePdfSheetProps = {
   opponentLogoUrl: string;
 };
 
-type PrintTone = "green" | "yellow" | "blue" | "mint" | "grey";
+type PrintTone = "green" | "yellow" | "blue" | "mint" | "grey" | "pass-progressive" | "pass-lost";
 
 type Tone = "blue" | "red" | "burnt" | "warn" | "pass-progressive" | "pass-neutral" | "pass-lost";
 
@@ -101,6 +101,35 @@ function PassResultPanel({
           </ul>
         </>
       )}
+    </div>
+  );
+}
+
+function PassResultColumnChart({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
+  const columns = [
+    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
+    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
+    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
+  ];
+  const max = Math.max(...columns.map((column) => column.value), 1);
+
+  return (
+    <div className="spdf-pass-columns">
+      <p className="spdf-pass-columns__title">{title}</p>
+      <div className="spdf-pass-columns__chart">
+        {columns.map((column) => (
+          <div key={column.label} className="spdf-pass-columns__item">
+            <strong className={`spdf-pass-columns__value spdf-pass-columns__value--${column.tone}`}>{column.value}</strong>
+            <span className="spdf-pass-columns__bar-wrap">
+              <span
+                className={`spdf-pass-columns__bar spdf-pass-columns__bar--${column.tone}`}
+                style={{ height: `${(column.value / max) * 100}%` }}
+              />
+            </span>
+            <span className="spdf-pass-columns__label">{column.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -215,7 +244,7 @@ function SummaryCard({
         <p className="spdf-section__phase">Summary</p>
         <div className="spdf-section__heading">
           <h3 className="spdf-section__title">{title}</h3>
-          {detail ? <p className="spdf-section__detail">{detail}</p> : null}
+          {detail ? <p className="spdf-section__detail spdf-section__detail--rate">{detail}</p> : null}
         </div>
       </div>
       <div className="spdf-section__content">
@@ -296,13 +325,13 @@ function SummaryPdfPage({
             kpi={String(summary.totalPasses)}
             unit="Total passes"
             aside={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
-            detail={`${summary.accuracy}% accurate`}
+            detail={`${summary.accuracy}% ACCURATE`}
           >
             <SummaryMeter
               headline={`${summary.accurate} accurate · ${summary.inaccurate} inaccurate`}
               segments={[
-                { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "green" },
-                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "yellow" },
+                { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
+                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "pass-lost" },
               ]}
             />
           </SummaryCard>
@@ -324,13 +353,13 @@ function SummaryPdfPage({
             title="Offensive duels"
             kpi={String(summary.offensiveWon + summary.offensiveLost)}
             unit="Total duels"
-            detail={`${summary.offensiveWinRate}% won rate`}
+            detail={`${summary.offensiveWinRate}% WON RATE`}
           >
             <SummaryMeter
               headline={`${summary.offensiveWon} won · ${summary.offensiveLost} lost`}
               segments={[
-                { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "green" },
-                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "yellow" },
+                { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
+                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "pass-lost" },
               ]}
             />
           </SummaryCard>
@@ -338,13 +367,13 @@ function SummaryPdfPage({
             title="Defensive duels"
             kpi={String(summary.defensiveWon + summary.defensiveLost)}
             unit="Total duels"
-            detail={`${summary.defensiveWinRate}% won rate`}
+            detail={`${summary.defensiveWinRate}% WON RATE`}
           >
             <SummaryMeter
               headline={`${summary.defensiveWon} won · ${summary.defensiveLost} lost`}
               segments={[
-                { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "green" },
-                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "yellow" },
+                { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
+                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "pass-lost" },
               ]}
             />
           </SummaryCard>
@@ -432,13 +461,12 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             size="lg"
             aside={games ? `${perGame(passTotal, games)} per game` : undefined}
           >
-            <div className="spdf-pass-stack">
-              <PassResultPanel
-                title="Total passes"
+            <div className="spdf-pass-layout">
+              <PassResultColumnChart
+                title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
-                compact
               />
-              <div className="spdf-pass-row">
+              <div className="spdf-pass-split-stack">
                 <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
                 <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
               </div>
