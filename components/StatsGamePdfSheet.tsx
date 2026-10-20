@@ -49,10 +49,10 @@ function PassResultPanel({
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const segments = [
-    { value: breakdown.progressive, tone: "pass-progressive" as const },
-    { value: breakdown.neutral, tone: "pass-neutral" as const },
-    { value: breakdown.lost, tone: "pass-lost" as const },
-  ];
+    { label: "Progressive", value: breakdown.progressive, tone: "pass-progressive" as const },
+    { label: "Neutral", value: breakdown.neutral, tone: "pass-neutral" as const },
+    { label: "Lost", value: breakdown.lost, tone: "pass-lost" as const },
+  ].filter((segment) => segment.value > 0);
 
   return (
     <div className={`spdf-pass-panel${compact ? " spdf-pass-panel--total" : ""}`}>
@@ -60,40 +60,47 @@ function PassResultPanel({
         <p className="spdf-pass-panel__title">{title}</p>
         <span className="spdf-pass-panel__total">{total} passes</span>
       </div>
-      <div className="spdf-pass-panel__track">
-        {segments.map((segment, index) =>
-          segment.value > 0 ? (
-            <span
-              key={index}
-              className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
-              style={{ width: `${pct(segment.value, total)}%` }}
-            />
-          ) : null,
-        )}
-      </div>
-      <ul className="spdf-pass-panel__legend">
-        <li>
-          <span className="spdf-pass-panel__dot spdf-pass-panel__dot--pass-progressive" />
-          <span className="spdf-pass-panel__legend-label">Progressive</span>
-          <strong>
-            {breakdown.progressive} · {pct(breakdown.progressive, total)}%
-          </strong>
-        </li>
-        <li>
-          <span className="spdf-pass-panel__dot spdf-pass-panel__dot--pass-neutral" />
-          <span className="spdf-pass-panel__legend-label">Neutral</span>
-          <strong>
-            {breakdown.neutral} · {pct(breakdown.neutral, total)}%
-          </strong>
-        </li>
-        <li>
-          <span className="spdf-pass-panel__dot spdf-pass-panel__dot--pass-lost" />
-          <span className="spdf-pass-panel__legend-label">Lost</span>
-          <strong>
-            {breakdown.lost} · {pct(breakdown.lost, total)}%
-          </strong>
-        </li>
-      </ul>
+      {compact ? (
+        <div className="spdf-pass-panel__meter" style={{ gridTemplateColumns: segments.map((segment) => `${segment.value}fr`).join(" ") }}>
+          {segments.map((segment) => (
+            <span key={segment.label} className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`} />
+          ))}
+          {segments.map((segment) => (
+            <div key={`${segment.label}-caption`} className="spdf-pass-panel__cap">
+              <span className="spdf-pass-panel__cap-label">
+                <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
+                {segment.label}
+              </span>
+              <strong>
+                {segment.value} · {pct(segment.value, total)}%
+              </strong>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="spdf-pass-panel__track">
+            {segments.map((segment) => (
+              <span
+                key={segment.label}
+                className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
+                style={{ width: `${pct(segment.value, total)}%` }}
+              />
+            ))}
+          </div>
+          <ul className="spdf-pass-panel__legend">
+            {segments.map((segment) => (
+              <li key={segment.label}>
+                <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
+                <span className="spdf-pass-panel__legend-label">{segment.label}</span>
+                <strong>
+                  {segment.value} · {pct(segment.value, total)}%
+                </strong>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
@@ -151,7 +158,8 @@ function PdfSide({
     <aside className="spdf-side">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={logoUrl} alt="" className="spdf-side__logo" />
-      <div className="spdf-side__photo" data-pdf-bg={photoUrl} style={{ backgroundImage: `url(${photoUrl})` }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={photoUrl} alt="" className="spdf-side__photo" />
       <div className="spdf-side__identity">
         <p className="spdf-side__label">Athlete</p>
         <h2 className="spdf-side__name">{name}</h2>
@@ -205,14 +213,16 @@ function SummaryCard({
     <section className="spdf-section spdf-section--build-up spdf-section--summary">
       <div className="spdf-section__top">
         <p className="spdf-section__phase">Summary</p>
-        <h3 className="spdf-section__title">{title}</h3>
+        <div className="spdf-section__heading">
+          <h3 className="spdf-section__title">{title}</h3>
+          {detail ? <p className="spdf-section__detail">{detail}</p> : null}
+        </div>
       </div>
       <div className="spdf-section__content">
-        <div className={`spdf-section__kpi${aside || detail ? " spdf-section__kpi--aside" : ""}`}>
+        <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
           <span className="spdf-section__value">{kpi}</span>
           {aside ? <span className="spdf-section__aside">{aside}</span> : null}
           <span className="spdf-section__unit">{unit}</span>
-          {detail ? <span className="spdf-section__detail">{detail}</span> : null}
         </div>
         <div className="spdf-section__panel">{children}</div>
       </div>

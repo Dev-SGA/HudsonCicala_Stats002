@@ -73,7 +73,7 @@
   display: flex;
   flex-direction: column;
   flex: 0 0 340px;
-  padding: 40px 36px 34px;
+  padding: 28px 36px 22px;
   background: #072334;
   color: #ffffff;
 }
@@ -85,18 +85,16 @@
 }
 
 .spdf-side__photo {
-  width: 268px;
-  height: 300px;
-  margin-top: 28px;
+  display: block;
+  width: 225px;
+  height: 408px;
+  margin: 14px auto 0;
   border-radius: 10px;
-  background-color: #0d3350;
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background: #0d3350;
 }
 
 .spdf-side__identity {
-  margin-top: 22px;
+  margin-top: 14px;
   padding-left: 14px;
   border-left: 3px solid #297cc1;
 }
@@ -497,18 +495,25 @@
   white-space: nowrap;
 }
 
-.spdf-section__kpi--aside .spdf-section__unit,
-.spdf-section__kpi--aside .spdf-section__detail {
+.spdf-section__kpi--aside .spdf-section__unit {
   flex-basis: 100%;
 }
 
+.spdf-section__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .spdf-section__detail {
-  margin-top: 2px;
-  font-size: 13px;
+  margin: 0;
+  flex-shrink: 0;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #05712d;
+  color: #6b8192;
 }
 
 .spdf-section__value {
@@ -554,13 +559,51 @@
   gap: 8px;
 }
 
-.spdf-pass-panel--total .spdf-pass-panel__legend {
-  flex-direction: row;
-  gap: 4px 12px;
+.spdf-pass-panel__meter {
+  display: grid;
+  grid-template-rows: 8px auto;
+  column-gap: 2px;
+  row-gap: 5px;
 }
 
-.spdf-pass-panel--total .spdf-pass-panel__legend li {
-  flex: 1 1 0;
+.spdf-pass-panel__meter .spdf-pass-panel__seg:first-of-type {
+  border-radius: 999px 0 0 999px;
+}
+
+.spdf-pass-panel__meter .spdf-pass-panel__seg:last-of-type {
+  border-radius: 0 999px 999px 0;
+}
+
+.spdf-pass-panel__cap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+  text-align: center;
+}
+
+.spdf-pass-panel__cap-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: #6b8192;
+  white-space: nowrap;
+}
+
+.spdf-pass-panel__cap strong {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #072334;
+  white-space: nowrap;
 }
 
 .spdf-pass-row {
