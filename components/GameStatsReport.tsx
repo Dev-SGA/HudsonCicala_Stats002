@@ -67,9 +67,12 @@ function PassResultsMeter({
   videos?: MatchStats["videos"];
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
+  const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
+  const inaccurateOnly = breakdown.lost - turnovers;
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
-  const lostPct = percent(breakdown.lost, total);
+  const inaccuratePct = percent(inaccurateOnly, total);
+  const turnoverPct = percent(turnovers, total);
 
   return (
     <div className="metric-card">
@@ -84,11 +87,12 @@ function PassResultsMeter({
       <div
         className="meter"
         role="img"
-        aria-label={`Progressive Pass: ${breakdown.progressive}. Other: ${breakdown.neutral}. Inaccurate Pass: ${breakdown.lost}.`}
+        aria-label={`Progressive Pass: ${breakdown.progressive}. Other: ${breakdown.neutral}. Inaccurate Pass: ${breakdown.lost}. Pass Turnovers: ${turnovers}.`}
       >
         <span className="meter__seg meter__seg--pass-progressive" style={{ width: `${progressivePct}%` }} />
         <span className="meter__seg meter__seg--pass-neutral" style={{ width: `${neutralPct}%` }} />
-        <span className="meter__seg meter__seg--pass-lost" style={{ width: `${lostPct}%` }} />
+        <span className="meter__seg meter__seg--pass-inaccurate" style={{ width: `${inaccuratePct}%` }} />
+        <span className="meter__seg meter__seg--pass-turnover" style={{ width: `${turnoverPct}%` }} />
       </div>
       <ul className="legend">
         <li>
@@ -110,16 +114,25 @@ function PassResultsMeter({
           </strong>
         </li>
         <li>
-          <span className="legend__dot legend__dot--pass-lost" />
+          <span className="legend__dot legend__dot--pass-inaccurate" />
           <PassPlayTip
             label="Inaccurate Pass"
             tip={PASS_PLAY_TIPS.lost}
             href={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
           />
           <strong>
-            {breakdown.lost} · {lostPct}%
+            {breakdown.lost} · {percent(breakdown.lost, total)}%
           </strong>
         </li>
+        {turnovers > 0 ? (
+          <li className="legend__nested">
+            <span className="legend__dot legend__dot--pass-turnover" />
+            <span className="legend__label">Pass Turnovers</span>
+            <strong>
+              {turnovers} · {turnoverPct}%
+            </strong>
+          </li>
+        ) : null}
       </ul>
     </div>
   );
@@ -232,7 +245,7 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "possessions",
       title: "Possessions",
       phase: "build-up",
-      content: <PossessionBoard possessions={possessions} scopeLabel={scope} games={games} />,
+      content: <PossessionBoard possessions={possessions} scopeLabel={scope} games={games} videos={videos} />,
     },
   );
 

@@ -4,6 +4,8 @@ export type PassResultBreakdown = {
   progressive: number;
   neutral: number;
   lost: number;
+  /** Subset of lost passes that are turnovers. */
+  turnovers?: number;
 };
 
 export type DuelAction = {
@@ -115,6 +117,7 @@ export function combinePassResults(...parts: PassResultBreakdown[]): PassResultB
       progressive: sum.progressive + part.progressive,
       neutral: sum.neutral + part.neutral,
       lost: sum.lost + part.lost,
+      turnovers: (sum.turnovers ?? 0) + (part.turnovers ?? 0),
     }),
     { progressive: 0, neutral: 0, lost: 0 },
   );

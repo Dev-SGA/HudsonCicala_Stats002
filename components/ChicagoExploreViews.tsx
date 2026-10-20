@@ -84,15 +84,27 @@ export function PossessionBoard({
   possessions,
   scopeLabel = "match",
   games,
+  videos,
 }: {
   possessions: PossessionSource;
   scopeLabel?: string;
   games?: number;
+  videos?: MatchStats["videos"];
 }) {
   const parts = possessionParts(possessions);
   const breakdown = [
-    { label: "Lost Duels", value: parts.dispossessed, tone: "yellow-deep" },
-    { label: "Inaccurate Pass", value: parts.inaccuratePasses, tone: "yellow-mid" },
+    {
+      label: "Lost Duels",
+      value: parts.dispossessed,
+      tone: "yellow-deep",
+      href: clipUrl(videos, "Off. Duels Lost", "Off Duels Lost"),
+    },
+    {
+      label: "Inaccurate Pass",
+      value: parts.inaccuratePasses,
+      tone: "yellow-mid",
+      href: clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass"),
+    },
     { label: "Turnover", value: parts.turnover, tone: "yellow-light", note: "Pass Turnover + Duel Turnover" },
   ];
   const breakdownTotal = breakdown.reduce((sum, item) => sum + item.value, 0);
@@ -137,7 +149,7 @@ export function PossessionBoard({
             <li key={item.label}>
               <span className={`legend__dot legend__dot--${item.tone}`} />
               <span className="legend__label">
-                {item.label}
+                <ClipLabel label={item.label} href={"href" in item ? item.href : undefined} />
                 {item.note ? <span className="legend__note">{item.note}</span> : null}
               </span>
               <strong>
@@ -319,7 +331,6 @@ export function StatsHeroSideboard({
         secondaryLabel="Inaccurate"
         primaryTone="positive"
         secondaryTone="muted"
-        secondaryHref={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
         showShare={false}
       />
       <StatsRateTopic
@@ -337,7 +348,6 @@ export function StatsHeroSideboard({
         primaryTone="positive"
         secondaryTone="muted"
         primaryHref={clipUrl(videos, "Off. Duels Won", "Off Duels Won")}
-        secondaryHref={clipUrl(videos, "Off. Duels Lost", "Off Duels Lost")}
         showShare={false}
       />
       <StatsRateTopic

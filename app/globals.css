@@ -1343,6 +1343,16 @@ body::before {
   background: var(--tone-pass-lost);
 }
 
+.meter__seg--pass-inaccurate,
+.legend__dot--pass-inaccurate {
+  background: #f0c48a;
+}
+
+.meter__seg--pass-turnover,
+.legend__dot--pass-turnover {
+  background: #e07a2f;
+}
+
 .meter__seg--yellow-deep,
 .legend__dot--yellow-deep {
   background: #c4960c;
@@ -1450,6 +1460,10 @@ body::before {
   gap: 8px;
   align-items: center;
   font-size: 13px;
+}
+
+.legend__nested {
+  padding-left: 18px;
 }
 
 .legend__dot {

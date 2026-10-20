@@ -47,10 +47,19 @@ function PassResultPanel({
   compact?: boolean;
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
-  const segments = [
-    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const },
-    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const },
-    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-lost" as const },
+  const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
+  const inaccurateOnly = breakdown.lost - turnovers;
+  const bar = [
+    { key: "progressive", value: breakdown.progressive, tone: "pass-progressive" },
+    { key: "other", value: breakdown.neutral, tone: "pass-neutral" },
+    { key: "inaccurate", value: inaccurateOnly, tone: "pass-inaccurate" },
+    { key: "turnover", value: turnovers, tone: "pass-turnover" },
+  ].filter((segment) => segment.value > 0);
+  const legend = [
+    { key: "progressive", label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive", nested: false },
+    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false },
+    { key: "inaccurate", label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate", nested: false },
+    { key: "turnover", label: "Pass Turnovers", value: turnovers, tone: "pass-turnover", nested: true },
   ].filter((segment) => segment.value > 0);
 
   return (
@@ -60,12 +69,12 @@ function PassResultPanel({
         <span className="spdf-pass-panel__total">{total} passes</span>
       </div>
       {compact ? (
-        <div className="spdf-pass-panel__meter" style={{ gridTemplateColumns: segments.map((segment) => `${segment.value}fr`).join(" ") }}>
-          {segments.map((segment) => (
-            <span key={segment.label} className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`} />
+        <div className="spdf-pass-panel__meter" style={{ gridTemplateColumns: bar.map((segment) => `${segment.value}fr`).join(" ") }}>
+          {bar.map((segment) => (
+            <span key={segment.key} className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`} />
           ))}
-          {segments.map((segment) => (
-            <div key={`${segment.label}-caption`} className="spdf-pass-panel__cap">
+          {legend.map((segment) => (
+            <div key={`${segment.key}-caption`} className={`spdf-pass-panel__cap${segment.nested ? " is-nested" : ""}`}>
               <span className="spdf-pass-panel__cap-label">
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
                 {segment.label}
@@ -79,17 +88,17 @@ function PassResultPanel({
       ) : (
         <>
           <div className="spdf-pass-panel__track">
-            {segments.map((segment) => (
+            {bar.map((segment) => (
               <span
-                key={segment.label}
+                key={segment.key}
                 className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`}
                 style={{ width: `${pct(segment.value, total)}%` }}
               />
             ))}
           </div>
           <ul className="spdf-pass-panel__legend">
-            {segments.map((segment) => (
-              <li key={segment.label}>
+            {legend.map((segment) => (
+              <li key={segment.key} className={segment.nested ? "is-nested" : undefined}>
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
                 <span className="spdf-pass-panel__legend-label">{segment.label}</span>
                 <strong>
@@ -107,10 +116,12 @@ function PassResultPanel({
 /** Total passes: one horizontal bar per category (Progressive Pass, Other, Inaccurate Pass). */
 function PassResultRowBars({ title, breakdown }: { title: string; breakdown: PassResultBreakdown }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
+  const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
   const rows = [
-    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const },
-    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const },
-    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-lost" as const },
+    { label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive" as const, nested: false },
+    { label: "Other", value: breakdown.neutral, tone: "pass-neutral" as const, nested: false },
+    { label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate" as const, nested: false, turnovers },
+    { label: "Pass Turnovers", value: turnovers, tone: "pass-turnover" as const, nested: true },
   ];
 
   return (
@@ -120,14 +131,30 @@ function PassResultRowBars({ title, breakdown }: { title: string; breakdown: Pas
         <span className="spdf-pass-panel__total">{total} passes</span>
       </div>
       <ul className="spdf-pass-rows">
-        {rows.map((row) => (
-          <li key={row.label} className="spdf-pass-row-bar">
+        {rows
+          .filter((row) => row.value > 0)
+          .map((row) => (
+          <li key={row.label} className={`spdf-pass-row-bar${row.nested ? " is-nested" : ""}`}>
             <span className="spdf-pass-row-bar__label">{row.label}</span>
             <span className="spdf-pass-row-bar__track">
-              <span
-                className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
-                style={{ width: `${pct(row.value, total)}%` }}
-              />
+              {row.nested ? (
+                <span
+                  className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
+                  style={{ width: `${pct(row.value, total)}%` }}
+                />
+              ) : row.label === "Inaccurate Pass" && turnovers > 0 ? (
+                <span className="spdf-pass-row-bar__fill spdf-pass-panel__seg--pass-inaccurate" style={{ width: `${pct(row.value, total)}%` }}>
+                  <span
+                    className="spdf-pass-row-bar__inner spdf-pass-panel__seg--pass-turnover"
+                    style={{ width: `${pct(turnovers, row.value)}%` }}
+                  />
+                </span>
+              ) : (
+                <span
+                  className={`spdf-pass-row-bar__fill spdf-pass-panel__seg--${row.tone}`}
+                  style={{ width: `${pct(row.value, total)}%` }}
+                />
+              )}
             </span>
             <strong className="spdf-pass-row-bar__value">
               {row.value} · {pct(row.value, total)}%
