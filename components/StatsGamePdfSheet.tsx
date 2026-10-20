@@ -140,7 +140,33 @@ function PassResultRowBars({ title, breakdown }: { title: string; breakdown: Pas
   );
 }
 
-type PdfPossessionSegTone = "retained" | "lost-plays" | "dispossessed" | "wrong-pass";
+type PdfPossessionSegTone =
+  | "retained"
+  | "lost-plays"
+  | "dispossessed"
+  | "wrong-pass"
+  | "lost-yellow-deep"
+  | "lost-yellow-light";
+
+function PdfPossessionStatCard({
+  label,
+  value,
+  share,
+  tone,
+}: {
+  label: string;
+  value: number;
+  share: number;
+  tone: "retained" | "lost-plays";
+}) {
+  return (
+    <div className={`spdf-possession-stat spdf-possession-stat--${tone}`}>
+      <span className="spdf-possession-stat__label">{label}</span>
+      <span className="spdf-possession-stat__value">{value}</span>
+      <span className="spdf-possession-stat__pct">{share}% of possessions</span>
+    </div>
+  );
+}
 
 function PdfPossessionSplit({
   title,
@@ -153,7 +179,7 @@ function PdfPossessionSplit({
   secondaryTone,
 }: {
   title: string;
-  headline: string;
+  headline?: string;
   primary: number;
   secondary: number;
   primaryLabel: string;
@@ -167,7 +193,7 @@ function PdfPossessionSplit({
   return (
     <div className="spdf-pass-panel spdf-possession-split">
       <p className="spdf-pass-panel__title">{title}</p>
-      <p className="spdf-possession-split__headline">{headline}</p>
+      {headline ? <p className="spdf-possession-split__headline">{headline}</p> : null}
       <div className="spdf-pass-panel__track">
         <span className={`spdf-pass-panel__seg spdf-pass-panel__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
         <span
@@ -204,6 +230,7 @@ function PdfSection({
   footer,
   size = "md",
   className,
+  panelOnly,
 }: {
   title: string;
   kpi: number;
@@ -213,21 +240,24 @@ function PdfSection({
   footer?: React.ReactNode;
   size?: "md" | "lg";
   className?: string;
+  panelOnly?: boolean;
 }) {
   return (
     <section
-      className={`spdf-section spdf-section--build-up spdf-section--${size}${className ? ` ${className}` : ""}`}
+      className={`spdf-section spdf-section--build-up spdf-section--${size}${panelOnly ? " spdf-section--panel-only" : ""}${className ? ` ${className}` : ""}`}
     >
       <div className="spdf-section__top">
         <p className="spdf-section__phase">Build-Up</p>
         <h3 className="spdf-section__title">{title}</h3>
       </div>
       <div className="spdf-section__content">
-        <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
-          <span className="spdf-section__value">{kpi}</span>
-          {aside ? <span className="spdf-section__aside">{aside}</span> : null}
-          <span className="spdf-section__unit">{unit}</span>
-        </div>
+        {panelOnly ? null : (
+          <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
+            <span className="spdf-section__value">{kpi}</span>
+            {aside ? <span className="spdf-section__aside">{aside}</span> : null}
+            <span className="spdf-section__unit">{unit}</span>
+          </div>
+        )}
         <div className="spdf-section__panel">{children}</div>
       </div>
       {footer ? <div className="spdf-section__footer">{footer}</div> : null}
@@ -469,7 +499,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
         <PdfHeader title={meta.title} subtitle={meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
 
         <div className="spdf-stack">
-          <section className="spdf-section spdf-section--build-up spdf-section--pressure">
+          <section className="spdf-section spdf-section--build-up spdf-section--pressure spdf-section--pressure-compact">
             <div className="spdf-section__top">
               <p className="spdf-section__phase">Build-Up</p>
               <h3 className="spdf-section__title">Passes Under Pressure vs Not</h3>
@@ -485,10 +515,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
               </div>
               <div className="spdf-pressure__context">
                 <p className="spdf-pressure__kicker">Pressure context</p>
-                <p className="spdf-pressure__headline">
-                  {passesUnderPressure.underPressure} under pressure · {passesUnderPressure.notUnderPressure} not under
-                  pressure
-                </p>
                 <div className="spdf-pressure__track">
                   <span
                     className="spdf-pressure__seg spdf-pressure__seg--warn"
@@ -524,21 +550,15 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             kpi={passTotal}
             unit="Passes"
             size="lg"
+            panelOnly
             className="spdf-section--pass-results"
-            aside={games ? `${perGame(passTotal, games)} per game` : undefined}
           >
-            <div className="spdf-pass-layout">
-              <div className="spdf-pass-layout__center">
-                <PassResultRowBars
-                  title="Total Passes"
-                  breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
-                />
-              </div>
-              <div className="spdf-pass-layout__arrows" aria-hidden="true">
-                <span className="spdf-pass-arrow" />
-                <span className="spdf-pass-arrow" />
-              </div>
-              <div className="spdf-pass-split-stack">
+            <div className="spdf-pass-results-app">
+              <PassResultRowBars
+                title="Total Passes"
+                breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+              />
+              <div className="spdf-pass-row">
                 <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
                 <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
               </div>
@@ -551,26 +571,29 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             unit="Total possessions"
             aside={games ? `${perGame(possessions.total, games)} per game` : undefined}
           >
-            <div className="spdf-possession-pair">
-              <PdfPossessionSplit
-                title="Possession outcomes"
-                headline={`${Math.max(possessions.total - possessions.lostPlays, 0)} retained · ${possessions.lostPlays} lost plays`}
-                primary={Math.max(possessions.total - possessions.lostPlays, 0)}
-                secondary={possessions.lostPlays}
-                primaryLabel="Retained"
-                secondaryLabel="Lost plays"
-                primaryTone="retained"
-                secondaryTone="lost-plays"
-              />
+            <div className="spdf-possession-layout">
+              <div className="spdf-possession-stat-cards">
+                <PdfPossessionStatCard
+                  label="Retained"
+                  value={Math.max(possessions.total - possessions.lostPlays, 0)}
+                  share={pct(Math.max(possessions.total - possessions.lostPlays, 0), possessions.total)}
+                  tone="retained"
+                />
+                <PdfPossessionStatCard
+                  label="Lost plays"
+                  value={possessions.lostPlays}
+                  share={pct(possessions.lostPlays, possessions.total)}
+                  tone="lost-plays"
+                />
+              </div>
               <PdfPossessionSplit
                 title="Lost play breakdown"
-                headline={`${possessions.lostBalls} dispossessed · ${possessions.wrongPasses} wrong passes`}
                 primary={possessions.lostBalls}
                 secondary={possessions.wrongPasses}
                 primaryLabel="Dispossessed"
                 secondaryLabel="Wrong passes"
-                primaryTone="dispossessed"
-                secondaryTone="wrong-pass"
+                primaryTone="lost-yellow-deep"
+                secondaryTone="lost-yellow-light"
               />
             </div>
           </PdfSection>
