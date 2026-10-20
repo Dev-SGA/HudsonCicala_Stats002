@@ -2,13 +2,6 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { AthleteProfileCard } from "@/components/AthleteProfileCard";
-import {
-  PossessionDonut,
-  PossessionWaterfall,
-  StatsColumns,
-  StatsDumbbells,
-  type ChicagoView,
-} from "@/components/ChicagoViews";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
@@ -431,7 +424,7 @@ function MatchSwitcher({
   );
 }
 
-function buildTopics(match: MatchStats, presentation: ChicagoView): Topic[] {
+function buildTopics(match: MatchStats): Topic[] {
   const { passesUnderPressure, passResults, possessions, duels, games } = match;
   const scope = match.id === "season" ? "season" : "match";
   const topics: Topic[] = [
@@ -488,38 +481,33 @@ function buildTopics(match: MatchStats, presentation: ChicagoView): Topic[] {
       id: "possessions",
       title: "Possessions",
       phase: "build-up",
-      content:
-        presentation === "v2" ? (
-          <PossessionDonut possessions={possessions} />
-        ) : presentation === "v3" ? (
-          <PossessionWaterfall possessions={possessions} />
-        ) : (
-          <>
-            <div className="metric-card metric-card--hero">
-              <h3 className="metric-card__title">Total possessions</h3>
-              <TotalFigure value={possessions.total} games={games} />
-              <p className="metric-card__caption">Ball possessions in the {scope}</p>
-            </div>
-            {duels ? (
-              <p className="metric-note">
-                Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
-              </p>
-            ) : null}
-            <MetricFlow
-              items={[
-                <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
-                <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
-                <PossessionStat
-                  key="lp"
-                  label="Lost Plays"
-                  value={possessions.lostPlays}
-                  total={possessions.total}
-                  variant="lost-plays"
-                />,
-              ]}
-            />
-          </>
-        ),
+      content: (
+        <>
+          <div className="metric-card metric-card--hero">
+            <h3 className="metric-card__title">Total possessions</h3>
+            <TotalFigure value={possessions.total} games={games} />
+            <p className="metric-card__caption">Ball possessions in the {scope}</p>
+          </div>
+          {duels ? (
+            <p className="metric-note">
+              Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
+            </p>
+          ) : null}
+          <MetricFlow
+            items={[
+              <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
+              <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
+              <PossessionStat
+                key="lp"
+                label="Lost Plays"
+                value={possessions.lostPlays}
+                total={possessions.total}
+                variant="lost-plays"
+              />,
+            ]}
+          />
+        </>
+      ),
     },
   ];
 
@@ -529,43 +517,11 @@ function buildTopics(match: MatchStats, presentation: ChicagoView): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content:
-        presentation === "v2" ? (
-          <StatsColumns summary={summary} />
-        ) : presentation === "v3" ? (
-          <StatsDumbbells summary={summary} />
-        ) : (
-          <StatsBoard summary={summary} games={games} />
-        ),
+      content: <StatsBoard summary={summary} games={games} />,
     });
   }
 
   return topics;
-}
-
-const CHICAGO_VIEWS: { id: ChicagoView; label: string }[] = [
-  { id: "classic", label: "Chicago Fire" },
-  { id: "v2", label: "Chicago Fire v2" },
-  { id: "v3", label: "Chicago Fire v3" },
-];
-
-function ChicagoViewTabs({ view, onChange }: { view: ChicagoView; onChange: (view: ChicagoView) => void }) {
-  return (
-    <div className="view-tabs" role="tablist" aria-label="Chicago Fire views">
-      {CHICAGO_VIEWS.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          role="tab"
-          className={`view-tabs__tab${view === tab.id ? " is-active" : ""}`}
-          aria-selected={view === tab.id}
-          onClick={() => onChange(tab.id)}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
@@ -573,12 +529,9 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const options = useMemo(() => [...matches, seasonMatch(matches)], [matches]);
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
-  const [chicagoView, setChicagoView] = useState<ChicagoView>("classic");
   const match = options.find((item) => item.id === matchId) ?? options[0];
-  const presentation: ChicagoView = match.id === "chicago-fire" ? chicagoView : "classic";
-  const heading = presentation === "classic" ? match.label : `${match.label} ${presentation}`;
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
-  const topics = useMemo(() => buildTopics(match, presentation), [match, presentation]);
+  const topics = useMemo(() => buildTopics(match), [match]);
 
   return (
     <VideoLinksProvider
@@ -599,7 +552,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={match.logo} alt="" className="club-logo club-logo--meta" />
               ) : null}
-              {heading}
+              {match.label}
             </p>
           </div>
         </header>
@@ -612,7 +565,6 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           <main className="report-main">
             <div className="view-panel">
               <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId} />
-              {match.id === "chicago-fire" ? <ChicagoViewTabs view={chicagoView} onChange={setChicagoView} /> : null}
               <TopicsBoard topics={topics} />
             </div>
           </main>
