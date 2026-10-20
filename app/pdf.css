@@ -1448,15 +1448,11 @@
   color: #56697a;
 }
 .spdf-videos {
-  margin-top: auto;
+  margin-top: 12px;
   padding: 10px 12px 8px;
   border: 1px solid #d4e8f7;
   border-radius: 8px;
   background: #f8fbfe;
-}
-
-.spdf-main--stats .spdf-foot {
-  margin-top: 12px;
 }
 
 .spdf-videos__title {

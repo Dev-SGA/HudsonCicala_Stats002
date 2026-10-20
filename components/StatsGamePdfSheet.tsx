@@ -479,7 +479,6 @@ function SummaryPdfPage({
             ]}
           />
         </div>
-        <PdfVideos videos={stats.videos ?? []} />
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
           <span>
@@ -494,10 +493,16 @@ function SummaryPdfPage({
 export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, opponentLogoUrl }: StatsGamePdfSheetProps) {
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
-  const scope = meta.subtitle === "Season" ? "season" : "match";
 
   return (
     <>
+    <SummaryPdfPage
+      stats={stats}
+      photoUrl={photoUrl}
+      logoUrl={logoUrl}
+      clubLogoUrl={clubLogoUrl}
+      opponentLogoUrl={opponentLogoUrl}
+    />
     <article className="stats-pdf stats-pdf--page1" aria-hidden="true">
       <PdfSide photoUrl={photoUrl} logoUrl={logoUrl} clubLogoUrl={clubLogoUrl} name={player.name} club={player.club} />
 
@@ -505,51 +510,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
         <PdfHeader title={meta.title} subtitle={meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
 
         <div className="spdf-stack">
-          <section className="spdf-section spdf-section--build-up spdf-section--pressure spdf-section--pressure-compact">
-            <div className="spdf-section__top">
-              <p className="spdf-section__phase">Build-Up</p>
-              <h3 className="spdf-section__title">Passes Under Pressure vs Not</h3>
-            </div>
-            <div className="spdf-pressure">
-              <div className="spdf-pressure__total">
-                <span className="spdf-pressure__kicker">Total passes</span>
-                <span className="spdf-pressure__figure">
-                  <span className="spdf-pressure__value">{passTotal}</span>
-                </span>
-                <span className="spdf-pressure__caption">Passes tracked in the {scope}</span>
-              </div>
-              <div className="spdf-pressure__context">
-                <p className="spdf-pressure__kicker">Pressure context</p>
-                <div className="spdf-pressure__track">
-                  <span
-                    className="spdf-pressure__seg spdf-pressure__seg--warn"
-                    style={{ width: `${pct(passesUnderPressure.underPressure, passTotal)}%` }}
-                  />
-                  <span
-                    className="spdf-pressure__seg spdf-pressure__seg--blue"
-                    style={{ width: `${pct(passesUnderPressure.notUnderPressure, passTotal)}%` }}
-                  />
-                </div>
-                <ul className="spdf-pressure__legend">
-                  <li>
-                    <span className="spdf-pressure__dot spdf-pressure__dot--warn" />
-                    <span>Under pressure</span>
-                    <strong>
-                      {passesUnderPressure.underPressure} · {pct(passesUnderPressure.underPressure, passTotal)}%
-                    </strong>
-                  </li>
-                  <li>
-                    <span className="spdf-pressure__dot spdf-pressure__dot--blue" />
-                    <span>Not under pressure</span>
-                    <strong>
-                      {passesUnderPressure.notUnderPressure} · {pct(passesUnderPressure.notUnderPressure, passTotal)}%
-                    </strong>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
           <PdfSection
             title="Pass Results"
             kpi={passTotal}
@@ -605,8 +565,9 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
               />
             </div>
           </PdfSection>
-
         </div>
+
+        <PdfVideos videos={stats.videos ?? []} />
 
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
@@ -616,13 +577,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
         </footer>
       </div>
     </article>
-    <SummaryPdfPage
-      stats={stats}
-      photoUrl={photoUrl}
-      logoUrl={logoUrl}
-      clubLogoUrl={clubLogoUrl}
-      opponentLogoUrl={opponentLogoUrl}
-    />
     </>
   );
 }
