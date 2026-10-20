@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { combinePassResults, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
@@ -205,16 +204,12 @@ function PdfPossessionSplit({
         <li>
           <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${primaryTone}`} />
           <span className="spdf-pass-panel__legend-label">{primaryLabel}</span>
-          <strong>
-            {primary} · {pct(primary, total)}%
-          </strong>
+          <strong>{primary}</strong>
         </li>
         <li>
           <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${secondaryTone}`} />
           <span className="spdf-pass-panel__legend-label">{secondaryLabel}</span>
-          <strong>
-            {secondary} · {pct(secondary, total)}%
-          </strong>
+          <strong>{secondary}</strong>
         </li>
       </ul>
     </div>
@@ -318,54 +313,15 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
   );
 }
 
-function SummaryCard({
-  title,
-  kpi,
-  unit,
-  aside,
-  detail,
-  children,
-}: {
-  title: string;
-  kpi: string;
-  unit: string;
-  aside?: string;
-  detail?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="spdf-section spdf-section--build-up spdf-section--summary">
-      <div className="spdf-section__top">
-        <p className="spdf-section__phase">Summary</p>
-        <div className="spdf-section__heading">
-          <h3 className="spdf-section__title">{title}</h3>
-          {detail ? <p className="spdf-section__detail spdf-section__detail--rate">{detail}</p> : null}
-        </div>
-      </div>
-      <div className="spdf-section__content">
-        <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
-          <span className="spdf-section__value">{kpi}</span>
-          {aside ? <span className="spdf-section__aside">{aside}</span> : null}
-          <span className="spdf-section__unit">{unit}</span>
-        </div>
-        <div className="spdf-section__panel">{children}</div>
-      </div>
-    </section>
-  );
-}
-
 function SummaryMeter({
-  headline,
   segments,
 }: {
-  headline: string;
   segments: { label: string; value: string; share: number; tone: PrintTone }[];
 }) {
   const total = segments.reduce((sum, segment) => sum + segment.share, 0);
 
   return (
-    <div className="spdf-pressure__context">
-      <p className="spdf-pressure__headline">{headline}</p>
+    <div className="spdf-summary-meter">
       <div className="spdf-pressure__track">
         {total === 0 ? (
           <span className="spdf-pressure__seg spdf-pressure__seg--grey" style={{ width: "100%" }} />
@@ -392,6 +348,44 @@ function SummaryMeter({
   );
 }
 
+function SummaryStatCard({
+  title,
+  total,
+  totalLabel,
+  rate,
+  rateLabel,
+  perGameLabel,
+  segments,
+}: {
+  title: string;
+  total: number;
+  totalLabel: string;
+  rate?: number;
+  rateLabel?: string;
+  perGameLabel?: string;
+  segments: { label: string; value: string; share: number; tone: PrintTone }[];
+}) {
+  return (
+    <section className="spdf-section spdf-section--build-up spdf-section--summary">
+      <h3 className="spdf-section__title">{title}</h3>
+      <div className={`spdf-summary-kpis${rate == null ? " spdf-summary-kpis--single" : ""}`}>
+        <div className="spdf-summary-kpi">
+          <span className="spdf-summary-kpi__value">{total}</span>
+          <span className="spdf-summary-kpi__label">{totalLabel}</span>
+          {perGameLabel ? <span className="spdf-summary-kpi__per">{perGameLabel}</span> : null}
+        </div>
+        {rate != null ? (
+          <div className="spdf-summary-kpi spdf-summary-kpi--rate">
+            <span className="spdf-summary-kpi__value">{rate}%</span>
+            <span className="spdf-summary-kpi__label">{rateLabel}</span>
+          </div>
+        ) : null}
+      </div>
+      <SummaryMeter segments={segments} />
+    </section>
+  );
+}
+
 function SummaryPdfPage({
   stats,
   photoUrl,
@@ -413,65 +407,58 @@ function SummaryPdfPage({
         club={stats.player.club}
       />
       <div className="spdf-main">
-        <PdfHeader title="Stats" subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
+        <PdfHeader title={stats.meta.title} subtitle={stats.meta.subtitle} opponentLogoUrl={opponentLogoUrl} />
         <div className="spdf-summary">
-          <SummaryCard
+          <SummaryStatCard
             title="General passing"
-            kpi={String(summary.totalPasses)}
-            unit="Total passes"
-            aside={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
-            detail={`${summary.accuracy}% ACCURATE`}
-          >
-            <SummaryMeter
-              headline={`${summary.accurate} accurate · ${summary.inaccurate} inaccurate`}
-              segments={[
-                { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
-                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
-              ]}
-            />
-          </SummaryCard>
-          <SummaryCard
-            title="Interceptions & recoveries"
-            kpi={String(summary.regains)}
-            unit="Total"
-            aside={games ? `${perGame(summary.regains, games)} per game` : undefined}
-          >
-            <SummaryMeter
-              headline={`${summary.interceptions} interceptions · ${summary.recoveries} recoveries`}
-              segments={[
-                { label: "Interceptions", value: String(summary.interceptions), share: summary.interceptions, tone: "blue" },
-                { label: "Recoveries", value: String(summary.recoveries), share: summary.recoveries, tone: "mint" },
-              ]}
-            />
-          </SummaryCard>
-          <SummaryCard
+            total={summary.totalPasses}
+            totalLabel="Total passes"
+            rate={summary.accuracy}
+            rateLabel="Accurate"
+            perGameLabel={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
+            segments={[
+              { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
+              { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
+            ]}
+          />
+          <SummaryStatCard
             title="Offensive duels"
-            kpi={String(summary.offensiveWon + summary.offensiveLost)}
-            unit="Total duels"
-            detail={`${summary.offensiveWinRate}% WON RATE`}
-          >
-            <SummaryMeter
-              headline={`${summary.offensiveWon} won · ${summary.offensiveLost} lost`}
-              segments={[
-                { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
-                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
-              ]}
-            />
-          </SummaryCard>
-          <SummaryCard
+            total={summary.offensiveWon + summary.offensiveLost}
+            totalLabel="Total duels"
+            rate={summary.offensiveWinRate}
+            rateLabel="Won rate"
+            perGameLabel={
+              games ? `${perGame(summary.offensiveWon + summary.offensiveLost, games)} per game` : undefined
+            }
+            segments={[
+              { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
+              { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
+            ]}
+          />
+          <SummaryStatCard
+            title="Regains"
+            total={summary.regains}
+            totalLabel="Total regains"
+            perGameLabel={games ? `${perGame(summary.regains, games)} per game` : undefined}
+            segments={[
+              { label: "Interceptions", value: String(summary.interceptions), share: summary.interceptions, tone: "blue" },
+              { label: "Recoveries", value: String(summary.recoveries), share: summary.recoveries, tone: "mint" },
+            ]}
+          />
+          <SummaryStatCard
             title="Defensive duels"
-            kpi={String(summary.defensiveWon + summary.defensiveLost)}
-            unit="Total duels"
-            detail={`${summary.defensiveWinRate}% WON RATE`}
-          >
-            <SummaryMeter
-              headline={`${summary.defensiveWon} won · ${summary.defensiveLost} lost`}
-              segments={[
-                { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
-                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
-              ]}
-            />
-          </SummaryCard>
+            total={summary.defensiveWon + summary.defensiveLost}
+            totalLabel="Total duels"
+            rate={summary.defensiveWinRate}
+            rateLabel="Won rate"
+            perGameLabel={
+              games ? `${perGame(summary.defensiveWon + summary.defensiveLost, games)} per game` : undefined
+            }
+            segments={[
+              { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
+              { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
+            ]}
+          />
         </div>
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
