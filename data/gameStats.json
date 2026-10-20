@@ -12,40 +12,6 @@
   },
   "matches": [
     {
-      "id": "001",
-      "kind": "baseline",
-      "label": "vs Club Ohio",
-      "shortLabel": "Club Ohio",
-      "logo": "/clubs/club-ohio.png",
-      "passesUnderPressure": {
-        "total": 81,
-        "underPressure": 51,
-        "notUnderPressure": 30,
-        "videoLink": ""
-      },
-      "passResults": {
-        "underPressure": {
-          "progressive": 10,
-          "neutral": 30,
-          "lost": 11
-        },
-        "notUnderPressure": {
-          "progressive": 7,
-          "neutral": 20,
-          "lost": 3
-        },
-        "videoLink": ""
-      },
-      "possessions": {
-        "total": 90,
-        "lostBalls": 7,
-        "wrongPasses": 10,
-        "lostPlays": 17,
-        "videoLink": ""
-      },
-      "duels": null
-    },
-    {
       "id": "chicago-fire",
       "kind": "session",
       "label": "vs Chicago Fire",

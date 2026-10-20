@@ -156,6 +156,7 @@ function StatsSplit({
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  showShare = true,
 }: {
   primary: number;
   secondary: number;
@@ -163,8 +164,10 @@ function StatsSplit({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  showShare?: boolean;
 }) {
   const total = primary + secondary;
+  const figure = (value: number) => (showShare ? `${value} · ${percent(value, total)}%` : String(value));
 
   return (
     <div className="stats-viz">
@@ -179,16 +182,12 @@ function StatsSplit({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span>{primaryLabel}</span>
-          <strong>
-            {primary} · {percent(primary, total)}%
-          </strong>
+          <strong>{figure(primary)}</strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span>{secondaryLabel}</span>
-          <strong>
-            {secondary} · {percent(secondary, total)}%
-          </strong>
+          <strong>{figure(secondary)}</strong>
         </li>
       </ul>
     </div>
@@ -234,6 +233,7 @@ function StatsRateTopic({
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  showShare = true,
 }: {
   title: string;
   total: number;
@@ -248,6 +248,7 @@ function StatsRateTopic({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  showShare?: boolean;
 }) {
   return (
     <section className="stats-topic">
@@ -262,6 +263,7 @@ function StatsRateTopic({
           secondaryLabel={secondaryLabel}
           primaryTone={primaryTone}
           secondaryTone={secondaryTone}
+          showShare={showShare}
         />
       </div>
     </section>
@@ -287,7 +289,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryLabel="Accurate"
         secondaryLabel="Inaccurate"
         primaryTone="positive"
-        secondaryTone="negative"
+        secondaryTone="muted"
+        showShare={false}
       />
       <StatsRateTopic
         title="Offensive Duels"
@@ -302,7 +305,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
-        secondaryTone="negative"
+        secondaryTone="muted"
+        showShare={false}
       />
       <StatsRateTopic
         title="Defensive Duels"
@@ -317,7 +321,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
-        secondaryTone="negative"
+        secondaryTone="muted"
+        showShare={false}
       />
       <section className="stats-topic">
         <h3 className="stats-topic__title">Regains</h3>

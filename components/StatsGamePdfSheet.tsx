@@ -426,7 +426,7 @@ function SummaryPdfPage({
               headline={`${summary.accurate} accurate · ${summary.inaccurate} inaccurate`}
               segments={[
                 { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
-                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "pass-lost" },
+                { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
               ]}
             />
           </SummaryCard>
@@ -454,7 +454,7 @@ function SummaryPdfPage({
               headline={`${summary.offensiveWon} won · ${summary.offensiveLost} lost`}
               segments={[
                 { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
-                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "pass-lost" },
+                { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
               ]}
             />
           </SummaryCard>
@@ -468,7 +468,7 @@ function SummaryPdfPage({
               headline={`${summary.defensiveWon} won · ${summary.defensiveLost} lost`}
               segments={[
                 { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
-                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "pass-lost" },
+                { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
               ]}
             />
           </SummaryCard>

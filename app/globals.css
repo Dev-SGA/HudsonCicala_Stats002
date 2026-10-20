@@ -965,6 +965,11 @@ body::before {
   margin: 0;
 }
 
+.stats-viz .stats-bar__seg--muted,
+.stats-viz .legend__dot--muted {
+  background: #b7c2cb;
+}
+
 .stats-viz__legend {
   display: flex;
   flex-wrap: wrap;

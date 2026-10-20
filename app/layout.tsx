@@ -4,7 +4,7 @@ import "./pdf.css";
 
 export const metadata: Metadata = {
   title: "Hudson Cicala — Game Stats 002 | SGA Performance",
-  description: "Match statistics for Hudson Cicala across Club Ohio, Chicago Fire, and Columbus Crew.",
+  description: "Match statistics for Hudson Cicala across Chicago Fire and Columbus Crew.",
 };
 
 export const viewport = {
