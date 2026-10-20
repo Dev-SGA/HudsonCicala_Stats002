@@ -575,7 +575,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                 primary={possessions.lostBalls}
                 secondary={possessions.wrongPasses}
                 primaryLabel="Dispossessed"
-                secondaryLabel="Wrong passes"
+                secondaryLabel="Inaccurate passes"
                 primaryTone="lost-yellow-deep"
                 secondaryTone="lost-yellow-light"
               />

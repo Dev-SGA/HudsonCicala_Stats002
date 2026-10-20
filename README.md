@@ -14,8 +14,8 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 - A barra de pressure context fica no card **Pressure context**, dentro de Passes Under Pressure vs Not.
 - **Season** fica ao lado de Columbus Crew e abre os mesmos cards, com os totais das três partidas. Cada total mostra o número por jogo ao lado.
 - **Dispossessed** são os duelos ofensivos perdidos.
-- Wrong passes são os passes maus.
-- Turnovers passou a se chamar **Lost Plays**, na cor amarelo queimado. O valor é dispossessed + wrong passes.
+- Inaccurate passes são os passes maus.
+- Turnovers passou a se chamar **Lost Plays**, na cor amarelo queimado. O valor é dispossessed + inaccurate passes.
 
 ## Desenvolvimento
 

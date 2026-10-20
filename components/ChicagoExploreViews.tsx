@@ -116,7 +116,7 @@ export function PossessionBoard({
         <div
           className="meter"
           role="img"
-          aria-label={`Dispossessed: ${parts.dispossessed}. Wrong passes: ${parts.wrongPasses}.`}
+          aria-label={`Dispossessed: ${parts.dispossessed}. Inaccurate passes: ${parts.wrongPasses}.`}
         >
           <span
             className="meter__seg meter__seg--yellow-deep"
@@ -137,7 +137,7 @@ export function PossessionBoard({
           </li>
           <li>
             <span className="legend__dot legend__dot--yellow-light" />
-            <span className="legend__label">Wrong passes</span>
+            <span className="legend__label">Inaccurate passes</span>
             <strong>
               {parts.wrongPasses} · {percent(parts.wrongPasses, breakdownTotal)}%
             </strong>
