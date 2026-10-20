@@ -339,13 +339,13 @@ body::before {
 }
 
 .topic--stats {
-  --topic-color: var(--tone-burnt-yellow);
-  background: color-mix(in srgb, var(--tone-burnt-yellow) 10%, var(--surface));
-  border-left-color: var(--tone-burnt-yellow);
+  --topic-color: #8b9aab;
+  background: color-mix(in srgb, var(--sga-white) 8%, var(--surface));
+  border-left-color: #8b9aab;
 }
 
 .topic--stats .topic__phase {
-  color: var(--tone-burnt-yellow);
+  color: #a8b4c0;
 }
 
 .topic__trigger {
@@ -779,11 +779,6 @@ body::before {
   background: var(--surface-sunken);
 }
 
-.possession-stat--retained {
-  border-color: color-mix(in srgb, #c5ddd0 28%, var(--line));
-  background: color-mix(in srgb, #d7ebe1 8%, var(--surface-sunken));
-}
-
 .possession-stat--lost {
   border-color: color-mix(in srgb, #ead9a8 32%, var(--line));
   background: color-mix(in srgb, #f3e6c4 9%, var(--surface-sunken));
@@ -797,10 +792,6 @@ body::before {
   color: var(--tone-accent);
 }
 
-.possession-stat--retained .possession-stat__label {
-  color: #b7d4c4;
-}
-
 .possession-stat--lost .possession-stat__label {
   color: #e4d7b0;
 }
@@ -812,10 +803,6 @@ body::before {
   letter-spacing: -0.03em;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-}
-
-.possession-stat--retained .possession-stat__value {
-  color: #d5ebe0;
 }
 
 .possession-stat--lost .possession-stat__value {

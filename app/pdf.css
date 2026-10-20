@@ -868,10 +868,6 @@
   color: #072334;
 }
 
-.spdf-possession-stat--retained .spdf-possession-stat__value {
-  color: #4d8f6e;
-}
-
 .spdf-possession-stat--lost-plays {
   border-color: #e0c878;
   background: #fbf8ef;

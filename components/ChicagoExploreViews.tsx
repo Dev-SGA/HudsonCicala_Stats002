@@ -104,7 +104,6 @@ export function PossessionBoard({
         label="Retained"
         value={parts.retained}
         detail={`${percent(parts.retained, parts.total)}% of possessions`}
-        tone="retained"
       />
       <PossessionStat
         label="Lost plays"
