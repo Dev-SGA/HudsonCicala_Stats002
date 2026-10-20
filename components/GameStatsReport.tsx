@@ -8,7 +8,7 @@ import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
 import { PossessionBoard, StatsHeroSideboard } from "@/components/ChicagoExploreViews";
-import { PerGameBadge } from "@/components/PerGameBadge";
+import { CountLine } from "@/components/CountLine";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
@@ -117,10 +117,13 @@ function PassResultsMeter({
   return (
     <div className="metric-card">
       <h3 className="metric-card__title">{title}</h3>
-      <p className="metric-card__headline metric-card__headline--stack">
-        <span>{total} passes</span>
-        {games ? <PerGameBadge total={total} games={games} className="per-game-badge--inline" /> : null}
-      </p>
+      {games ? (
+        <CountLine value={total} unit="passes" games={games} />
+      ) : (
+        <p className="metric-card__headline">
+          <span>{total} passes</span>
+        </p>
+      )}
       <div
         className="meter"
         role="img"
@@ -157,13 +160,9 @@ function PassResultsMeter({
   );
 }
 
-function TotalFigure({ value, games }: { value: number; games?: number }) {
-  return (
-    <span className="metric-total metric-total--stack">
-      <span className="metric-card__value">{value}</span>
-      {games ? <PerGameBadge total={value} games={games} /> : null}
-    </span>
-  );
+function TotalFigure({ value, games, unit }: { value: number; games?: number; unit: string }) {
+  if (games) return <CountLine value={value} unit={unit} games={games} />;
+  return <span className="metric-card__value">{value}</span>;
 }
 
 function MatchSwitcher({
@@ -235,7 +234,7 @@ function buildTopics(match: MatchStats): Topic[] {
           items={[
             <div key="total" className="metric-card metric-card--hero metric-card--compact">
               <h3 className="metric-card__title">Total passes</h3>
-              <TotalFigure value={passesUnderPressure.total} games={games} />
+              <TotalFigure value={passesUnderPressure.total} games={games} unit="passes" />
               <p className="metric-card__caption">Passes tracked in the {scope}</p>
             </div>,
             <SplitMeter
@@ -267,8 +266,8 @@ function buildTopics(match: MatchStats): Topic[] {
           />
           <MetricFlow
             items={[
-              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} />,
-              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} />,
+              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} games={games} />,
+              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} games={games} />,
             ]}
           />
         </>
@@ -279,11 +278,7 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Possessions",
       phase: "build-up",
       content: (
-        <PossessionBoard
-          possessions={possessions}
-          scopeLabel={scope}
-          totalFigure={<TotalFigure value={possessions.total} games={games} />}
-        />
+        <PossessionBoard possessions={possessions} scopeLabel={scope} games={games} />
       ),
     },
   ];

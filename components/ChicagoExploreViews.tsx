@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-import { PerGameBadge } from "@/components/PerGameBadge";
+import { CountLine } from "@/components/CountLine";
 import type { MatchStats, MatchSummary } from "@/lib/stats";
 
 type PossessionSource = MatchStats["possessions"];
@@ -22,56 +21,30 @@ function possessionParts(possessions: PossessionSource) {
   };
 }
 
-function ExploreSplit({
-  title,
-  headline,
-  primary,
-  secondary,
-  primaryLabel,
-  secondaryLabel,
-  primaryTone,
-  secondaryTone,
+function PossessionStat({
+  label,
+  value,
+  detail,
+  tone,
+  games,
+  unit,
 }: {
-  title: string;
-  headline: string;
-  primary: number;
-  secondary: number;
-  primaryLabel: string;
-  secondaryLabel: string;
-  primaryTone: Tone;
-  secondaryTone: Tone;
+  label: string;
+  value: number;
+  detail?: string;
+  tone?: "retained" | "lost";
+  games?: number;
+  unit?: string;
 }) {
-  const total = primary + secondary;
-  const primaryPct = percent(primary, total);
-
   return (
-    <div className="metric-card metric-card--major">
-      <h3 className="metric-card__title">{title}</h3>
-      <p className="metric-card__headline">{headline}</p>
-      <div
-        className="meter"
-        role="img"
-        aria-label={`${primaryLabel}: ${primary}. ${secondaryLabel}: ${secondary}.`}
-      >
-        <span className={`meter__seg meter__seg--${primaryTone}`} style={{ width: `${primaryPct}%` }} />
-        <span className={`meter__seg meter__seg--${secondaryTone}`} style={{ width: `${100 - primaryPct}%` }} />
-      </div>
-      <ul className="legend">
-        <li>
-          <span className={`legend__dot legend__dot--${primaryTone}`} />
-          <span className="legend__label">{primaryLabel}</span>
-          <strong>
-            {primary} · {percent(primary, total)}%
-          </strong>
-        </li>
-        <li>
-          <span className={`legend__dot legend__dot--${secondaryTone}`} />
-          <span className="legend__label">{secondaryLabel}</span>
-          <strong>
-            {secondary} · {percent(secondary, total)}%
-          </strong>
-        </li>
-      </ul>
+    <div className={`possession-stat${tone ? ` possession-stat--${tone}` : ""}`}>
+      <span className="possession-stat__label">{label}</span>
+      {games && unit ? (
+        <CountLine value={value} unit={unit} games={games} />
+      ) : (
+        <span className="possession-stat__value">{value}</span>
+      )}
+      {detail ? <span className="possession-stat__detail">{detail}</span> : null}
     </div>
   );
 }
@@ -109,46 +82,74 @@ function ExploreBar({
 export function PossessionBoard({
   possessions,
   scopeLabel = "match",
-  totalFigure,
+  games,
 }: {
   possessions: PossessionSource;
   scopeLabel?: string;
-  totalFigure: ReactNode;
+  games?: number;
 }) {
   const parts = possessionParts(possessions);
+  const breakdownTotal = parts.dispossessed + parts.wrongPasses;
 
   return (
     <div className="possessions-board">
-      <div className="metric-card metric-card--hero metric-card--compact">
-        <h3 className="metric-card__title">Total possessions</h3>
-        {totalFigure}
-        <p className="metric-card__caption">Ball possessions in the {scopeLabel}</p>
+      <PossessionStat
+        label="Total possessions"
+        value={parts.total}
+        detail={`Ball possessions in the ${scopeLabel}`}
+        games={games}
+        unit="possessions"
+      />
+      <PossessionStat
+        label="Retained"
+        value={parts.retained}
+        detail={`${percent(parts.retained, parts.total)}% of possessions`}
+        tone="retained"
+      />
+      <PossessionStat
+        label="Lost plays"
+        value={parts.lostPlays}
+        detail={`${percent(parts.lostPlays, parts.total)}% of possessions`}
+        tone="lost"
+      />
+      <div className="possession-chart">
+        <h3 className="possession-chart__title">Lost play breakdown</h3>
+        <div
+          className="meter"
+          role="img"
+          aria-label={`Dispossessed: ${parts.dispossessed}. Wrong passes: ${parts.wrongPasses}.`}
+        >
+          <span
+            className="meter__seg meter__seg--yellow-deep"
+            style={{ width: `${percent(parts.dispossessed, breakdownTotal)}%` }}
+          />
+          <span
+            className="meter__seg meter__seg--yellow-light"
+            style={{ width: `${percent(parts.wrongPasses, breakdownTotal)}%` }}
+          />
+        </div>
+        <ul className="legend">
+          <li>
+            <span className="legend__dot legend__dot--yellow-deep" />
+            <span className="legend__label">Dispossessed</span>
+            <strong>
+              {parts.dispossessed} · {percent(parts.dispossessed, breakdownTotal)}%
+            </strong>
+          </li>
+          <li>
+            <span className="legend__dot legend__dot--yellow-light" />
+            <span className="legend__label">Wrong passes</span>
+            <strong>
+              {parts.wrongPasses} · {percent(parts.wrongPasses, breakdownTotal)}%
+            </strong>
+          </li>
+        </ul>
       </div>
-      <ExploreSplit
-        title="Possession outcomes"
-        headline={`${parts.retained} retained · ${parts.lostPlays} lost plays`}
-        primary={parts.retained}
-        secondary={parts.lostPlays}
-        primaryLabel="Retained"
-        secondaryLabel="Lost plays"
-        primaryTone="positive"
-        secondaryTone="negative"
-      />
-      <ExploreSplit
-        title="Lost play breakdown"
-        headline={`${parts.dispossessed} dispossessed · ${parts.wrongPasses} wrong passes`}
-        primary={parts.dispossessed}
-        secondary={parts.wrongPasses}
-        primaryLabel="Dispossessed"
-        secondaryLabel="Wrong passes"
-        primaryTone="negative"
-        secondaryTone="warn"
-      />
     </div>
   );
 }
 
-function StatsBarCard({
+function StatsSplit({
   primary,
   secondary,
   primaryLabel,
@@ -163,8 +164,10 @@ function StatsBarCard({
   primaryTone: Tone;
   secondaryTone: Tone;
 }) {
+  const total = primary + secondary;
+
   return (
-    <div className="stats-stat-card stats-stat-card--bars">
+    <div className="stats-split">
       <ExploreBar
         primary={primary}
         secondary={secondary}
@@ -172,18 +175,47 @@ function StatsBarCard({
         secondaryTone={secondaryTone}
         label={`${primaryLabel} ${primary}. ${secondaryLabel} ${secondary}.`}
       />
-      <ul className="stats-stat-card__legend">
+      <ul className="stats-split__legend">
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span>{primaryLabel}</span>
-          <strong>{primary}</strong>
+          <strong>
+            {primary} · {percent(primary, total)}%
+          </strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span>{secondaryLabel}</span>
-          <strong>{secondary}</strong>
+          <strong>
+            {secondary} · {percent(secondary, total)}%
+          </strong>
         </li>
       </ul>
+    </div>
+  );
+}
+
+function StatsFigure({
+  label,
+  value,
+  unit,
+  games,
+  rate,
+}: {
+  label: string;
+  value: number;
+  unit?: string;
+  games?: number;
+  rate?: boolean;
+}) {
+  return (
+    <div className={`stats-figure${rate ? " stats-figure--rate" : ""}`}>
+      <span className="stats-figure__label">{label}</span>
+      {games && unit ? (
+        <CountLine value={value} unit={unit} games={games} />
+      ) : (
+        <span className="stats-figure__value">{rate ? `${value}%` : value}</span>
+      )}
     </div>
   );
 }
@@ -191,8 +223,11 @@ function StatsBarCard({
 function StatsRateTopic({
   title,
   total,
-  totalExtra,
+  totalLabel,
+  totalUnit,
+  games,
   rate,
+  rateLabel,
   primary,
   secondary,
   primaryLabel,
@@ -202,8 +237,11 @@ function StatsRateTopic({
 }: {
   title: string;
   total: number;
+  totalLabel: string;
+  totalUnit: string;
+  games?: number;
   rate: number;
-  totalExtra?: ReactNode;
+  rateLabel: string;
   primary: number;
   secondary: number;
   primaryLabel: string;
@@ -214,15 +252,10 @@ function StatsRateTopic({
   return (
     <section className="stats-topic">
       <h3 className="stats-topic__title">{title}</h3>
-      <div className="stats-topic__cards">
-        <div className="stats-stat-card stats-stat-card--total">
-          <span className="stats-stat-card__value">{total}</span>
-          {totalExtra ? <div className="stats-stat-card__extra">{totalExtra}</div> : null}
-        </div>
-        <div className="stats-stat-card stats-stat-card--rate">
-          <span className="stats-stat-card__value">{rate}%</span>
-        </div>
-        <StatsBarCard
+      <div className="stats-topic__panel">
+        <StatsFigure label={totalLabel} value={total} unit={totalUnit} games={games} />
+        <StatsFigure label={rateLabel} value={rate} rate />
+        <StatsSplit
           primary={primary}
           secondary={secondary}
           primaryLabel={primaryLabel}
@@ -244,8 +277,11 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="General Passing"
         total={summary.totalPasses}
+        totalLabel="Total passes"
+        totalUnit="passes"
+        games={games}
         rate={summary.accuracy}
-        totalExtra={games ? <PerGameBadge total={summary.totalPasses} games={games} subtle /> : null}
+        rateLabel="Accurate"
         primary={summary.accurate}
         secondary={summary.inaccurate}
         primaryLabel="Accurate"
@@ -256,7 +292,11 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="Offensive Duels"
         total={offensiveTotal}
+        totalLabel="Total duels"
+        totalUnit="duels"
+        games={games}
         rate={summary.offensiveWinRate}
+        rateLabel="Won rate"
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
@@ -267,7 +307,11 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="Defensive Duels"
         total={defensiveTotal}
+        totalLabel="Total duels"
+        totalUnit="duels"
+        games={games}
         rate={summary.defensiveWinRate}
+        rateLabel="Won rate"
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
@@ -277,16 +321,9 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       />
       <section className="stats-topic">
         <h3 className="stats-topic__title">Regains</h3>
-        <div className="stats-topic__cards stats-topic__cards--pair">
-          <div className="stats-stat-card stats-stat-card--total">
-            <span className="stats-stat-card__value">{summary.regains}</span>
-            {games ? (
-              <div className="stats-stat-card__extra">
-                <PerGameBadge total={summary.regains} games={games} subtle />
-              </div>
-            ) : null}
-          </div>
-          <StatsBarCard
+        <div className="stats-topic__panel stats-topic__panel--pair">
+          <StatsFigure label="Total regains" value={summary.regains} unit="regains" games={games} />
+          <StatsSplit
             primary={summary.interceptions}
             secondary={summary.recoveries}
             primaryLabel="Interceptions"

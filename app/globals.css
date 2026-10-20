@@ -724,24 +724,125 @@ body::before {
   color: var(--tone-positive);
 }
 
+.count-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+  margin: 4px 0 0;
+}
+
+.metric-card .count-line {
+  margin: 0 0 14px;
+}
+
+.count-line__main {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.count-line__sep {
+  font-size: 18px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--sga-white) 28%, transparent);
+}
+
+.count-line__avg {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--sga-white) 48%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
 .possessions-board {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   align-items: stretch;
 }
 
-.possessions-board .metric-card {
+.possession-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
   min-width: 0;
-  height: 100%;
+  min-height: 148px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
 }
 
-.possessions-board .metric-card--major {
-  flex: unset;
+.possession-stat--retained {
+  border-color: color-mix(in srgb, var(--tone-positive) 42%, var(--line));
+  background: color-mix(in srgb, var(--tone-positive) 12%, var(--surface-sunken));
 }
 
-.possessions-board .metric-card__headline {
-  font-size: 16px;
+.possession-stat--lost {
+  border-color: color-mix(in srgb, #c4960c 55%, var(--line));
+  background: color-mix(in srgb, #a97412 22%, var(--surface-sunken));
+}
+
+.possession-stat__label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tone-accent);
+}
+
+.possession-stat--retained .possession-stat__label {
+  color: var(--tone-positive);
+}
+
+.possession-stat--lost .possession-stat__label {
+  color: #e0c878;
+}
+
+.possession-stat__value {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.possession-stat--retained .possession-stat__value {
+  color: var(--tone-positive);
+}
+
+.possession-stat--lost .possession-stat__value {
+  color: #e0c878;
+}
+
+.possession-stat__detail {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.possession-chart {
+  grid-column: 1 / -1;
+  padding: 16px 18px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+
+.possession-chart__title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tone-accent);
 }
 
 .metric-note--compact {
@@ -788,27 +889,102 @@ body::before {
 .stats-board-v2 {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .stats-topic__title {
-  margin: 0 0 10px;
-  font-size: 13px;
+  margin: 0 0 8px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--tone-accent);
 }
 
-.stats-topic__cards {
+.stats-topic__panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1.5fr);
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: minmax(180px, 1.15fr) minmax(120px, 0.7fr) minmax(220px, 1.7fr);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--sga-navy) 42%, var(--surface-sunken));
+  overflow: hidden;
 }
 
-.stats-topic__cards--pair {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+.stats-topic__panel--pair {
+  grid-template-columns: minmax(180px, 0.9fr) minmax(240px, 1.8fr);
+}
+
+.stats-figure {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px 18px;
+  border-right: 1px solid var(--line);
+}
+
+.stats-figure__label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.stats-figure__value {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-figure--rate .stats-figure__value {
+  font-size: 36px;
+  color: var(--tone-accent);
+}
+
+.stats-figure .count-line {
+  margin: 0;
+}
+
+.stats-split {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px 18px;
+}
+
+.stats-split .stats-bar {
+  height: 14px;
+  margin-top: 0;
+}
+
+.stats-split__legend {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.stats-split__legend li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.stats-split__legend strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
 
 .stats-stat-card {
@@ -1171,6 +1347,16 @@ body::before {
 .meter__seg--pass-lost,
 .legend__dot--pass-lost {
   background: var(--tone-pass-lost);
+}
+
+.meter__seg--yellow-deep,
+.legend__dot--yellow-deep {
+  background: #c4960c;
+}
+
+.meter__seg--yellow-light,
+.legend__dot--yellow-light {
+  background: #f0d998;
 }
 
 .legend {
@@ -1808,13 +1994,15 @@ body::before {
     grid-template-columns: 1fr;
   }
 
-  .possessions-board {
+  .possessions-board,
+  .stats-topic__panel,
+  .stats-topic__panel--pair {
     grid-template-columns: 1fr;
   }
 
-  .stats-topic__cards,
-  .stats-topic__cards--pair {
-    grid-template-columns: 1fr;
+  .stats-figure {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
 }
 
