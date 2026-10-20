@@ -479,7 +479,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
 
   return (
     <>
-    <article className="stats-pdf" aria-hidden="true">
+    <article className="stats-pdf stats-pdf--page1" aria-hidden="true">
       <PdfSide photoUrl={photoUrl} logoUrl={logoUrl} clubLogoUrl={clubLogoUrl} name={player.name} club={player.club} />
 
       <div className="spdf-main">

@@ -950,23 +950,24 @@
 }
 
 .spdf-summary-kpis--single {
-  grid-template-columns: minmax(0, 0.5fr);
+  grid-template-columns: 1fr 1fr;
 }
 
 .spdf-summary-kpi {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
-  padding: 8px 10px;
+  min-height: 78px;
+  padding: 12px 12px 10px;
   border: 1px solid #d4e8f7;
   border-radius: 6px;
   background: #ffffff;
 }
 
 .spdf-summary-kpi__value {
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -978,7 +979,7 @@
 }
 
 .spdf-summary-kpi__label {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -995,18 +996,18 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   flex: 1 1 auto;
   min-height: 0;
   margin-top: 8px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid #d4e8f7;
   border-radius: 6px;
   background: #ffffff;
 }
 
 .spdf-summary-meter .spdf-pressure__track {
-  height: 12px;
+  height: 10px;
   background: #e3eaf0;
 }
 
@@ -1523,3 +1524,37 @@
   color: #8a9dab;
   flex-shrink: 0;
 }
+
+/* Page 1 only: every type size one step larger. */
+.stats-pdf--page1 .spdf-side__label { font-size: 12px; }
+.stats-pdf--page1 .spdf-side__name { font-size: 31px; }
+.stats-pdf--page1 .spdf-side__club { font-size: 17px; }
+.stats-pdf--page1 .spdf-side__slogan { font-size: 10px; }
+.stats-pdf--page1 .spdf-head__eyebrow { font-size: 12px; }
+.stats-pdf--page1 .spdf-head__title { font-size: 29px; }
+.stats-pdf--page1 .spdf-head__meta { font-size: 14px; }
+.stats-pdf--page1 .spdf-section__phase { font-size: 10px; }
+.stats-pdf--page1 .spdf-section__title { font-size: 13px; }
+.stats-pdf--page1 .spdf-section--pressure-compact .spdf-section__title { font-size: 12px; }
+.stats-pdf--page1 .spdf-pressure__kicker { font-size: 10px; }
+.stats-pdf--page1 .spdf-pressure__value { font-size: 35px; }
+.stats-pdf--page1 .spdf-section--pressure-compact .spdf-pressure__value { font-size: 27px; }
+.stats-pdf--page1 .spdf-pressure__per { font-size: 13px; }
+.stats-pdf--page1 .spdf-pressure__caption { font-size: 11px; }
+.stats-pdf--page1 .spdf-pressure__legend li { font-size: 11px; }
+.stats-pdf--page1 .spdf-pressure__legend strong { font-size: 12px; }
+.stats-pdf--page1 .spdf-section__value { font-size: 37px; }
+.stats-pdf--page1 .spdf-section--lg .spdf-section__value { font-size: 35px; }
+.stats-pdf--page1 .spdf-section__aside { font-size: 12px; }
+.stats-pdf--page1 .spdf-section__unit { font-size: 9px; }
+.stats-pdf--page1 .spdf-pass-panel__title { font-size: 10px; }
+.stats-pdf--page1 .spdf-pass-panel__total { font-size: 10px; }
+.stats-pdf--page1 .spdf-pass-panel__legend-label { font-size: 9px; }
+.stats-pdf--page1 .spdf-pass-panel__legend strong { font-size: 12px; }
+.stats-pdf--page1 .spdf-pass-row-bar__label { font-size: 8px; }
+.stats-pdf--page1 .spdf-pass-row-bar__value { font-size: 11px; }
+.stats-pdf--page1 .spdf-possession-stat__label { font-size: 9px; }
+.stats-pdf--page1 .spdf-possession-stat__value { font-size: 29px; }
+.stats-pdf--page1 .spdf-possession-stat__pct { font-size: 10px; }
+.stats-pdf--page1 .spdf-foot { font-size: 11px; }
+
