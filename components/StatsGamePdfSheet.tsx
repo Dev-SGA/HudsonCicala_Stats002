@@ -40,10 +40,12 @@ function StatTiles({
 function PassResultPanel({
   title,
   breakdown,
+  wide = false,
   compact = false,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
+  wide?: boolean;
   compact?: boolean;
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
@@ -61,7 +63,7 @@ function PassResultPanel({
   ].filter((segment) => segment.value > 0);
 
   return (
-    <div className={`spdf-pass-panel${compact ? " spdf-pass-panel--total" : ""}`}>
+    <div className={`spdf-pass-panel${wide ? " spdf-pass-panel--wide" : ""}${compact ? " spdf-pass-panel--total" : ""}`}>
       <div className="spdf-pass-panel__head">
         <p className="spdf-pass-panel__title">{title}</p>
         <span className="spdf-pass-panel__total">{total} passes</span>
@@ -490,13 +492,16 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             panelOnly
             className="spdf-section--pass-results"
           >
-            <div className="spdf-pass-results-app spdf-pass-results-app--trio">
+            <div className="spdf-pass-results-app">
               <PassResultPanel
+                wide
                 title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
               />
-              <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
-              <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
+              <div className="spdf-pass-results-app__pair">
+                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
+                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
+              </div>
             </div>
           </PdfSection>
 

@@ -268,28 +268,34 @@
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  height: 100%;
-}
-
-.spdf-pass-results-app--trio {
-  flex-direction: row;
-  align-items: stretch;
-  gap: 8px;
   height: auto;
 }
 
-.spdf-pass-results-app--trio .spdf-pass-panel {
+.spdf-pass-results-app__pair {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.spdf-pass-results-app__pair .spdf-pass-panel {
+  flex: 1 1 0;
   padding: 8px 10px 6px;
   gap: 6px;
 }
 
-.spdf-pass-results-app--trio .spdf-pass-panel__legend {
-  gap: 2px;
+.spdf-pass-panel--wide {
+  width: 100%;
+  padding: 8px 12px 6px;
+  gap: 5px;
 }
 
-.spdf-pass-results-app--trio .spdf-pass-panel__legend-label {
-  font-size: 8px;
-  letter-spacing: 0.02em;
+.spdf-pass-panel--wide .spdf-pass-panel__track {
+  height: 12px;
+}
+
+.spdf-pass-panel--wide .spdf-pass-panel__legend {
+  gap: 2px;
 }
 
 .spdf-pass-results-app .spdf-pass-panel {
