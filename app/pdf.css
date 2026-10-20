@@ -653,6 +653,29 @@
   width: 100%;
 }
 
+/* Stats page: softer green / yellow bars (aligned with page-one pass palette) */
+.spdf-section--summary .spdf-pressure__seg--green,
+.spdf-section--summary .spdf-pressure__dot--green {
+  background: #9fd4b0;
+}
+
+.spdf-section--summary .spdf-pressure__seg--yellow,
+.spdf-section--summary .spdf-pressure__dot--yellow {
+  background: #f2d998;
+}
+
+.spdf-section--summary .spdf-pressure__legend strong.spdf-tone--green {
+  color: #4d8f6e;
+}
+
+.spdf-section--summary .spdf-pressure__legend strong.spdf-tone--yellow {
+  color: #a97412;
+}
+
+.spdf-section--summary .spdf-pressure__track {
+  background: #e8eef3;
+}
+
 .spdf-pass-panel {
   flex: 1 1 0;
   min-width: 0;

@@ -106,41 +106,50 @@ function ExploreBar({
   );
 }
 
-export function PossessionSplitView({
+export function PossessionBoard({
   possessions,
   scopeLabel = "match",
+  totalFigure,
 }: {
   possessions: PossessionSource;
   scopeLabel?: string;
+  totalFigure: ReactNode;
 }) {
   const parts = possessionParts(possessions);
 
   return (
-    <div className="explore-stack">
-      <ExploreSplit
-        title="Possession outcomes"
-        headline={`${parts.retained} retained · ${parts.lostPlays} lost plays`}
-        primary={parts.retained}
-        secondary={parts.lostPlays}
-        primaryLabel="Retained"
-        secondaryLabel="Lost plays"
-        primaryTone="positive"
-        secondaryTone="negative"
-      />
-      <ExploreSplit
-        title="Lost play breakdown"
-        headline={`${parts.dispossessed} dispossessed · ${parts.wrongPasses} wrong passes`}
-        primary={parts.dispossessed}
-        secondary={parts.wrongPasses}
-        primaryLabel="Dispossessed"
-        secondaryLabel="Wrong passes"
-        primaryTone="negative"
-        secondaryTone="warn"
-      />
+    <>
+      <div className="possessions-board">
+        <div className="metric-card metric-card--hero metric-card--compact">
+          <h3 className="metric-card__title">Total possessions</h3>
+          {totalFigure}
+          <p className="metric-card__caption">Ball possessions in the {scopeLabel}</p>
+        </div>
+        <ExploreSplit
+          title="Possession outcomes"
+          headline={`${parts.retained} retained · ${parts.lostPlays} lost plays`}
+          primary={parts.retained}
+          secondary={parts.lostPlays}
+          primaryLabel="Retained"
+          secondaryLabel="Lost plays"
+          primaryTone="positive"
+          secondaryTone="negative"
+        />
+        <ExploreSplit
+          title="Lost play breakdown"
+          headline={`${parts.dispossessed} dispossessed · ${parts.wrongPasses} wrong passes`}
+          primary={parts.dispossessed}
+          secondary={parts.wrongPasses}
+          primaryLabel="Dispossessed"
+          secondaryLabel="Wrong passes"
+          primaryTone="negative"
+          secondaryTone="warn"
+        />
+      </div>
       <p className="metric-note metric-note--compact">
-        {parts.total} possessions in the {scopeLabel}. Dispossessed are offensive duels lost. Wrong passes are the bad passes.
+        Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
       </p>
-    </div>
+    </>
   );
 }
 
@@ -209,7 +218,7 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         unit="Total passes"
         meta={
           <>
-            <span className="stats-accuracy-pill">{summary.accuracy}% accurate</span>
+            <span className="stats-accuracy-note">{summary.accuracy}% accurate</span>
             {games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
           </>
         }
@@ -234,8 +243,9 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       />
       <StatsHeroRow
         title="Offensive duels"
-        value={`${summary.offensiveWinRate}%`}
-        unit="Won rate"
+        value={String(summary.offensiveWon + summary.offensiveLost)}
+        unit="Total duels"
+        meta={<span className="stats-win-rate">{summary.offensiveWinRate}% won rate</span>}
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
@@ -245,8 +255,9 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       />
       <StatsHeroRow
         title="Defensive duels"
-        value={`${summary.defensiveWinRate}%`}
-        unit="Won rate"
+        value={String(summary.defensiveWon + summary.defensiveLost)}
+        unit="Total duels"
+        meta={<span className="stats-win-rate">{summary.defensiveWinRate}% won rate</span>}
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"

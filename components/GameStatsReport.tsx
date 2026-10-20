@@ -7,7 +7,7 @@ import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
-import { PossessionSplitView, StatsHeroSideboard } from "@/components/ChicagoExploreViews";
+import { PossessionBoard, StatsHeroSideboard } from "@/components/ChicagoExploreViews";
 import { PerGameBadge } from "@/components/PerGameBadge";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
@@ -279,14 +279,11 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Possessions",
       phase: "build-up",
       content: (
-        <>
-          <div className="metric-card metric-card--hero metric-card--compact">
-            <h3 className="metric-card__title">Total possessions</h3>
-            <TotalFigure value={possessions.total} games={games} />
-            <p className="metric-card__caption">Ball possessions in the {scope}</p>
-          </div>
-          <PossessionSplitView possessions={possessions} scopeLabel={scope} />
-        </>
+        <PossessionBoard
+          possessions={possessions}
+          scopeLabel={scope}
+          totalFigure={<TotalFigure value={possessions.total} games={games} />}
+        />
       ),
     },
   ];

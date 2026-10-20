@@ -632,18 +632,18 @@ body::before {
   color: var(--text-muted);
 }
 
-.stats-accuracy-pill {
-  display: inline-flex;
-  align-items: baseline;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--tone-positive) 55%, var(--line));
-  background: color-mix(in srgb, var(--tone-positive) 16%, var(--surface-sunken));
-  font-size: 20px;
+.stats-accuracy-note {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.stats-win-rate {
+  font-size: 14px;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--tone-positive);
-  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
 }
 
 .stats-hero-row__meta {
@@ -724,13 +724,24 @@ body::before {
   color: var(--tone-positive);
 }
 
-.explore-stack {
+.possessions-board {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  align-items: stretch;
 }
 
-.explore-stack .metric-card--major {
+.possessions-board .metric-card {
   min-width: 0;
+  height: 100%;
+}
+
+.possessions-board .metric-card--major {
+  flex: unset;
+}
+
+.possessions-board .metric-card__headline {
+  font-size: 16px;
 }
 
 .metric-note--compact {
@@ -1686,6 +1697,10 @@ body::before {
   }
 
   .stats-board--columns {
+    grid-template-columns: 1fr;
+  }
+
+  .possessions-board {
     grid-template-columns: 1fr;
   }
 }

@@ -320,7 +320,12 @@ function SummaryPdfPage({
               ]}
             />
           </SummaryCard>
-          <SummaryCard title="Offensive duels" kpi={`${summary.offensiveWinRate}%`} unit="Won">
+          <SummaryCard
+            title="Offensive duels"
+            kpi={String(summary.offensiveWon + summary.offensiveLost)}
+            unit="Total duels"
+            detail={`${summary.offensiveWinRate}% won rate`}
+          >
             <SummaryMeter
               headline={`${summary.offensiveWon} won · ${summary.offensiveLost} lost`}
               segments={[
@@ -329,7 +334,12 @@ function SummaryPdfPage({
               ]}
             />
           </SummaryCard>
-          <SummaryCard title="Defensive duels" kpi={`${summary.defensiveWinRate}%`} unit="Won">
+          <SummaryCard
+            title="Defensive duels"
+            kpi={String(summary.defensiveWon + summary.defensiveLost)}
+            unit="Total duels"
+            detail={`${summary.defensiveWinRate}% won rate`}
+          >
             <SummaryMeter
               headline={`${summary.defensiveWon} won · ${summary.defensiveLost} lost`}
               segments={[
