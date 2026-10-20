@@ -1431,11 +1431,15 @@
   color: #56697a;
 }
 .spdf-videos {
-  margin-top: 12px;
-  padding: 12px 16px 10px;
+  margin-top: auto;
+  padding: 10px 12px 8px;
   border: 1px solid #d4e8f7;
   border-radius: 8px;
   background: #f8fbfe;
+}
+
+.spdf-main--stats .spdf-foot {
+  margin-top: 12px;
 }
 
 .spdf-videos__title {
@@ -1449,8 +1453,8 @@
 
 .spdf-videos__list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1471,12 +1475,20 @@
 .spdf-videos__play {
   display: grid;
   place-items: center;
-  flex: 0 0 24px;
-  height: 24px;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: #297cc1;
-  color: #ffffff;
-  font-size: 9px;
+}
+
+.spdf-videos__play-icon {
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-style: solid;
+  border-width: 4px 0 4px 7px;
+  border-color: transparent transparent transparent #ffffff;
 }
 
 .spdf-videos__text {

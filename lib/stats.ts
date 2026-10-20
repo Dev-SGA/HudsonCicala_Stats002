@@ -49,6 +49,7 @@ export type MatchStats = {
     lostPlays: number;
     videoLink: string;
   };
+  videos?: { label: string; url: string }[];
   duels: DuelBlock | null;
   games?: number;
 };
@@ -76,6 +77,7 @@ export type GameStats = {
   passesUnderPressure: MatchStats["passesUnderPressure"];
   passResults: MatchStats["passResults"];
   possessions: MatchStats["possessions"];
+  videos?: { label: string; url: string }[];
   duels: DuelBlock | null;
 };
 
@@ -236,6 +238,7 @@ export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
     passesUnderPressure: match.passesUnderPressure,
     passResults: match.passResults,
     possessions: match.possessions,
+    videos: match.videos,
     duels: match.duels,
   };
 }
