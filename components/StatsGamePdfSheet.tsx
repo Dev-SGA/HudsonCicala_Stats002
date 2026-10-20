@@ -479,6 +479,7 @@ function SummaryPdfPage({
             ]}
           />
         </div>
+        <PdfVideos videos={stats.videos ?? []} />
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
           <span>
@@ -566,8 +567,6 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
             </div>
           </PdfSection>
         </div>
-
-        <PdfVideos videos={stats.videos ?? []} />
 
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>

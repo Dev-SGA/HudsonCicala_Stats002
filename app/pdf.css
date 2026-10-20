@@ -1448,7 +1448,7 @@
   color: #56697a;
 }
 .spdf-videos {
-  margin-top: 12px;
+  margin-top: auto;
   padding: 10px 12px 8px;
   border: 1px solid #d4e8f7;
   border-radius: 8px;
@@ -1533,6 +1533,10 @@
   border-radius: 8px;
   font-size: 10px;
   color: #8a9dab;
+}
+
+.spdf-main--stats .spdf-foot {
+  margin-top: 12px;
 }
 
 .spdf-foot {
