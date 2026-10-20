@@ -726,7 +726,7 @@ body::before {
 
 .possessions-board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -785,9 +785,50 @@ body::before {
   outline-offset: 2px;
 }
 
-.stats-hero-board {
+.stats-metric-grid {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  align-items: stretch;
+}
+
+.stats-metric-grid .stats-metric-card {
+  min-width: 0;
+  min-height: 100%;
+  padding: 14px 14px 12px;
+  gap: 12px;
+}
+
+.stats-metric-grid .stats-hero-row__value {
+  font-size: 32px;
+}
+
+.stats-metric-grid .stats-hero-row__title {
+  font-size: 11px;
+}
+
+.stats-metric-grid .stats-hero-row__legend {
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.stats-metric-grid .stats-hero-row__legend strong {
+  font-size: 13px;
+}
+
+.stats-metric-card__rate {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.stats-metric-grid .stats-hero-row__meta {
+  margin-top: 8px;
+}
+
+.stats-metric-card--regains {
+  grid-column: 1;
 }
 
 .stats-hero-row {
@@ -1701,6 +1742,18 @@ body::before {
   }
 
   .possessions-board {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-metric-card--regains {
+    grid-column: auto;
+  }
+
+  .stats-metric-grid .stats-metric-card {
     grid-template-columns: 1fr;
   }
 }

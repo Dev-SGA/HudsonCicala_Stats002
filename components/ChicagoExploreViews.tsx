@@ -153,36 +153,41 @@ export function PossessionBoard({
   );
 }
 
-function StatsHeroRow({
+function StatsMetricCard({
   title,
   value,
   unit,
-  meta,
+  rate,
+  extra,
   primary,
   secondary,
   primaryLabel,
   secondaryLabel,
   primaryTone,
   secondaryTone,
+  className,
 }: {
   title: string;
   value: string;
   unit: string;
-  meta?: ReactNode;
+  rate?: string;
+  extra?: ReactNode;
   primary: number;
   secondary: number;
   primaryLabel: string;
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
+  className?: string;
 }) {
   return (
-    <section className="stats-hero-row">
+    <section className={`stats-metric-card stats-hero-row${className ? ` ${className}` : ""}`}>
       <div className="stats-hero-row__lead">
         <h3 className="stats-hero-row__title">{title}</h3>
         <p className="stats-hero-row__value">{value}</p>
         <p className="stats-hero-row__unit">{unit}</p>
-        {meta ? <div className="stats-hero-row__meta">{meta}</div> : null}
+        {rate ? <p className="stats-metric-card__rate">{rate}</p> : null}
+        {extra ? <div className="stats-hero-row__meta">{extra}</div> : null}
       </div>
       <div className="stats-hero-row__chart">
         <ExploreBar
@@ -210,18 +215,17 @@ function StatsHeroRow({
 }
 
 export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; games?: number }) {
+  const offensiveTotal = summary.offensiveWon + summary.offensiveLost;
+  const defensiveTotal = summary.defensiveWon + summary.defensiveLost;
+
   return (
-    <div className="stats-hero-board">
-      <StatsHeroRow
-        title="General passing"
+    <div className="stats-metric-grid">
+      <StatsMetricCard
+        title="General Passing"
         value={String(summary.totalPasses)}
         unit="Total passes"
-        meta={
-          <>
-            <span className="stats-accuracy-note">{summary.accuracy}% accurate</span>
-            {games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
-          </>
-        }
+        rate={`${summary.accuracy}% accurate`}
+        extra={games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
         primary={summary.accurate}
         secondary={summary.inaccurate}
         primaryLabel="Accurate"
@@ -229,23 +233,11 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryTone="positive"
         secondaryTone="negative"
       />
-      <StatsHeroRow
-        title="Interceptions & recoveries"
-        value={String(summary.regains)}
-        unit="Total regains"
-        meta={games ? <PerGameBadge total={summary.regains} games={games} /> : null}
-        primary={summary.interceptions}
-        secondary={summary.recoveries}
-        primaryLabel="Interceptions"
-        secondaryLabel="Recoveries"
-        primaryTone="accent"
-        secondaryTone="recover"
-      />
-      <StatsHeroRow
-        title="Offensive duels"
-        value={String(summary.offensiveWon + summary.offensiveLost)}
+      <StatsMetricCard
+        title="Offensive Duels"
+        value={String(offensiveTotal)}
         unit="Total duels"
-        meta={<span className="stats-win-rate">{summary.offensiveWinRate}% won rate</span>}
+        rate={`${summary.offensiveWinRate}% won rate`}
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
@@ -253,17 +245,30 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         primaryTone="positive"
         secondaryTone="negative"
       />
-      <StatsHeroRow
-        title="Defensive duels"
-        value={String(summary.defensiveWon + summary.defensiveLost)}
+      <StatsMetricCard
+        title="Defensive Duels"
+        value={String(defensiveTotal)}
         unit="Total duels"
-        meta={<span className="stats-win-rate">{summary.defensiveWinRate}% won rate</span>}
+        rate={`${summary.defensiveWinRate}% won rate`}
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
+      />
+      <StatsMetricCard
+        className="stats-metric-card--regains"
+        title="Regains"
+        value={String(summary.regains)}
+        unit="Total regains"
+        extra={games ? <PerGameBadge total={summary.regains} games={games} /> : null}
+        primary={summary.interceptions}
+        secondary={summary.recoveries}
+        primaryLabel="Interceptions"
+        secondaryLabel="Recoveries"
+        primaryTone="accent"
+        secondaryTone="recover"
       />
     </div>
   );
