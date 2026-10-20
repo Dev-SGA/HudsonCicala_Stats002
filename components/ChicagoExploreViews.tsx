@@ -1,17 +1,10 @@
-import { MatchTrendTip } from "@/components/MatchTrendTip";
 import type { ReactNode } from "react";
 import { PerGameBadge } from "@/components/PerGameBadge";
 import type { MatchStats, MatchSummary } from "@/lib/stats";
-import type { TrendMetric } from "@/lib/matchTrends";
 
 type PossessionSource = MatchStats["possessions"];
 
 type Tone = "positive" | "negative" | "accent" | "recover" | "warn" | "muted";
-
-type TrendContext = {
-  matches: MatchStats[];
-  activeMatchId: string;
-};
 
 function percent(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
@@ -38,9 +31,6 @@ function ExploreSplit({
   secondaryLabel,
   primaryTone,
   secondaryTone,
-  primaryMetric,
-  secondaryMetric,
-  trend,
 }: {
   title: string;
   headline: string;
@@ -50,9 +40,6 @@ function ExploreSplit({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
-  primaryMetric: TrendMetric;
-  secondaryMetric: TrendMetric;
-  trend: TrendContext;
 }) {
   const total = primary + secondary;
   const primaryPct = percent(primary, total);
@@ -73,20 +60,16 @@ function ExploreSplit({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span className="legend__label">{primaryLabel}</span>
-          <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {primary} · {percent(primary, total)}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {primary} · {percent(primary, total)}%
+          </strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span className="legend__label">{secondaryLabel}</span>
-          <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {secondary} · {percent(secondary, total)}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {secondary} · {percent(secondary, total)}%
+          </strong>
         </li>
       </ul>
     </div>
@@ -125,11 +108,9 @@ function ExploreBar({
 
 export function PossessionSplitView({
   possessions,
-  trend,
   scopeLabel = "match",
 }: {
   possessions: PossessionSource;
-  trend: TrendContext;
   scopeLabel?: string;
 }) {
   const parts = possessionParts(possessions);
@@ -145,9 +126,6 @@ export function PossessionSplitView({
         secondaryLabel="Lost plays"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryMetric="possessions-retained"
-        secondaryMetric="possessions-lost-plays"
-        trend={trend}
       />
       <ExploreSplit
         title="Lost play breakdown"
@@ -158,9 +136,6 @@ export function PossessionSplitView({
         secondaryLabel="Wrong passes"
         primaryTone="negative"
         secondaryTone="warn"
-        primaryMetric="possessions-dispossessed"
-        secondaryMetric="possessions-wrong-passes"
-        trend={trend}
       />
       <p className="metric-note metric-note--compact">
         {parts.total} possessions in the {scopeLabel}. Dispossessed are offensive duels lost. Wrong passes are the bad passes.
@@ -173,7 +148,6 @@ function StatsHeroRow({
   title,
   value,
   unit,
-  valueMetric,
   meta,
   primary,
   secondary,
@@ -181,14 +155,10 @@ function StatsHeroRow({
   secondaryLabel,
   primaryTone,
   secondaryTone,
-  primaryMetric,
-  secondaryMetric,
-  trend,
 }: {
   title: string;
   value: string;
   unit: string;
-  valueMetric: TrendMetric;
   meta?: ReactNode;
   primary: number;
   secondary: number;
@@ -196,22 +166,12 @@ function StatsHeroRow({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
-  primaryMetric: TrendMetric;
-  secondaryMetric: TrendMetric;
-  trend: TrendContext;
 }) {
   return (
     <section className="stats-hero-row">
       <div className="stats-hero-row__lead">
         <h3 className="stats-hero-row__title">{title}</h3>
-        <MatchTrendTip
-          metric={valueMetric}
-          matches={trend.matches}
-          activeMatchId={trend.activeMatchId}
-          className="trend-tip--hero-value"
-        >
-          <span className="stats-hero-row__value">{value}</span>
-        </MatchTrendTip>
+        <p className="stats-hero-row__value">{value}</p>
         <p className="stats-hero-row__unit">{unit}</p>
         {meta ? <div className="stats-hero-row__meta">{meta}</div> : null}
       </div>
@@ -227,16 +187,12 @@ function StatsHeroRow({
           <li>
             <span className={`legend__dot legend__dot--${primaryTone}`} />
             <span>{primaryLabel}</span>
-            <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-              <strong>{primary}</strong>
-            </MatchTrendTip>
+            <strong>{primary}</strong>
           </li>
           <li>
             <span className={`legend__dot legend__dot--${secondaryTone}`} />
             <span>{secondaryLabel}</span>
-            <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-              <strong>{secondary}</strong>
-            </MatchTrendTip>
+            <strong>{secondary}</strong>
           </li>
         </ul>
       </div>
@@ -244,27 +200,16 @@ function StatsHeroRow({
   );
 }
 
-export function StatsHeroSideboard({
-  summary,
-  games,
-  trend,
-}: {
-  summary: MatchSummary;
-  games?: number;
-  trend: TrendContext;
-}) {
+export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; games?: number }) {
   return (
     <div className="stats-hero-board">
       <StatsHeroRow
         title="General passing"
         value={String(summary.totalPasses)}
         unit="Total passes"
-        valueMetric="stats-total-passes"
         meta={
           <>
-            <MatchTrendTip metric="stats-accuracy" matches={trend.matches} activeMatchId={trend.activeMatchId}>
-              <span className="stats-accuracy-pill">{summary.accuracy}% accurate</span>
-            </MatchTrendTip>
+            <span className="stats-accuracy-pill">{summary.accuracy}% accurate</span>
             {games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
           </>
         }
@@ -274,15 +219,11 @@ export function StatsHeroSideboard({
         secondaryLabel="Inaccurate"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryMetric="pass-accurate"
-        secondaryMetric="pass-inaccurate"
-        trend={trend}
       />
       <StatsHeroRow
         title="Interceptions & recoveries"
         value={String(summary.regains)}
         unit="Total regains"
-        valueMetric="stats-regains"
         meta={games ? <PerGameBadge total={summary.regains} games={games} /> : null}
         primary={summary.interceptions}
         secondary={summary.recoveries}
@@ -290,39 +231,28 @@ export function StatsHeroSideboard({
         secondaryLabel="Recoveries"
         primaryTone="accent"
         secondaryTone="recover"
-        primaryMetric="stats-interceptions"
-        secondaryMetric="stats-recoveries"
-        trend={trend}
       />
       <StatsHeroRow
         title="Offensive duels"
         value={`${summary.offensiveWinRate}%`}
         unit="Won rate"
-        valueMetric="stats-offensive-won-rate"
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryMetric="stats-offensive-won"
-        secondaryMetric="stats-offensive-lost"
-        trend={trend}
       />
       <StatsHeroRow
         title="Defensive duels"
         value={`${summary.defensiveWinRate}%`}
         unit="Won rate"
-        valueMetric="stats-defensive-won-rate"
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryMetric="stats-defensive-won"
-        secondaryMetric="stats-defensive-lost"
-        trend={trend}
       />
     </div>
   );

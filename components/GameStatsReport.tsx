@@ -8,10 +8,8 @@ import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
 import { PossessionSplitView, StatsHeroSideboard } from "@/components/ChicagoExploreViews";
-import { MatchTrendTip } from "@/components/MatchTrendTip";
 import { PerGameBadge } from "@/components/PerGameBadge";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
-import type { TrendMetric } from "@/lib/matchTrends";
 import { BRAND } from "@/lib/brand";
 import {
   combinePassResults,
@@ -29,11 +27,6 @@ type GameStatsReportProps = {
 };
 
 type BarTone = "accent" | "positive" | "negative" | "muted" | "warn";
-
-type TrendContext = {
-  matches: MatchStats[];
-  activeMatchId: string;
-};
 
 const PASS_PLAY_TIPS = {
   progressive:
@@ -65,9 +58,6 @@ function SplitMeter({
   secondaryTone,
   headline,
   major,
-  primaryMetric,
-  secondaryMetric,
-  trend,
 }: {
   title: string;
   primary: number;
@@ -78,9 +68,6 @@ function SplitMeter({
   secondaryTone: BarTone;
   headline: string;
   major?: boolean;
-  primaryMetric: TrendMetric;
-  secondaryMetric: TrendMetric;
-  trend: TrendContext;
 }) {
   const total = primary + secondary;
   const primaryPct = percent(primary, total);
@@ -97,66 +84,31 @@ function SplitMeter({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <span className="legend__label">{primaryLabel}</span>
-          <MatchTrendTip metric={primaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {primary} · {percent(primary, total)}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {primary} · {percent(primary, total)}%
+          </strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <span className="legend__label">{secondaryLabel}</span>
-          <MatchTrendTip metric={secondaryMetric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {secondary} · {percent(secondary, total)}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {secondary} · {percent(secondary, total)}%
+          </strong>
         </li>
       </ul>
     </div>
   );
 }
 
-type PassResultsTrendScope = "combined" | "underPressure" | "notUnderPressure";
-
-const PASS_RESULTS_TREND: Record<
-  PassResultsTrendScope,
-  { total: TrendMetric; progressive: TrendMetric; neutral: TrendMetric; lost: TrendMetric }
-> = {
-  combined: {
-    total: "pass-results-total",
-    progressive: "pass-progressive",
-    neutral: "pass-neutral",
-    lost: "pass-lost",
-  },
-  underPressure: {
-    total: "pass-up-total",
-    progressive: "pass-up-progressive",
-    neutral: "pass-up-neutral",
-    lost: "pass-up-lost",
-  },
-  notUnderPressure: {
-    total: "pass-nop-total",
-    progressive: "pass-nop-progressive",
-    neutral: "pass-nop-neutral",
-    lost: "pass-nop-lost",
-  },
-};
-
 function PassResultsMeter({
   title,
   breakdown,
   games,
-  trendScope,
-  trend,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
   games?: number;
-  trendScope: PassResultsTrendScope;
-  trend: TrendContext;
 }) {
-  const trendMetrics = PASS_RESULTS_TREND[trendScope];
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
@@ -166,9 +118,7 @@ function PassResultsMeter({
     <div className="metric-card">
       <h3 className="metric-card__title">{title}</h3>
       <p className="metric-card__headline metric-card__headline--stack">
-        <MatchTrendTip metric={trendMetrics.total} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-          <span>{total} passes</span>
-        </MatchTrendTip>
+        <span>{total} passes</span>
         {games ? <PerGameBadge total={total} games={games} className="per-game-badge--inline" /> : null}
       </p>
       <div
@@ -184,51 +134,33 @@ function PassResultsMeter({
         <li>
           <span className="legend__dot legend__dot--pass-progressive" />
           <PassPlayTip label="Progressive plays" tip={PASS_PLAY_TIPS.progressive} />
-          <MatchTrendTip metric={trendMetrics.progressive} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {breakdown.progressive} · {progressivePct}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {breakdown.progressive} · {progressivePct}%
+          </strong>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-neutral" />
           <PassPlayTip label="Neutral plays" tip={PASS_PLAY_TIPS.neutral} />
-          <MatchTrendTip metric={trendMetrics.neutral} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {breakdown.neutral} · {neutralPct}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {breakdown.neutral} · {neutralPct}%
+          </strong>
         </li>
         <li>
           <span className="legend__dot legend__dot--pass-lost" />
           <PassPlayTip label="Lost plays" tip={PASS_PLAY_TIPS.lost} />
-          <MatchTrendTip metric={trendMetrics.lost} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-            <strong>
-              {breakdown.lost} · {lostPct}%
-            </strong>
-          </MatchTrendTip>
+          <strong>
+            {breakdown.lost} · {lostPct}%
+          </strong>
         </li>
       </ul>
     </div>
   );
 }
 
-function TotalFigure({
-  value,
-  games,
-  metric,
-  trend,
-}: {
-  value: number;
-  games?: number;
-  metric: TrendMetric;
-  trend: TrendContext;
-}) {
+function TotalFigure({ value, games }: { value: number; games?: number }) {
   return (
     <span className="metric-total metric-total--stack">
-      <MatchTrendTip metric={metric} matches={trend.matches} activeMatchId={trend.activeMatchId}>
-        <span className="metric-card__value">{value}</span>
-      </MatchTrendTip>
+      <span className="metric-card__value">{value}</span>
       {games ? <PerGameBadge total={value} games={games} /> : null}
     </span>
   );
@@ -288,10 +220,9 @@ function MatchSwitcher({
   );
 }
 
-function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
+function buildTopics(match: MatchStats): Topic[] {
   const { passesUnderPressure, passResults, possessions, games } = match;
   const scope = match.id === "season" ? "season" : "match";
-  const trend: TrendContext = { matches: sessionMatches, activeMatchId: match.id };
 
   const topics: Topic[] = [
     {
@@ -304,12 +235,7 @@ function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
           items={[
             <div key="total" className="metric-card metric-card--hero metric-card--compact">
               <h3 className="metric-card__title">Total passes</h3>
-              <TotalFigure
-                value={passesUnderPressure.total}
-                games={games}
-                metric="passes-total"
-                trend={trend}
-              />
+              <TotalFigure value={passesUnderPressure.total} games={games} />
               <p className="metric-card__caption">Passes tracked in the {scope}</p>
             </div>,
             <SplitMeter
@@ -322,9 +248,6 @@ function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
               secondaryLabel="Not under pressure"
               primaryTone="warn"
               secondaryTone="accent"
-              primaryMetric="passes-under-pressure"
-              secondaryMetric="passes-not-under-pressure"
-              trend={trend}
               major
             />,
           ]}
@@ -341,25 +264,11 @@ function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
             title="Total passes"
             breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
             games={games}
-            trendScope="combined"
-            trend={trend}
           />
           <MetricFlow
             items={[
-              <PassResultsMeter
-                key="up"
-                title="Under pressure"
-                breakdown={passResults.underPressure}
-                trendScope="underPressure"
-                trend={trend}
-              />,
-              <PassResultsMeter
-                key="nop"
-                title="Not under pressure"
-                breakdown={passResults.notUnderPressure}
-                trendScope="notUnderPressure"
-                trend={trend}
-              />,
+              <PassResultsMeter key="up" title="Under pressure" breakdown={passResults.underPressure} />,
+              <PassResultsMeter key="nop" title="Not under pressure" breakdown={passResults.notUnderPressure} />,
             ]}
           />
         </>
@@ -373,10 +282,10 @@ function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
         <>
           <div className="metric-card metric-card--hero metric-card--compact">
             <h3 className="metric-card__title">Total possessions</h3>
-            <TotalFigure value={possessions.total} games={games} metric="possessions-total" trend={trend} />
+            <TotalFigure value={possessions.total} games={games} />
             <p className="metric-card__caption">Ball possessions in the {scope}</p>
           </div>
-          <PossessionSplitView possessions={possessions} trend={trend} scopeLabel={scope} />
+          <PossessionSplitView possessions={possessions} scopeLabel={scope} />
         </>
       ),
     },
@@ -388,7 +297,7 @@ function buildTopics(match: MatchStats, sessionMatches: MatchStats[]): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: <StatsHeroSideboard summary={summary} games={games} trend={trend} />,
+      content: <StatsHeroSideboard summary={summary} games={games} />,
     });
   }
 
@@ -402,7 +311,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const [matchId, setMatchId] = useState(initialMatchId);
   const match = options.find((item) => item.id === matchId) ?? options[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
-  const topics = useMemo(() => buildTopics(match, matches), [match, matches]);
+  const topics = useMemo(() => buildTopics(match), [match]);
 
   return (
     <VideoLinksProvider
