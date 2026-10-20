@@ -7,6 +7,13 @@ import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
+import {
+  type ChicagoExploreView,
+  PossessionShareView,
+  PossessionSplitView,
+  StatsColumnBoard,
+  StatsHeroSideboard,
+} from "@/components/ChicagoExploreViews";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
@@ -424,8 +431,84 @@ function MatchSwitcher({
   );
 }
 
-function buildTopics(match: MatchStats): Topic[] {
-  const { passesUnderPressure, passResults, possessions, duels, games } = match;
+const CHICAGO_EXPLORE_MATCH_ID = "chicago-fire";
+
+function buildPossessionsContent(
+  match: MatchStats,
+  exploreView: ChicagoExploreView,
+): ReactNode {
+  const { possessions, duels, games } = match;
+  const scope = match.id === "season" ? "season" : "match";
+
+  if (exploreView === "v2") {
+    return (
+      <>
+        <div className="metric-card metric-card--hero metric-card--compact">
+          <h3 className="metric-card__title">Total possessions</h3>
+          <TotalFigure value={possessions.total} games={games} />
+          <p className="metric-card__caption">Ball possessions in the {scope}</p>
+        </div>
+        <PossessionSplitView possessions={possessions} />
+      </>
+    );
+  }
+
+  if (exploreView === "v3") {
+    return (
+      <>
+        <div className="metric-card metric-card--hero metric-card--compact">
+          <h3 className="metric-card__title">Total possessions</h3>
+          <TotalFigure value={possessions.total} games={games} />
+          <p className="metric-card__caption">Ball possessions in the {scope}</p>
+        </div>
+        <PossessionShareView possessions={possessions} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="metric-card metric-card--hero">
+        <h3 className="metric-card__title">Total possessions</h3>
+        <TotalFigure value={possessions.total} games={games} />
+        <p className="metric-card__caption">Ball possessions in the {scope}</p>
+      </div>
+      {duels ? (
+        <p className="metric-note">
+          Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
+        </p>
+      ) : null}
+      <MetricFlow
+        items={[
+          <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
+          <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
+          <PossessionStat
+            key="lp"
+            label="Lost Plays"
+            value={possessions.lostPlays}
+            total={possessions.total}
+            variant="lost-plays"
+          />,
+        ]}
+      />
+    </>
+  );
+}
+
+function buildStatsContent(match: MatchStats, exploreView: ChicagoExploreView, summary: MatchSummary): ReactNode {
+  const { games } = match;
+  if (exploreView === "v2") {
+    return <StatsHeroSideboard summary={summary} games={games} />;
+  }
+  if (exploreView === "v3") {
+    return <StatsColumnBoard summary={summary} games={games} />;
+  }
+  return <StatsBoard summary={summary} games={games} />;
+}
+
+function buildTopics(match: MatchStats, exploreView: ChicagoExploreView = "classic"): Topic[] {
+  const { passesUnderPressure, passResults, games } = match;
+  const chicagoExplore = match.id === CHICAGO_EXPLORE_MATCH_ID ? exploreView : "classic";
   const scope = match.id === "season" ? "season" : "match";
   const topics: Topic[] = [
     {
@@ -481,33 +564,7 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "possessions",
       title: "Possessions",
       phase: "build-up",
-      content: (
-        <>
-          <div className="metric-card metric-card--hero">
-            <h3 className="metric-card__title">Total possessions</h3>
-            <TotalFigure value={possessions.total} games={games} />
-            <p className="metric-card__caption">Ball possessions in the {scope}</p>
-          </div>
-          {duels ? (
-            <p className="metric-note">
-              Dispossessed are offensive duels lost. Wrong passes are the bad passes. Lost plays add the two together.
-            </p>
-          ) : null}
-          <MetricFlow
-            items={[
-              <PossessionStat key="lb" label="Dispossessed" value={possessions.lostBalls} total={possessions.total} />,
-              <PossessionStat key="wp" label="Wrong passes" value={possessions.wrongPasses} total={possessions.total} />,
-              <PossessionStat
-                key="lp"
-                label="Lost Plays"
-                value={possessions.lostPlays}
-                total={possessions.total}
-                variant="lost-plays"
-              />,
-            ]}
-          />
-        </>
-      ),
+      content: buildPossessionsContent(match, chicagoExplore),
     },
   ];
 
@@ -517,11 +574,42 @@ function buildTopics(match: MatchStats): Topic[] {
       id: "stats",
       title: "Stats",
       phase: "stats",
-      content: <StatsBoard summary={summary} games={games} />,
+      content: buildStatsContent(match, chicagoExplore, summary),
     });
   }
 
   return topics;
+}
+
+function ChicagoExploreTabs({
+  view,
+  onChange,
+}: {
+  view: ChicagoExploreView;
+  onChange: (view: ChicagoExploreView) => void;
+}) {
+  const tabs: { id: ChicagoExploreView; label: string }[] = [
+    { id: "classic", label: "Classic" },
+    { id: "v2", label: "v2" },
+    { id: "v3", label: "v3" },
+  ];
+
+  return (
+    <div className="view-tabs" role="tablist" aria-label="Chicago Fire layout alternatives">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          role="tab"
+          className={`view-tabs__tab${view === tab.id ? " is-active" : ""}`}
+          aria-selected={view === tab.id}
+          onClick={() => onChange(tab.id)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
@@ -529,9 +617,20 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const options = useMemo(() => [...matches, seasonMatch(matches)], [matches]);
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
+  const [chicagoExploreView, setChicagoExploreView] = useState<ChicagoExploreView>("classic");
   const match = options.find((item) => item.id === matchId) ?? options[0];
   const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
-  const topics = useMemo(() => buildTopics(match), [match]);
+  const topics = useMemo(
+    () => buildTopics(match, match.id === CHICAGO_EXPLORE_MATCH_ID ? chicagoExploreView : "classic"),
+    [match, chicagoExploreView],
+  );
+
+  function handleMatchChange(id: string) {
+    setMatchId(id);
+    if (id !== CHICAGO_EXPLORE_MATCH_ID) {
+      setChicagoExploreView("classic");
+    }
+  }
 
   return (
     <VideoLinksProvider
@@ -564,7 +663,10 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
 
           <main className="report-main">
             <div className="view-panel">
-              <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId} />
+              <MatchSwitcher matches={options} activeId={match.id} onChange={handleMatchChange} />
+              {match.id === CHICAGO_EXPLORE_MATCH_ID ? (
+                <ChicagoExploreTabs view={chicagoExploreView} onChange={setChicagoExploreView} />
+              ) : null}
               <TopicsBoard topics={topics} />
             </div>
           </main>
