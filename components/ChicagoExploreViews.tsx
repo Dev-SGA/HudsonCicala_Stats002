@@ -191,10 +191,8 @@ function StatsBarCard({
 function StatsRateTopic({
   title,
   total,
-  totalUnit,
-  rate,
-  rateUnit,
   totalExtra,
+  rate,
   primary,
   secondary,
   primaryLabel,
@@ -204,9 +202,7 @@ function StatsRateTopic({
 }: {
   title: string;
   total: number;
-  totalUnit: string;
   rate: number;
-  rateUnit: string;
   totalExtra?: ReactNode;
   primary: number;
   secondary: number;
@@ -220,15 +216,11 @@ function StatsRateTopic({
       <h3 className="stats-topic__title">{title}</h3>
       <div className="stats-topic__cards">
         <div className="stats-stat-card stats-stat-card--total">
-          <span className="stats-stat-card__kicker">Total</span>
           <span className="stats-stat-card__value">{total}</span>
-          <span className="stats-stat-card__unit">{totalUnit}</span>
           {totalExtra ? <div className="stats-stat-card__extra">{totalExtra}</div> : null}
         </div>
         <div className="stats-stat-card stats-stat-card--rate">
-          <span className="stats-stat-card__kicker">Rate</span>
           <span className="stats-stat-card__value">{rate}%</span>
-          <span className="stats-stat-card__unit">{rateUnit}</span>
         </div>
         <StatsBarCard
           primary={primary}
@@ -252,10 +244,8 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="General Passing"
         total={summary.totalPasses}
-        totalUnit="Total passes"
         rate={summary.accuracy}
-        rateUnit="Accurate"
-        totalExtra={games ? <PerGameBadge total={summary.totalPasses} games={games} /> : null}
+        totalExtra={games ? <PerGameBadge total={summary.totalPasses} games={games} subtle /> : null}
         primary={summary.accurate}
         secondary={summary.inaccurate}
         primaryLabel="Accurate"
@@ -266,9 +256,7 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="Offensive Duels"
         total={offensiveTotal}
-        totalUnit="Total duels"
         rate={summary.offensiveWinRate}
-        rateUnit="Won rate"
         primary={summary.offensiveWon}
         secondary={summary.offensiveLost}
         primaryLabel="Won"
@@ -279,9 +267,7 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
       <StatsRateTopic
         title="Defensive Duels"
         total={defensiveTotal}
-        totalUnit="Total duels"
         rate={summary.defensiveWinRate}
-        rateUnit="Won rate"
         primary={summary.defensiveWon}
         secondary={summary.defensiveLost}
         primaryLabel="Won"
@@ -293,12 +279,10 @@ export function StatsHeroSideboard({ summary, games }: { summary: MatchSummary; 
         <h3 className="stats-topic__title">Regains</h3>
         <div className="stats-topic__cards stats-topic__cards--pair">
           <div className="stats-stat-card stats-stat-card--total">
-            <span className="stats-stat-card__kicker">Total</span>
             <span className="stats-stat-card__value">{summary.regains}</span>
-            <span className="stats-stat-card__unit">Total regains</span>
             {games ? (
               <div className="stats-stat-card__extra">
-                <PerGameBadge total={summary.regains} games={games} />
+                <PerGameBadge total={summary.regains} games={games} subtle />
               </div>
             ) : null}
           </div>

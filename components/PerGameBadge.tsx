@@ -4,11 +4,21 @@ type PerGameBadgeProps = {
   total: number;
   games: number;
   className?: string;
+  /** Smaller inline caption for stat cards */
+  subtle?: boolean;
 };
 
-export function PerGameBadge({ total, games, className }: PerGameBadgeProps) {
+export function PerGameBadge({ total, games, className, subtle }: PerGameBadgeProps) {
   if (games <= 0) return null;
   const avg = perGame(total, games);
+
+  if (subtle) {
+    return (
+      <span className={`per-game-badge-subtle${className ? ` ${className}` : ""}`}>
+        {avg} per game · {games} matches
+      </span>
+    );
+  }
 
   return (
     <div className={`per-game-badge${className ? ` ${className}` : ""}`}>
