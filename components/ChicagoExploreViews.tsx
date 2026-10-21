@@ -219,7 +219,9 @@ function StatsSplit({
   showShare?: boolean;
 }) {
   const total = primary + secondary;
-  const figure = (value: number) => (showShare ? `${value} · ${percent(value, total)}%` : String(value));
+  const primaryPct = percent(primary, total);
+  const secondaryPct = total > 0 ? 100 - primaryPct : 0;
+  const figure = (value: number, share: number) => (showShare ? `${value} · ${share}%` : String(value));
 
   return (
     <div className="stats-viz">
@@ -234,12 +236,12 @@ function StatsSplit({
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
           <ClipLabel label={primaryLabel} href={primaryHref} />
-          <strong>{figure(primary)}</strong>
+          <strong>{figure(primary, primaryPct)}</strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
           <ClipLabel label={secondaryLabel} href={secondaryHref} />
-          <strong>{figure(secondary)}</strong>
+          <strong>{figure(secondary, secondaryPct)}</strong>
         </li>
       </ul>
     </div>
