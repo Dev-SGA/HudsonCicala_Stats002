@@ -127,6 +127,54 @@
         "interception": { "actions": 3, "good": 0, "bad": 0 },
         "recovery": { "actions": 3, "good": 0, "bad": 0 }
       }
+    },
+    {
+      "id": "st-louis-city",
+      "kind": "session",
+      "label": "vs St. Louis City SC",
+      "shortLabel": "St. Louis City",
+      "logo": "/clubs/st-louis-city.png",
+      "passesUnderPressure": {
+        "total": 41,
+        "underPressure": 33,
+        "notUnderPressure": 8,
+        "videoLink": ""
+      },
+      "passResults": {
+        "underPressure": {
+          "progressive": 10,
+          "neutral": 21,
+          "lost": 2,
+          "turnovers": 2
+        },
+        "notUnderPressure": {
+          "progressive": 3,
+          "neutral": 3,
+          "lost": 2,
+          "turnovers": 1
+        },
+        "videoLink": ""
+      },
+      "possessions": {
+        "total": 45,
+        "lostBalls": 1,
+        "wrongPasses": 4,
+        "lostPlays": 5,
+        "passTurnover": 3,
+        "duelTurnover": 1,
+        "videoLink": ""
+      },
+      "videos": [],
+      "duels": {
+        "offensiveWon": { "actions": 1, "good": 0, "bad": 0 },
+        "offensiveLost": { "actions": 1, "good": 0, "bad": 0 },
+        "fouled": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveWon": { "actions": 3, "good": 0, "bad": 0 },
+        "defensiveLost": { "actions": 3, "good": 0, "bad": 0 },
+        "fouls": { "actions": 0, "good": 0, "bad": 0 },
+        "interception": { "actions": 8, "good": 0, "bad": 0 },
+        "recovery": { "actions": 7, "good": 0, "bad": 0 }
+      }
     }
   ]
 }
