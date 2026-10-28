@@ -297,36 +297,6 @@ function PdfSide({
   );
 }
 
-function PdfVideos({ videos }: { videos: { label: string; url: string }[] }) {
-  if (videos.length === 0) return null;
-
-  return (
-    <section className="spdf-videos">
-      <p className="spdf-videos__title">Videos</p>
-      <ul className="spdf-videos__list">
-        {videos.map((video) => (
-          <li key={video.label}>
-            <a
-              className="spdf-videos__link"
-              href={video.url}
-              data-pdf-link={video.url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="spdf-videos__play" aria-hidden="true">
-                <span className="spdf-videos__play-icon" />
-              </span>
-              <span className="spdf-videos__text">
-                <strong>{video.label}</strong>
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtitle: string; opponentLogoUrl: string }) {
   return (
     <header className="spdf-head">
@@ -562,7 +532,6 @@ function SummaryPdfPage({
           />
           <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} />
         </div>
-        <PdfVideos videos={stats.videos ?? []} />
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>
           <span>

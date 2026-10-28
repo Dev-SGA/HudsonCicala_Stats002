@@ -178,7 +178,9 @@
         { "label": "Def. Duels Won", "url": "https://drive.google.com/file/d/1MnQCrt3pIrmuhllrWIwazuQvvC71aHgd/view?usp=drive_link" },
         { "label": "Def. Duels Lost", "url": "https://drive.google.com/file/d/1iWXi2WCLnxlBIN4mwPkE5TKyNQV-g3h7/view?usp=drive_link" },
         { "label": "Recoveries", "url": "https://drive.google.com/file/d/1B0OO8sCiGLq0U6BTumERdOBYrDgk8Gl5/view?usp=drive_link" },
-        { "label": "Interceptions", "url": "https://drive.google.com/file/d/1TiWhdSDFa6DGkxs1nzYMfvsdUmdOq51S/view?usp=drive_link" }
+        { "label": "Interceptions", "url": "https://drive.google.com/file/d/1TiWhdSDFa6DGkxs1nzYMfvsdUmdOq51S/view?usp=drive_link" },
+        { "label": "Turnover Duels", "url": "https://drive.google.com/file/d/1mcVwYhHP1f4OHuJwU6Pf8H1GoT_qbRmB/view?usp=drive_link" },
+        { "label": "Turnover Passes", "url": "https://drive.google.com/file/d/10q5ltrb0Tj9kZG3ZK_2cSMQyK4vyU8ox/view?usp=drive_link" }
       ],
       "duels": {
         "offensiveWon": { "actions": 1, "good": 0, "bad": 0 },
