@@ -907,6 +907,12 @@
   color: #6b8192;
 }
 
+.spdf-possession-stat__per {
+  font-size: 9px;
+  font-weight: 700;
+  color: #9aabba;
+}
+
 .spdf-possession-split__headline {
   margin: 0 0 6px;
   font-size: 11px;
@@ -963,6 +969,42 @@
 .spdf-section--summary {
   height: auto;
   padding: 10px 12px;
+}
+
+.spdf-section--goals {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+}
+
+.spdf-section--goals .spdf-section__title {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.spdf-section--goals .spdf-summary-kpis {
+  flex: 1 1 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0;
+}
+
+.spdf-section--goals .spdf-summary-kpi {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 12px;
+}
+
+.spdf-section--goals .spdf-summary-kpi__value {
+  font-size: 22px;
+}
+
+.spdf-section--goals .spdf-summary-kpi__per {
+  margin-left: auto;
 }
 
 .spdf-section--summary .spdf-section__title {
@@ -1514,7 +1556,7 @@
 
 .spdf-videos__list {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
   margin: 0;
   padding: 0;

@@ -133,17 +133,20 @@ function PdfPossessionStatCard({
   value,
   share,
   tone,
+  perGameLabel,
 }: {
   label: string;
   value: number;
   share: number;
   tone: "retained" | "lost-plays" | "turnovers";
+  perGameLabel?: string;
 }) {
   return (
     <div className={`spdf-possession-stat spdf-possession-stat--${tone}`}>
       <span className="spdf-possession-stat__label">{label}</span>
       <span className="spdf-possession-stat__value">{value}</span>
       <span className="spdf-possession-stat__pct">{share}% of possessions</span>
+      {perGameLabel ? <span className="spdf-possession-stat__per">{perGameLabel}</span> : null}
     </div>
   );
 }
@@ -378,6 +381,28 @@ function SummaryStatCard({
   );
 }
 
+function GoalsAssistsCard({ goals, assists, games }: { goals: number; assists: number; games?: number }) {
+  const items = [
+    { label: "Goals", value: goals },
+    { label: "Assists", value: assists },
+  ];
+
+  return (
+    <section className="spdf-section spdf-section--build-up spdf-section--summary spdf-section--goals">
+      <h3 className="spdf-section__title">Goals &amp; Assists</h3>
+      <div className="spdf-summary-kpis">
+        {items.map((item) => (
+          <div key={item.label} className="spdf-summary-kpi">
+            <span className="spdf-summary-kpi__value">{item.value}</span>
+            <span className="spdf-summary-kpi__label">{item.label}</span>
+            {games ? <span className="spdf-summary-kpi__per">{perGame(item.value, games)} per game</span> : null}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SummaryPdfPage({
   stats,
   photoUrl,
@@ -451,6 +476,7 @@ function SummaryPdfPage({
               { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
             ]}
           />
+          <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} />
         </div>
         <PdfVideos videos={stats.videos ?? []} />
         <footer className="spdf-foot">
@@ -467,6 +493,8 @@ function SummaryPdfPage({
 export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, opponentLogoUrl }: StatsGamePdfSheetProps) {
   const { player, meta, passesUnderPressure, passResults, possessions } = stats;
   const passTotal = passesUnderPressure.total;
+  const games = meta.games;
+  const turnovers = (possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0);
 
   return (
     <>
@@ -523,12 +551,14 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                   value={possessions.lostPlays}
                   share={pct(possessions.lostPlays, possessions.total)}
                   tone="lost-plays"
+                  perGameLabel={games ? `${perGame(possessions.lostPlays, games)} per game` : undefined}
                 />
                 <PdfPossessionStatCard
                   label="Turnovers"
-                  value={(possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0)}
-                  share={pct((possessions.passTurnover ?? 0) + (possessions.duelTurnover ?? 0), possessions.total)}
+                  value={turnovers}
+                  share={pct(turnovers, possessions.total)}
                   tone="turnovers"
+                  perGameLabel={games ? `${perGame(turnovers, games)} per game` : undefined}
                 />
               </div>
               <div className="spdf-possession-breakdowns">

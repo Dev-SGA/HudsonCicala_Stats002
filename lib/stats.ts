@@ -33,6 +33,8 @@ export type MatchStats = {
   label: string;
   shortLabel: string;
   logo: string;
+  goals?: number;
+  assists?: number;
   passesUnderPressure: {
     total: number;
     underPressure: number;
@@ -78,6 +80,8 @@ export type GameStats = {
   meta: StatsReport["meta"] & { fileSlug: string; games?: number };
   player: StatsReport["player"];
   opponentLogo: string;
+  goals?: number;
+  assists?: number;
   passesUnderPressure: MatchStats["passesUnderPressure"];
   passResults: MatchStats["passResults"];
   possessions: MatchStats["possessions"];
@@ -103,9 +107,13 @@ export type MatchSummary = {
   interceptions: number;
   recoveries: number;
   regains: number;
+  goals: number;
+  assists: number;
 };
 
 type SummarySource = {
+  goals?: number;
+  assists?: number;
   passesUnderPressure: MatchStats["passesUnderPressure"];
   passResults: MatchStats["passResults"];
   duels: DuelBlock | null;
@@ -179,6 +187,8 @@ export function matchSummary(source: SummarySource): MatchSummary | null {
     interceptions,
     recoveries,
     regains: interceptions + recoveries,
+    goals: source.goals ?? 0,
+    assists: source.assists ?? 0,
   };
 }
 
@@ -213,6 +223,8 @@ export function seasonMatch(matches: MatchStats[]): MatchStats {
     label: "Season",
     shortLabel: "Season",
     logo: "",
+    goals: matches.reduce((sum, match) => sum + (match.goals ?? 0), 0),
+    assists: matches.reduce((sum, match) => sum + (match.assists ?? 0), 0),
     passesUnderPressure: {
       total: matches.reduce((sum, match) => sum + match.passesUnderPressure.total, 0),
       underPressure: matches.reduce((sum, match) => sum + match.passesUnderPressure.underPressure, 0),
@@ -249,6 +261,8 @@ export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
     },
     player: report.player,
     opponentLogo: match.logo,
+    goals: match.goals,
+    assists: match.assists,
     passesUnderPressure: match.passesUnderPressure,
     passResults: match.passResults,
     possessions: match.possessions,

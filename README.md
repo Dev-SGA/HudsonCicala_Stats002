@@ -15,6 +15,7 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 - **Season** fica ao lado de St. Louis City SC e abre os mesmos cards, com os totais das três partidas. Cada total mostra o número por jogo ao lado.
 - **Dispossessed** são os duelos ofensivos perdidos.
 - Inaccurate passes são os passes maus.
+- Card **Goals & Assists** em Stats (campos `goals` e `assists` de cada partida). Na Season, Lost Plays e Turnovers também mostram a média por jogo.
 - Turnovers passou a se chamar **Lost Plays**, na cor amarelo queimado. O valor é dispossessed + inaccurate passes.
 
 ## Desenvolvimento

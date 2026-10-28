@@ -17,6 +17,8 @@
       "label": "vs Chicago Fire",
       "shortLabel": "Chicago Fire",
       "logo": "/clubs/chicago-fire.png",
+      "goals": 0,
+      "assists": 0,
       "passesUnderPressure": {
         "total": 53,
         "underPressure": 33,
@@ -75,6 +77,8 @@
       "label": "vs Columbus Crew",
       "shortLabel": "Columbus Crew",
       "logo": "/clubs/columbus-crew.png",
+      "goals": 0,
+      "assists": 0,
       "passesUnderPressure": {
         "total": 69,
         "underPressure": 56,
@@ -134,6 +138,8 @@
       "label": "vs St. Louis City SC",
       "shortLabel": "St. Louis City",
       "logo": "/clubs/st-louis-city.png",
+      "goals": 0,
+      "assists": 0,
       "passesUnderPressure": {
         "total": 41,
         "underPressure": 33,

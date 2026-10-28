@@ -144,12 +144,16 @@ export function PossessionBoard({
         value={parts.lostPlays}
         detail={`${percent(parts.lostPlays, parts.total)}% of possessions`}
         tone="lost"
+        games={games}
+        unit="lost plays"
       />
       <PossessionStat
         label="Turnovers"
         value={parts.turnover}
         detail={`${percent(parts.turnover, parts.total)}% of possessions`}
         tone="turnover"
+        games={games}
+        unit="turnovers"
       />
       <div className="possession-charts">
         <PossessionBreakdown title="Lost play breakdown" rows={lostRows} scale={lostScale} />
@@ -410,6 +414,13 @@ export function StatsHeroSideboard({
             primaryHref={clipUrl(videos, "Interceptions")}
             secondaryHref={clipUrl(videos, "Recoveries")}
           />
+        </div>
+      </section>
+      <section className="stats-topic">
+        <h3 className="stats-topic__title">Goals &amp; Assists</h3>
+        <div className="stats-topic__panel stats-topic__panel--duo">
+          <StatsFigure label="Goals" value={summary.goals} unit="goals" games={games} />
+          <StatsFigure label="Assists" value={summary.assists} unit="assists" games={games} />
         </div>
       </section>
     </div>
