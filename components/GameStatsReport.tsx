@@ -14,7 +14,9 @@ import { BRAND } from "@/lib/brand";
 import {
   clipUrl,
   combinePassResults,
+  formatCount,
   matchSummary,
+  perGameMatch,
   seasonMatch,
   toGameStats,
   type GameStats,
@@ -88,7 +90,7 @@ function PassResultsMeter({
         <CountLine value={total} unit="passes" games={games} />
       ) : (
         <p className="metric-card__headline">
-          <span>{total} passes</span>
+          <span>{formatCount(total)} passes</span>
         </p>
       )}
       <div
@@ -113,7 +115,7 @@ function PassResultsMeter({
             href={clipUrl(videos, "Progressive Passes", "Progressive Pass")}
           />
           <strong>
-            {breakdown.progressive} · {progressivePct}%
+            {formatCount(breakdown.progressive)} · {progressivePct}%
           </strong>
         </li>
         <li>
@@ -124,7 +126,7 @@ function PassResultsMeter({
             href={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
           />
           <strong>
-            {breakdown.lost} · {percent(breakdown.lost, total)}%
+            {formatCount(breakdown.lost)} · {percent(breakdown.lost, total)}%
           </strong>
         </li>
         {turnovers > 0 ? (
@@ -132,7 +134,7 @@ function PassResultsMeter({
             <span className="legend__dot legend__dot--pass-turnover" />
             <ClipLegendLabel label="Turnover Pass" href={clipUrl(videos, "Turnover Passes", "Turnover Pass")} />
             <strong>
-              {turnovers} · {turnoverPct}%
+              {formatCount(turnovers)} · {turnoverPct}%
             </strong>
           </li>
         ) : null}
@@ -140,10 +142,35 @@ function PassResultsMeter({
           <span className="legend__dot legend__dot--pass-neutral" />
           <PassPlayTip label="Other" tip={PASS_PLAY_TIPS.neutral} />
           <strong>
-            {breakdown.neutral} · {neutralPct}%
+            {formatCount(breakdown.neutral)} · {neutralPct}%
           </strong>
         </li>
       </ul>
+    </div>
+  );
+}
+
+type SeasonMode = "total" | "perGame";
+
+function SeasonModeToggle({ mode, onChange }: { mode: SeasonMode; onChange: (mode: SeasonMode) => void }) {
+  const items: { id: SeasonMode; label: string }[] = [
+    { id: "total", label: "Total" },
+    { id: "perGame", label: "Per game" },
+  ];
+
+  return (
+    <div className="match-nav__pills season-mode" role="group" aria-label="Season numbers">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          type="button"
+          className={`match-nav__pill${item.id === mode ? " is-active" : ""}`}
+          aria-pressed={item.id === mode}
+          onClick={() => onChange(item.id)}
+        >
+          {item.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -152,10 +179,12 @@ function MatchSwitcher({
   matches,
   activeId,
   onChange,
+  children,
 }: {
   matches: MatchStats[];
   activeId: string;
   onChange: (id: string) => void;
+  children?: React.ReactNode;
 }) {
   const index = matches.findIndex((match) => match.id === activeId);
 
@@ -198,6 +227,7 @@ function MatchSwitcher({
           <span aria-hidden="true">›</span>
         </button>
       </div>
+      {children}
     </div>
   );
 }
@@ -264,7 +294,11 @@ function buildTopics(match: MatchStats): Topic[] {
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
   const { player, meta, matches } = report;
-  const options = useMemo(() => [...matches, seasonMatch(matches)], [matches]);
+  const [seasonMode, setSeasonMode] = useState<SeasonMode>("total");
+  const options = useMemo(() => {
+    const season = seasonMatch(matches);
+    return [...matches, seasonMode === "perGame" ? perGameMatch(season) : { ...season, games: undefined }];
+  }, [matches, seasonMode]);
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
   const match = options.find((item) => item.id === matchId) ?? options[0];
@@ -302,7 +336,9 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
 
           <main className="report-main">
             <div className="view-panel">
-              <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId} />
+              <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId}>
+                {match.id === "season" ? <SeasonModeToggle mode={seasonMode} onChange={setSeasonMode} /> : null}
+              </MatchSwitcher>
               <TopicsBoard topics={topics} />
             </div>
           </main>

@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-import { combinePassResults, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { combinePassResults, formatCount, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -26,7 +26,7 @@ function StatTiles({
     <ul className="spdf-stats">
       {items.map((item) => (
         <li key={item.label} className={`spdf-stat${item.emphasizeDetail ? " spdf-stat--lost-plays" : ""}`}>
-          <span className={`spdf-stat__value${item.tone ? ` spdf-stat__value--${item.tone}` : ""}`}>{item.value}</span>
+          <span className={`spdf-stat__value${item.tone ? ` spdf-stat__value--${item.tone}` : ""}`}>{formatCount(item.value)}</span>
           <span className="spdf-stat__label">{item.label}</span>
           {item.detail ? (
             <span className={`spdf-stat__detail${item.emphasizeDetail ? " spdf-stat__detail--lost-plays" : ""}`}>{item.detail}</span>
@@ -66,7 +66,7 @@ function PassResultPanel({
     <div className={`spdf-pass-panel${wide ? " spdf-pass-panel--wide" : ""}${compact ? " spdf-pass-panel--total" : ""}`}>
       <div className="spdf-pass-panel__head">
         <p className="spdf-pass-panel__title">{title}</p>
-        <span className="spdf-pass-panel__total">{total} passes</span>
+        <span className="spdf-pass-panel__total">{formatCount(total)} passes</span>
       </div>
       {compact ? (
         <div className="spdf-pass-panel__meter" style={{ gridTemplateColumns: bar.map((segment) => `${segment.value}fr`).join(" ") }}>
@@ -82,7 +82,7 @@ function PassResultPanel({
                 {segment.label}
               </span>
               <strong>
-                {segment.value} · {pct(segment.value, total)}%
+                {formatCount(segment.value)} · {pct(segment.value, total)}%
               </strong>
             </div>
           ))}
@@ -108,7 +108,7 @@ function PassResultPanel({
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
                 <span className="spdf-pass-panel__legend-label">{segment.label}</span>
                 <strong>
-                  {segment.value} · {pct(segment.value, total)}%
+                  {formatCount(segment.value)} · {pct(segment.value, total)}%
                 </strong>
               </li>
             ))}
@@ -144,7 +144,7 @@ function PdfPossessionStatCard({
   return (
     <div className={`spdf-possession-stat spdf-possession-stat--${tone}`}>
       <span className="spdf-possession-stat__label">{label}</span>
-      <span className="spdf-possession-stat__value">{value}</span>
+      <span className="spdf-possession-stat__value">{formatCount(value)}</span>
       <span className="spdf-possession-stat__pct">{share}% of possessions</span>
       {perGameLabel ? <span className="spdf-possession-stat__per">{perGameLabel}</span> : null}
     </div>
@@ -173,7 +173,7 @@ function PdfPossessionSplit({
             <span className="spdf-possession-row__track">
               <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }} />
             </span>
-            <strong>{row.value}</strong>
+            <strong>{formatCount(row.value)}</strong>
           </li>
         ))}
       </ul>
@@ -213,7 +213,7 @@ function PdfSection({
       <div className="spdf-section__content">
         {panelOnly ? null : (
           <div className={`spdf-section__kpi${aside ? " spdf-section__kpi--aside" : ""}`}>
-            <span className="spdf-section__value">{kpi}</span>
+            <span className="spdf-section__value">{formatCount(kpi)}</span>
             {aside ? <span className="spdf-section__aside">{aside}</span> : null}
             <span className="spdf-section__unit">{unit}</span>
           </div>
@@ -365,7 +365,7 @@ function SummaryStatCard({
       <h3 className="spdf-section__title">{title}</h3>
       <div className={`spdf-summary-kpis${rate == null ? " spdf-summary-kpis--single" : ""}`}>
         <div className="spdf-summary-kpi">
-          <span className="spdf-summary-kpi__value">{total}</span>
+          <span className="spdf-summary-kpi__value">{formatCount(total)}</span>
           <span className="spdf-summary-kpi__label">{totalLabel}</span>
           {perGameLabel ? <span className="spdf-summary-kpi__per">{perGameLabel}</span> : null}
         </div>
@@ -393,7 +393,7 @@ function GoalsAssistsCard({ goals, assists, games }: { goals: number; assists: n
       <div className="spdf-summary-kpis">
         {items.map((item) => (
           <div key={item.label} className="spdf-summary-kpi">
-            <span className="spdf-summary-kpi__value">{item.value}</span>
+            <span className="spdf-summary-kpi__value">{formatCount(item.value)}</span>
             <span className="spdf-summary-kpi__label">{item.label}</span>
             {games ? <span className="spdf-summary-kpi__per">{perGame(item.value, games)} per game</span> : null}
           </div>
@@ -434,8 +434,8 @@ function SummaryPdfPage({
             rateLabel="Accurate"
             perGameLabel={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
             segments={[
-              { label: "Accurate", value: String(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
-              { label: "Inaccurate", value: String(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
+              { label: "Accurate", value: formatCount(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
+              { label: "Inaccurate", value: formatCount(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
             ]}
           />
           <SummaryStatCard
@@ -448,8 +448,8 @@ function SummaryPdfPage({
               games ? `${perGame(summary.offensiveWon + summary.offensiveLost, games)} per game` : undefined
             }
             segments={[
-              { label: "Won", value: String(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
-              { label: "Lost", value: String(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
+              { label: "Won", value: formatCount(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
+              { label: "Lost", value: formatCount(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
             ]}
           />
           <SummaryStatCard
@@ -458,8 +458,8 @@ function SummaryPdfPage({
             totalLabel="Total tackles"
             perGameLabel={games ? `${perGame(summary.regains, games)} per game` : undefined}
             segments={[
-              { label: "Interceptions", value: String(summary.interceptions), share: summary.interceptions, tone: "blue" },
-              { label: "Recoveries", value: String(summary.recoveries), share: summary.recoveries, tone: "mint" },
+              { label: "Interceptions", value: formatCount(summary.interceptions), share: summary.interceptions, tone: "blue" },
+              { label: "Recoveries", value: formatCount(summary.recoveries), share: summary.recoveries, tone: "mint" },
             ]}
           />
           <SummaryStatCard
@@ -472,8 +472,8 @@ function SummaryPdfPage({
               games ? `${perGame(summary.defensiveWon + summary.defensiveLost, games)} per game` : undefined
             }
             segments={[
-              { label: "Won", value: String(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
-              { label: "Lost", value: String(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
+              { label: "Won", value: formatCount(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
+              { label: "Lost", value: formatCount(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
             ]}
           />
           <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} />

@@ -1928,6 +1928,11 @@ body::before {
   line-height: 1;
 }
 
+.season-mode .match-nav__pill {
+  padding: 7px 12px;
+  font-size: 11px;
+}
+
 .match-nav__arrow:disabled {
   opacity: 0.35;
   cursor: not-allowed;

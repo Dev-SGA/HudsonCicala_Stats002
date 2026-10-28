@@ -12,7 +12,7 @@ O visual segue o Stats 001: tema escuro SGA, Source Sans 3 e Good Times.
 
 - Card **Stats** nas partidas novas: general passing (accurate, inaccurate e a % de passes certos), duelos ofensivos e defensivos (won, lost, % won) e interceptações com recuperações.
 - A barra de pressure context fica no card **Pressure context**, dentro de Passes Under Pressure vs Not.
-- **Season** fica ao lado de St. Louis City SC e abre os mesmos cards, com os totais das três partidas. Cada total mostra o número por jogo ao lado.
+- **Season** fica ao lado de St. Louis City SC e abre os mesmos cards. A chave **Total / Per game** troca os números absolutos entre os totais das três partidas e a média por jogo (as porcentagens não mudam). O PDF segue o modo escolhido.
 - **Dispossessed** são os duelos ofensivos perdidos.
 - Inaccurate passes são os passes maus.
 - Card **Goals & Assists** em Stats (campos `goals` e `assists` de cada partida). Na Season, Lost Plays e Turnovers também mostram a média por jogo.

@@ -1,3 +1,5 @@
+import { formatCount } from "@/lib/stats";
+
 type CountLineProps = {
   value: number;
   unit: string;
@@ -17,7 +19,7 @@ export function CountLine({ value, unit, games, className }: CountLineProps) {
   return (
     <p className={`count-line${className ? ` ${className}` : ""}`}>
       <span className="count-line__main">
-        {value} {unit}
+        {formatCount(value)} {unit}
       </span>
       <span className="count-line__sep" aria-hidden="true">
         |

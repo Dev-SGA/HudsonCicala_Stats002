@@ -1,5 +1,5 @@
 import { CountLine } from "@/components/CountLine";
-import { clipUrl, type MatchStats, type MatchSummary } from "@/lib/stats";
+import { clipUrl, formatCount, type MatchStats, type MatchSummary } from "@/lib/stats";
 
 type PossessionSource = MatchStats["possessions"];
 
@@ -45,7 +45,7 @@ function PossessionStat({
       {games && unit ? (
         <CountLine value={value} unit={unit} games={games} />
       ) : (
-        <span className="possession-stat__value">{value}</span>
+        <span className="possession-stat__value">{formatCount(value)}</span>
       )}
       {detail ? <span className="possession-stat__detail">{detail}</span> : null}
     </div>
@@ -184,7 +184,7 @@ function PossessionBreakdown({
             <span className="possession-row__track">
               <span className={`possession-row__fill possession-row__fill--${row.tone}`} style={{ width: `${percent(row.value, scale)}%` }} />
             </span>
-            <strong>{row.value}</strong>
+            <strong>{formatCount(row.value)}</strong>
           </li>
         ))}
       </ul>
@@ -225,7 +225,7 @@ function StatsSplit({
   const total = primary + secondary;
   const primaryPct = percent(primary, total);
   const secondaryPct = total > 0 ? 100 - primaryPct : 0;
-  const figure = (value: number, share: number) => (showShare ? `${value} · ${share}%` : String(value));
+  const figure = (value: number, share: number) => (showShare ? `${formatCount(value)} · ${share}%` : formatCount(value));
 
   return (
     <div className="stats-viz">
@@ -271,7 +271,7 @@ function StatsFigure({
       {games && unit ? (
         <CountLine value={value} unit={unit} games={games} />
       ) : (
-        <span className="stats-figure__value">{rate ? `${value}%` : value}</span>
+        <span className="stats-figure__value">{rate ? `${value}%` : formatCount(value)}</span>
       )}
     </div>
   );

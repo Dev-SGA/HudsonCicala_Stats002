@@ -58,6 +58,8 @@ export type MatchStats = {
   videos?: { label: string; url: string }[];
   duels: DuelBlock | null;
   games?: number;
+  /** Season numbers divided by the games played. */
+  perGame?: boolean;
 };
 
 export type StatsReport = {
@@ -140,6 +142,12 @@ export function clipUrl(videos: { label: string; url: string }[] | undefined, ..
   const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
   const keys = new Set(aliases.map(normalize));
   return videos.find((video) => keys.has(normalize(video.label)))?.url;
+}
+
+/** Whole numbers stay as they are; averages show one decimal. */
+export function formatCount(value: number): string {
+  if (Number.isInteger(value)) return String(value);
+  return (Math.round(value * 10) / 10).toFixed(1).replace(/\.0$/, "");
 }
 
 /** Average per recorded game, with one decimal when it is not a whole number. */
@@ -250,13 +258,40 @@ export function seasonMatch(matches: MatchStats[]): MatchStats {
   };
 }
 
+function scaleNumbers<T>(value: T, factor: number): T {
+  if (typeof value === "number") return (value * factor) as T;
+  if (Array.isArray(value) || value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, scaleNumbers(item, factor)]),
+  ) as T;
+}
+
+/** Season match with every absolute number divided by the games played. Shares stay the same. */
+export function perGameMatch(season: MatchStats): MatchStats {
+  const games = season.games ?? 0;
+  const factor = games > 0 ? 1 / games : 0;
+
+  return {
+    ...season,
+    label: `${season.label} · Per game`,
+    goals: (season.goals ?? 0) * factor,
+    assists: (season.assists ?? 0) * factor,
+    passesUnderPressure: scaleNumbers(season.passesUnderPressure, factor),
+    passResults: scaleNumbers(season.passResults, factor),
+    possessions: scaleNumbers(season.possessions, factor),
+    duels: scaleNumbers(season.duels, factor),
+    games: undefined,
+    perGame: true,
+  };
+}
+
 export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
   return {
     meta: {
       ...report.meta,
       subtitle: match.label,
       session: match.kind === "baseline" ? "001" : report.meta.session,
-      fileSlug: `${report.meta.session}-${match.id}`,
+      fileSlug: `${report.meta.session}-${match.id}${match.perGame ? "-per-game" : ""}`,
       games: match.games,
     },
     player: report.player,
