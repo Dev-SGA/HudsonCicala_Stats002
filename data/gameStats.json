@@ -172,13 +172,13 @@
       },
       "videos": [
         { "label": "Progressive Passes", "url": "https://drive.google.com/file/d/1XawSt0miu0PeGBO6MlA1ncnPUOJ8mAVB/view?usp=drive_link" },
-        { "label": "Inaccurate Passes", "url": "https://drive.google.com/file/d/1LOBk1u7-GURdAFcWQ1mcsfqynLQ6H1Z8/view?usp=drive_link" },
+        { "label": "Inaccurate Passes", "url": "https://drive.google.com/file/d/1Aj4bNwKncHlgbjxc6f44Na0zuhwQiJyZ/view?usp=drive_link" },
         { "label": "Off. Duels Won", "url": "https://drive.google.com/file/d/16ArUutxEvfLEkpZjmZTrZbcbwqblyWSu/view?usp=drive_link" },
         { "label": "Off. Duels Lost", "url": "https://drive.google.com/file/d/1LOBk1u7-GURdAFcWQ1mcsfqynLQ6H1Z8/view?usp=drive_link" },
         { "label": "Def. Duels Won", "url": "https://drive.google.com/file/d/1MnQCrt3pIrmuhllrWIwazuQvvC71aHgd/view?usp=drive_link" },
         { "label": "Def. Duels Lost", "url": "https://drive.google.com/file/d/1iWXi2WCLnxlBIN4mwPkE5TKyNQV-g3h7/view?usp=drive_link" },
         { "label": "Recoveries", "url": "https://drive.google.com/file/d/1B0OO8sCiGLq0U6BTumERdOBYrDgk8Gl5/view?usp=drive_link" },
-        { "label": "Interceptions", "url": "https://drive.google.com/file/d/1B0OO8sCiGLq0U6BTumERdOBYrDgk8Gl5/view?usp=drive_link" }
+        { "label": "Interceptions", "url": "https://drive.google.com/file/d/1TiWhdSDFa6DGkxs1nzYMfvsdUmdOq51S/view?usp=drive_link" }
       ],
       "duels": {
         "offensiveWon": { "actions": 1, "good": 0, "bad": 0 },
