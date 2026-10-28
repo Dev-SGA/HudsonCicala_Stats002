@@ -429,6 +429,7 @@ body::before {
   }
 }
 
+
 /* ---------- Topic content ---------- */
 
 .section-label {
@@ -1478,8 +1479,23 @@ body::before {
 }
 
 .clip-link {
+  display: inline-flex;
+  align-items: center;
   color: inherit;
   text-decoration: none;
+}
+
+.legend__label.clip-link {
+  flex-direction: row;
+  gap: 0;
+}
+
+.play-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  vertical-align: -2px;
 }
 
 .clip-link:hover,
@@ -1503,6 +1519,8 @@ body::before {
 }
 
 .pass-play-tip__label {
+  display: inline-flex;
+  align-items: center;
   text-decoration: underline dotted color-mix(in srgb, var(--text-muted) 70%, transparent);
   text-underline-offset: 3px;
 }
@@ -2160,4 +2178,3 @@ body::before {
     animation: none;
   }
 }
-

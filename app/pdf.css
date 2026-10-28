@@ -144,6 +144,22 @@
   height: 34px;
 }
 
+.spdf-play {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  line-height: 0;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.spdf-play__icon {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
 .spdf-side__slogan {
   margin: auto 0 0;
   font-family: "Good Times", "Source Sans 3", sans-serif;
@@ -1205,7 +1221,8 @@
 
 .spdf-pass-panel__legend-label {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 1px;
   min-width: 0;
   font-size: 8px;
@@ -1673,4 +1690,3 @@
 .stats-pdf--page1 .spdf-possession-stat__value { font-size: 22px; }
 .stats-pdf--page1 .spdf-possession-stat__pct { font-size: 10px; }
 .stats-pdf--page1 .spdf-foot { font-size: 11px; }
-

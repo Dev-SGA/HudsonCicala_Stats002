@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-import { combinePassResults, formatCount, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { clipUrl, combinePassResults, formatCount, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -12,6 +12,16 @@ type StatsGamePdfSheetProps = {
 type PrintTone = "green" | "yellow" | "blue" | "mint" | "grey" | "pass-progressive" | "pass-lost";
 
 type Tone = "blue" | "red" | "burnt" | "warn" | "pass-progressive" | "pass-neutral" | "pass-lost";
+
+function PdfPlay({ href }: { href?: string }) {
+  if (!href) return null;
+  return (
+    <a className="spdf-play" href={href} data-pdf-link={href} target="_blank" rel="noreferrer" aria-label="Open video">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/play-icon.png" alt="" className="spdf-play__icon" width={14} height={14} />
+    </a>
+  );
+}
 
 function pct(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
@@ -40,11 +50,13 @@ function StatTiles({
 function PassResultPanel({
   title,
   breakdown,
+  videos,
   wide = false,
   compact = false,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
+  videos?: GameStats["videos"];
   wide?: boolean;
   compact?: boolean;
 }) {
@@ -56,10 +68,31 @@ function PassResultPanel({
     { key: "other", value: breakdown.neutral, tone: "pass-neutral", host: false },
   ].filter((segment) => segment.value > 0);
   const legend = [
-    { key: "progressive", label: "Progressive Pass", value: breakdown.progressive, tone: "pass-progressive", nested: false },
-    { key: "inaccurate", label: "Inaccurate Pass", value: breakdown.lost, tone: "pass-inaccurate", nested: false },
-    { key: "turnover", label: "Turnover Pass", value: turnovers, tone: "pass-turnover", nested: true },
-    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false },
+    {
+      key: "progressive",
+      label: "Progressive Pass",
+      value: breakdown.progressive,
+      tone: "pass-progressive",
+      nested: false,
+      href: clipUrl(videos, "Progressive Passes", "Progressive Pass"),
+    },
+    {
+      key: "inaccurate",
+      label: "Inaccurate Pass",
+      value: breakdown.lost,
+      tone: "pass-inaccurate",
+      nested: false,
+      href: clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass"),
+    },
+    {
+      key: "turnover",
+      label: "Turnover Pass",
+      value: turnovers,
+      tone: "pass-turnover",
+      nested: true,
+      href: clipUrl(videos, "Turnover Passes", "Turnover Pass"),
+    },
+    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false, href: undefined },
   ].filter((segment) => segment.value > 0);
 
   return (
@@ -106,7 +139,10 @@ function PassResultPanel({
             {legend.map((segment) => (
               <li key={segment.key} className={segment.nested ? "is-nested" : undefined}>
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
-                <span className="spdf-pass-panel__legend-label">{segment.label}</span>
+                <span className="spdf-pass-panel__legend-label">
+                  {segment.label}
+                  <PdfPlay href={segment.href} />
+                </span>
                 <strong>
                   {formatCount(segment.value)} · {pct(segment.value, total)}%
                 </strong>
@@ -156,7 +192,7 @@ function PdfPossessionSplit({
   rows,
 }: {
   title: string;
-  rows: { label: string; value: number; tone: "lost-yellow-deep" | "lost-yellow-mid" }[];
+  rows: { label: string; value: number; tone: "lost-yellow-deep" | "lost-yellow-mid"; href?: string }[];
 }) {
   const scale = Math.max(
     rows.reduce((sum, row) => sum + row.value, 0),
@@ -169,7 +205,10 @@ function PdfPossessionSplit({
       <ul className="spdf-possession-rows">
         {rows.map((row) => (
           <li key={row.label} className="spdf-possession-row">
-            <span className="spdf-possession-row__label">{row.label}</span>
+            <span className="spdf-possession-row__label">
+              {row.label}
+              <PdfPlay href={row.href} />
+            </span>
             <span className="spdf-possession-row__track">
               <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }} />
             </span>
@@ -311,7 +350,7 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
 function SummaryMeter({
   segments,
 }: {
-  segments: { label: string; value: string; share: number; tone: PrintTone }[];
+  segments: { label: string; value: string; share: number; tone: PrintTone; href?: string }[];
 }) {
   const total = segments.reduce((sum, segment) => sum + segment.share, 0);
 
@@ -334,7 +373,10 @@ function SummaryMeter({
         {segments.map((segment) => (
           <li key={segment.label}>
             <span className={`spdf-pressure__dot spdf-pressure__dot--${segment.tone}`} />
-            <span>{segment.label}</span>
+            <span>
+              {segment.label}
+              <PdfPlay href={segment.href} />
+            </span>
             <strong className={`spdf-tone spdf-tone--${segment.tone}`}>{segment.value}</strong>
           </li>
         ))}
@@ -358,7 +400,7 @@ function SummaryStatCard({
   rate?: number;
   rateLabel?: string;
   perGameLabel?: string;
-  segments: { label: string; value: string; share: number; tone: PrintTone }[];
+  segments: { label: string; value: string; share: number; tone: PrintTone; href?: string }[];
 }) {
   return (
     <section className="spdf-section spdf-section--build-up spdf-section--summary">
@@ -435,7 +477,13 @@ function SummaryPdfPage({
             perGameLabel={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
             segments={[
               { label: "Accurate", value: formatCount(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
-              { label: "Inaccurate", value: formatCount(summary.inaccurate), share: summary.inaccurate, tone: "grey" },
+              {
+                label: "Inaccurate",
+                value: formatCount(summary.inaccurate),
+                share: summary.inaccurate,
+                tone: "grey",
+                href: clipUrl(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
+              },
             ]}
           />
           <SummaryStatCard
@@ -448,8 +496,20 @@ function SummaryPdfPage({
               games ? `${perGame(summary.offensiveWon + summary.offensiveLost, games)} per game` : undefined
             }
             segments={[
-              { label: "Won", value: formatCount(summary.offensiveWon), share: summary.offensiveWon, tone: "pass-progressive" },
-              { label: "Lost", value: formatCount(summary.offensiveLost), share: summary.offensiveLost, tone: "grey" },
+              {
+                label: "Won",
+                value: formatCount(summary.offensiveWon),
+                share: summary.offensiveWon,
+                tone: "pass-progressive",
+                href: clipUrl(stats.videos, "Off. Duels Won", "Off Duels Won"),
+              },
+              {
+                label: "Lost",
+                value: formatCount(summary.offensiveLost),
+                share: summary.offensiveLost,
+                tone: "grey",
+                href: clipUrl(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
+              },
             ]}
           />
           <SummaryStatCard
@@ -458,8 +518,20 @@ function SummaryPdfPage({
             totalLabel="Total tackles"
             perGameLabel={games ? `${perGame(summary.regains, games)} per game` : undefined}
             segments={[
-              { label: "Interceptions", value: formatCount(summary.interceptions), share: summary.interceptions, tone: "blue" },
-              { label: "Recoveries", value: formatCount(summary.recoveries), share: summary.recoveries, tone: "mint" },
+              {
+                label: "Interceptions",
+                value: formatCount(summary.interceptions),
+                share: summary.interceptions,
+                tone: "blue",
+                href: clipUrl(stats.videos, "Interceptions"),
+              },
+              {
+                label: "Recoveries",
+                value: formatCount(summary.recoveries),
+                share: summary.recoveries,
+                tone: "mint",
+                href: clipUrl(stats.videos, "Recoveries"),
+              },
             ]}
           />
           <SummaryStatCard
@@ -472,8 +544,20 @@ function SummaryPdfPage({
               games ? `${perGame(summary.defensiveWon + summary.defensiveLost, games)} per game` : undefined
             }
             segments={[
-              { label: "Won", value: formatCount(summary.defensiveWon), share: summary.defensiveWon, tone: "pass-progressive" },
-              { label: "Lost", value: formatCount(summary.defensiveLost), share: summary.defensiveLost, tone: "grey" },
+              {
+                label: "Won",
+                value: formatCount(summary.defensiveWon),
+                share: summary.defensiveWon,
+                tone: "pass-progressive",
+                href: clipUrl(stats.videos, "Def. Duels Won", "Def Duels Won"),
+              },
+              {
+                label: "Lost",
+                value: formatCount(summary.defensiveLost),
+                share: summary.defensiveLost,
+                tone: "grey",
+                href: clipUrl(stats.videos, "Def. Duels Lost", "Def Duels Lost"),
+              },
             ]}
           />
           <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} />
@@ -525,10 +609,11 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                 wide
                 title="Total Passes"
                 breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
+                videos={stats.videos}
               />
               <div className="spdf-pass-results-app__pair">
-                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
-                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
+                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} videos={stats.videos} />
+                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} videos={stats.videos} />
               </div>
             </div>
           </PdfSection>
@@ -565,15 +650,35 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                 <PdfPossessionSplit
                   title="Lost play breakdown"
                   rows={[
-                    { label: "Lost Duels", value: possessions.lostBalls, tone: "lost-yellow-deep" },
-                    { label: "Inaccurate Pass", value: possessions.wrongPasses, tone: "lost-yellow-mid" },
+                    {
+                      label: "Lost Duels",
+                      value: possessions.lostBalls,
+                      tone: "lost-yellow-deep",
+                      href: clipUrl(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
+                    },
+                    {
+                      label: "Inaccurate Pass",
+                      value: possessions.wrongPasses,
+                      tone: "lost-yellow-mid",
+                      href: clipUrl(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
+                    },
                   ]}
                 />
                 <PdfPossessionSplit
                   title="Turnover breakdown"
                   rows={[
-                    { label: "Turnover Duel", value: possessions.duelTurnover ?? 0, tone: "lost-yellow-deep" },
-                    { label: "Turnover Pass", value: possessions.passTurnover ?? 0, tone: "lost-yellow-mid" },
+                    {
+                      label: "Turnover Duel",
+                      value: possessions.duelTurnover ?? 0,
+                      tone: "lost-yellow-deep",
+                      href: clipUrl(stats.videos, "Turnover Duels", "Turnover Duel"),
+                    },
+                    {
+                      label: "Turnover Pass",
+                      value: possessions.passTurnover ?? 0,
+                      tone: "lost-yellow-mid",
+                      href: clipUrl(stats.videos, "Turnover Passes", "Turnover Pass"),
+                    },
                   ]}
                 />
               </div>

@@ -197,6 +197,8 @@ function ClipLabel({ label, href }: { label: string; href?: string }) {
   return (
     <a className="clip-link" href={href} target="_blank" rel="noreferrer">
       {label}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
     </a>
   );
 }

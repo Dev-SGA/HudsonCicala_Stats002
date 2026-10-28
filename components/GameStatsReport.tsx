@@ -42,7 +42,11 @@ function PassPlayTip({ label, tip, href }: { label: string; tip: string; href?: 
   if (href) {
     return (
       <a className={className} href={href} target="_blank" rel="noreferrer" data-tip={tip} aria-label={`${label}. ${tip}`}>
-        <span className="pass-play-tip__label">{label}</span>
+        <span className="pass-play-tip__label">
+          {label}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
+        </span>
       </a>
     );
   }
@@ -58,6 +62,8 @@ function ClipLegendLabel({ label, href }: { label: string; href?: string }) {
   return (
     <a className="legend__label clip-link" href={href} target="_blank" rel="noreferrer">
       {label}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
     </a>
   );
 }
