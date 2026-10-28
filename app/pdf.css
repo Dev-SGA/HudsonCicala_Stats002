@@ -1602,3 +1602,82 @@
 .stats-pdf--page1 .spdf-possession-stat__value { font-size: 22px; }
 .stats-pdf--page1 .spdf-possession-stat__pct { font-size: 10px; }
 .stats-pdf--page1 .spdf-foot { font-size: 11px; }
+
+/* Larger type on the stats summary and possession cards (pass results unchanged). */
+.spdf-section--summary .spdf-section__title {
+  font-size: 16px;
+}
+
+.spdf-section--summary .spdf-summary-kpi__value {
+  font-size: 40px;
+}
+
+.spdf-section--summary .spdf-summary-kpi__label {
+  font-size: 11px;
+}
+
+.spdf-section--goals .spdf-summary-kpi__value {
+  font-size: 28px;
+}
+
+.spdf-summary-meter {
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.spdf-summary-meter .spdf-pressure__track {
+  height: 16px;
+}
+
+.spdf-summary-meter .spdf-pressure__legend li {
+  font-size: 13px;
+}
+
+.spdf-summary-meter .spdf-pressure__legend strong {
+  font-size: 15px;
+}
+
+.spdf-summary-meter .spdf-pressure__dot {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+}
+
+.spdf-summary-meter .spdf-play,
+.spdf-summary-meter .spdf-play__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.stats-pdf .spdf-possession-stat__label {
+  font-size: 10px;
+}
+
+.stats-pdf .spdf-possession-stat__value {
+  font-size: 34px;
+}
+
+.stats-pdf .spdf-possession-stat__pct,
+.stats-pdf .spdf-possession-stat__per {
+  font-size: 11px;
+}
+
+.stats-pdf .spdf-possession-row__label {
+  font-size: 10px;
+}
+
+.stats-pdf .spdf-possession-row strong {
+  font-size: 13px;
+}
+
+.stats-pdf .spdf-possession-row__track {
+  height: 12px;
+}
+
+.stats-pdf .spdf-possession-split__headline {
+  font-size: 12px;
+}
+
+.stats-pdf .spdf-possession-row {
+  grid-template-columns: 128px minmax(0, 1fr) auto;
+}
