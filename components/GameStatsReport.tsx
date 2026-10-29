@@ -87,7 +87,6 @@ function PassResultsMeter({
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
   const progressivePct = percent(breakdown.progressive, total);
   const neutralPct = percent(breakdown.neutral, total);
-  const turnoverPct = percent(turnovers, total);
 
   return (
     <div className="metric-card">
@@ -139,9 +138,7 @@ function PassResultsMeter({
           <li className="legend__nested">
             <span className="legend__dot legend__dot--pass-turnover" />
             <ClipLegendLabel label="Turnover Pass" href={clipUrl(videos, "Turnover Passes", "Turnover Pass")} />
-            <strong>
-              {formatCount(turnovers)} · {turnoverPct}%
-            </strong>
+            <strong>{formatCount(turnovers)}</strong>
           </li>
         ) : null}
         <li>

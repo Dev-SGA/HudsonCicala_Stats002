@@ -144,7 +144,7 @@ function PassResultPanel({
                   <PdfPlay href={segment.href} />
                 </span>
                 <strong>
-                  {formatCount(segment.value)} · {pct(segment.value, total)}%
+                  {segment.nested ? formatCount(segment.value) : `${formatCount(segment.value)} · ${pct(segment.value, total)}%`}
                 </strong>
               </li>
             ))}
