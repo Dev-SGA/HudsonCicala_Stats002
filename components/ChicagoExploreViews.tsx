@@ -363,7 +363,7 @@ export function StatsHeroSideboard({
         primaryLabel="Accurate"
         secondaryLabel="Inaccurate"
         primaryTone="positive"
-        secondaryTone="muted"
+        secondaryTone="negative"
         showShare={false}
       />
       <StatsRateTopic
@@ -379,7 +379,7 @@ export function StatsHeroSideboard({
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
-        secondaryTone="muted"
+        secondaryTone="negative"
         primaryHref={clipUrl(videos, "Off. Duels Won", "Off Duels Won")}
         secondaryHref={clipUrl(videos, "Off. Duels Lost", "Off Duels Lost")}
         showShare={false}
@@ -397,7 +397,7 @@ export function StatsHeroSideboard({
         primaryLabel="Won"
         secondaryLabel="Lost"
         primaryTone="positive"
-        secondaryTone="muted"
+        secondaryTone="negative"
         primaryHref={clipUrl(videos, "Def. Duels Won", "Def Duels Won")}
         secondaryHref={clipUrl(videos, "Def. Duels Lost", "Def Duels Lost")}
         showShare={false}

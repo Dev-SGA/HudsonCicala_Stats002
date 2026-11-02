@@ -957,12 +957,23 @@ body::before {
 }
 
 .stats-topic__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0 0 8px;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--tone-accent);
+}
+
+.stats-topic__title::before {
+  content: "";
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: currentColor;
 }
 
 .stats-topic__panel {
@@ -1004,6 +1015,10 @@ body::before {
   color: var(--text-faint);
 }
 
+.stats-figure:last-child {
+  border-right: 0;
+}
+
 .stats-figure__value {
   font-size: 40px;
   font-weight: 800;
@@ -1035,6 +1050,12 @@ body::before {
   width: 100%;
   height: 12px;
   margin: 0;
+  gap: 2px;
+}
+
+.stats-viz .stats-bar__seg--negative,
+.stats-viz .legend__dot--negative {
+  background: var(--tone-burnt-yellow);
 }
 
 .stats-viz .stats-bar__seg--muted,
