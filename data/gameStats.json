@@ -192,6 +192,55 @@
         "interception": { "actions": 8, "good": 0, "bad": 0 },
         "recovery": { "actions": 7, "good": 0, "bad": 0 }
       }
+    },
+    {
+      "id": "sporting-kansas-city",
+      "kind": "session",
+      "label": "vs Sporting Kansas City",
+      "shortLabel": "Sporting KC",
+      "logo": "/clubs/sporting-kansas-city.png",
+      "goals": 0,
+      "assists": 0,
+      "passesUnderPressure": {
+        "total": 70,
+        "underPressure": 55,
+        "notUnderPressure": 15,
+        "videoLink": ""
+      },
+      "passResults": {
+        "underPressure": {
+          "progressive": 15,
+          "neutral": 30,
+          "lost": 10,
+          "turnovers": 6
+        },
+        "notUnderPressure": {
+          "progressive": 5,
+          "neutral": 5,
+          "lost": 5,
+          "turnovers": 3
+        },
+        "videoLink": ""
+      },
+      "possessions": {
+        "total": 76,
+        "lostBalls": 5,
+        "wrongPasses": 15,
+        "lostPlays": 20,
+        "passTurnover": 9,
+        "duelTurnover": 5,
+        "videoLink": ""
+      },
+      "duels": {
+        "offensiveWon": { "actions": 1, "good": 0, "bad": 0 },
+        "offensiveLost": { "actions": 5, "good": 0, "bad": 0 },
+        "fouled": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveWon": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveLost": { "actions": 0, "good": 0, "bad": 0 },
+        "fouls": { "actions": 0, "good": 0, "bad": 0 },
+        "interception": { "actions": 5, "good": 0, "bad": 0 },
+        "recovery": { "actions": 12, "good": 0, "bad": 0 }
+      }
     }
   ]
 }
