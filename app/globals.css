@@ -1519,6 +1519,10 @@ body::before {
   vertical-align: -2px;
 }
 
+.play-icon--pending {
+  opacity: 0.45;
+}
+
 .clip-link:hover,
 .pass-play-tip--clip:hover .pass-play-tip__label {
   color: var(--tone-accent);

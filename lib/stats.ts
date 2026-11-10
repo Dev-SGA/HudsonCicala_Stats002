@@ -137,11 +137,29 @@ function rate(part: number, total: number): number {
   return total > 0 ? Math.round((part / total) * 100) : 0;
 }
 
-export function clipUrl(videos: { label: string; url: string }[] | undefined, ...aliases: string[]): string | undefined {
+const normalizeClipLabel = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function findClip(
+  videos: { label: string; url: string }[] | undefined,
+  aliases: string[],
+): { label: string; url: string } | undefined {
   if (!videos?.length) return undefined;
-  const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const keys = new Set(aliases.map(normalize));
-  return videos.find((video) => keys.has(normalize(video.label)))?.url;
+  const keys = new Set(aliases.map(normalizeClipLabel));
+  return videos.find((video) => keys.has(normalizeClipLabel(video.label)));
+}
+
+export function clipUrl(videos: { label: string; url: string }[] | undefined, ...aliases: string[]): string | undefined {
+  const url = findClip(videos, aliases)?.url;
+  return url ? url : undefined;
+}
+
+/** Clip entry for a label — href once the url is filled, hasClip while the upload is still pending. */
+export type ClipRef = { href?: string; hasClip: boolean };
+
+export function clipRef(videos: { label: string; url: string }[] | undefined, ...aliases: string[]): ClipRef {
+  const clip = findClip(videos, aliases);
+  if (!clip) return { hasClip: false };
+  return { href: clip.url || undefined, hasClip: true };
 }
 
 /** Whole numbers stay as they are; averages show one decimal. */

@@ -160,6 +160,10 @@
   height: 14px;
 }
 
+.spdf-play--pending {
+  opacity: 0.45;
+}
+
 .spdf-side__slogan {
   margin: auto 0 0;
   font-family: "Good Times", "Source Sans 3", sans-serif;

@@ -253,6 +253,128 @@
         "interception": { "actions": 5, "good": 0, "bad": 0 },
         "recovery": { "actions": 12, "good": 0, "bad": 0 }
       }
+    },
+    {
+      "id": "midwest-united",
+      "kind": "session",
+      "label": "vs Midwest United",
+      "shortLabel": "Midwest United",
+      "logo": "/clubs/midwest-united.png",
+      "goals": 0,
+      "assists": 0,
+      "passesUnderPressure": {
+        "total": 126,
+        "underPressure": 87,
+        "notUnderPressure": 39,
+        "videoLink": ""
+      },
+      "passResults": {
+        "underPressure": {
+          "progressive": 16,
+          "neutral": 61,
+          "lost": 10,
+          "turnovers": 6
+        },
+        "notUnderPressure": {
+          "progressive": 6,
+          "neutral": 29,
+          "lost": 4,
+          "turnovers": 3
+        },
+        "videoLink": ""
+      },
+      "possessions": {
+        "total": 133,
+        "lostBalls": 2,
+        "wrongPasses": 14,
+        "lostPlays": 16,
+        "passTurnover": 9,
+        "duelTurnover": 2,
+        "videoLink": ""
+      },
+      "videos": [
+        { "label": "Progressive Passes", "url": "" },
+        { "label": "Inaccurate Passes", "url": "" },
+        { "label": "Turnover Passes", "url": "" },
+        { "label": "Off. Duels Won", "url": "" },
+        { "label": "Off. Duels Lost", "url": "" },
+        { "label": "Def. Duels Won", "url": "" },
+        { "label": "Def. Duels Lost", "url": "" },
+        { "label": "Recoveries", "url": "" },
+        { "label": "Interceptions", "url": "" },
+        { "label": "Turnover Duels", "url": "" }
+      ],
+      "duels": {
+        "offensiveWon": { "actions": 5, "good": 0, "bad": 0 },
+        "offensiveLost": { "actions": 2, "good": 0, "bad": 0 },
+        "fouled": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveWon": { "actions": 2, "good": 0, "bad": 0 },
+        "defensiveLost": { "actions": 2, "good": 0, "bad": 0 },
+        "fouls": { "actions": 0, "good": 0, "bad": 0 },
+        "interception": { "actions": 9, "good": 0, "bad": 0 },
+        "recovery": { "actions": 7, "good": 0, "bad": 0 }
+      }
+    },
+    {
+      "id": "vardar",
+      "kind": "session",
+      "label": "vs Vardar Soccer Club",
+      "shortLabel": "Vardar",
+      "logo": "/clubs/vardar.png",
+      "goals": 0,
+      "assists": 0,
+      "passesUnderPressure": {
+        "total": 102,
+        "underPressure": 68,
+        "notUnderPressure": 34,
+        "videoLink": ""
+      },
+      "passResults": {
+        "underPressure": {
+          "progressive": 12,
+          "neutral": 46,
+          "lost": 10,
+          "turnovers": 7
+        },
+        "notUnderPressure": {
+          "progressive": 5,
+          "neutral": 28,
+          "lost": 1,
+          "turnovers": 1
+        },
+        "videoLink": ""
+      },
+      "possessions": {
+        "total": 109,
+        "lostBalls": 3,
+        "wrongPasses": 11,
+        "lostPlays": 14,
+        "passTurnover": 8,
+        "duelTurnover": 0,
+        "videoLink": ""
+      },
+      "videos": [
+        { "label": "Progressive Passes", "url": "" },
+        { "label": "Inaccurate Passes", "url": "" },
+        { "label": "Turnover Passes", "url": "" },
+        { "label": "Off. Duels Won", "url": "" },
+        { "label": "Off. Duels Lost", "url": "" },
+        { "label": "Def. Duels Won", "url": "" },
+        { "label": "Def. Duels Lost", "url": "" },
+        { "label": "Recoveries", "url": "" },
+        { "label": "Interceptions", "url": "" },
+        { "label": "Turnover Duels", "url": "" }
+      ],
+      "duels": {
+        "offensiveWon": { "actions": 4, "good": 0, "bad": 0 },
+        "offensiveLost": { "actions": 3, "good": 0, "bad": 0 },
+        "fouled": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveWon": { "actions": 5, "good": 0, "bad": 0 },
+        "defensiveLost": { "actions": 4, "good": 0, "bad": 0 },
+        "fouls": { "actions": 0, "good": 0, "bad": 0 },
+        "interception": { "actions": 4, "good": 0, "bad": 0 },
+        "recovery": { "actions": 2, "good": 0, "bad": 0 }
+      }
     }
   ]
 }

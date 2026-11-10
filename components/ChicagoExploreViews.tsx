@@ -1,5 +1,5 @@
 import { CountLine } from "@/components/CountLine";
-import { clipUrl, formatCount, type MatchStats, type MatchSummary } from "@/lib/stats";
+import { clipRef, formatCount, type ClipRef, type MatchStats, type MatchSummary } from "@/lib/stats";
 
 type PossessionSource = MatchStats["possessions"];
 
@@ -101,13 +101,13 @@ export function PossessionBoard({
       label: "Lost Duels",
       value: parts.dispossessed,
       tone: "yellow-deep",
-      href: clipUrl(videos, "Off. Duels Lost", "Off Duels Lost"),
+      clip: clipRef(videos, "Off. Duels Lost", "Off Duels Lost"),
     },
     {
       label: "Inaccurate Pass",
       value: parts.inaccuratePasses,
       tone: "yellow-mid",
-      href: clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass"),
+      clip: clipRef(videos, "Inaccurate Passes", "Inaccurate Pass"),
     },
   ];
   const turnoverRows = [
@@ -115,13 +115,13 @@ export function PossessionBoard({
       label: "Turnover Duel",
       value: parts.duelTurnover,
       tone: "yellow-deep",
-      href: clipUrl(videos, "Turnover Duels", "Turnover Duel"),
+      clip: clipRef(videos, "Turnover Duels", "Turnover Duel"),
     },
     {
       label: "Turnover Pass",
       value: parts.passTurnover,
       tone: "yellow-mid",
-      href: clipUrl(videos, "Turnover Passes", "Turnover Pass"),
+      clip: clipRef(videos, "Turnover Passes", "Turnover Pass"),
     },
   ];
 
@@ -169,7 +169,7 @@ function PossessionBreakdown({
   scale,
 }: {
   title: string;
-  rows: { label: string; value: number; tone: string; href?: string }[];
+  rows: { label: string; value: number; tone: string; clip?: ClipRef }[];
   scale: number;
 }) {
   return (
@@ -179,7 +179,7 @@ function PossessionBreakdown({
         {rows.map((row) => (
           <li key={row.label} className="possession-row">
             <span className="possession-row__label">
-              <ClipLabel label={row.label} href={row.href} />
+              <ClipLabel label={row.label} clip={row.clip} />
             </span>
             <span className="possession-row__track">
               <span className={`possession-row__fill possession-row__fill--${row.tone}`} style={{ width: `${percent(row.value, scale)}%` }} />
@@ -192,14 +192,24 @@ function PossessionBreakdown({
   );
 }
 
-function ClipLabel({ label, href }: { label: string; href?: string }) {
-  if (!href) return <span>{label}</span>;
+function ClipLabel({ label, clip }: { label: string; clip?: ClipRef }) {
+  if (clip?.href) {
+    return (
+      <a className="clip-link" href={clip.href} target="_blank" rel="noreferrer">
+        {label}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
+      </a>
+    );
+  }
   return (
-    <a className="clip-link" href={href} target="_blank" rel="noreferrer">
+    <span>
       {label}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
-    </a>
+      {clip?.hasClip ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/brand/play-icon.png" alt="" className="play-icon play-icon--pending" width={14} height={14} />
+      ) : null}
+    </span>
   );
 }
 
@@ -210,8 +220,8 @@ function StatsSplit({
   secondaryLabel,
   primaryTone,
   secondaryTone,
-  primaryHref,
-  secondaryHref,
+  primaryClip,
+  secondaryClip,
   showShare = true,
 }: {
   primary: number;
@@ -220,8 +230,8 @@ function StatsSplit({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
-  primaryHref?: string;
-  secondaryHref?: string;
+  primaryClip?: ClipRef;
+  secondaryClip?: ClipRef;
   showShare?: boolean;
 }) {
   const total = primary + secondary;
@@ -241,12 +251,12 @@ function StatsSplit({
       <ul className="stats-viz__legend">
         <li>
           <span className={`legend__dot legend__dot--${primaryTone}`} />
-          <ClipLabel label={primaryLabel} href={primaryHref} />
+          <ClipLabel label={primaryLabel} clip={primaryClip} />
           <strong>{figure(primary, primaryPct)}</strong>
         </li>
         <li>
           <span className={`legend__dot legend__dot--${secondaryTone}`} />
-          <ClipLabel label={secondaryLabel} href={secondaryHref} />
+          <ClipLabel label={secondaryLabel} clip={secondaryClip} />
           <strong>{figure(secondary, secondaryPct)}</strong>
         </li>
       </ul>
@@ -293,8 +303,8 @@ function StatsRateTopic({
   secondaryLabel,
   primaryTone,
   secondaryTone,
-  primaryHref,
-  secondaryHref,
+  primaryClip,
+  secondaryClip,
   showShare = true,
 }: {
   title: string;
@@ -310,8 +320,8 @@ function StatsRateTopic({
   secondaryLabel: string;
   primaryTone: Tone;
   secondaryTone: Tone;
-  primaryHref?: string;
-  secondaryHref?: string;
+  primaryClip?: ClipRef;
+  secondaryClip?: ClipRef;
   showShare?: boolean;
 }) {
   return (
@@ -327,8 +337,8 @@ function StatsRateTopic({
           secondaryLabel={secondaryLabel}
           primaryTone={primaryTone}
           secondaryTone={secondaryTone}
-          primaryHref={primaryHref}
-          secondaryHref={secondaryHref}
+          primaryClip={primaryClip}
+          secondaryClip={secondaryClip}
           showShare={showShare}
         />
       </div>
@@ -380,8 +390,8 @@ export function StatsHeroSideboard({
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryHref={clipUrl(videos, "Off. Duels Won", "Off Duels Won")}
-        secondaryHref={clipUrl(videos, "Off. Duels Lost", "Off Duels Lost")}
+        primaryClip={clipRef(videos, "Off. Duels Won", "Off Duels Won")}
+        secondaryClip={clipRef(videos, "Off. Duels Lost", "Off Duels Lost")}
         showShare={false}
       />
       <StatsRateTopic
@@ -398,8 +408,8 @@ export function StatsHeroSideboard({
         secondaryLabel="Lost"
         primaryTone="positive"
         secondaryTone="negative"
-        primaryHref={clipUrl(videos, "Def. Duels Won", "Def Duels Won")}
-        secondaryHref={clipUrl(videos, "Def. Duels Lost", "Def Duels Lost")}
+        primaryClip={clipRef(videos, "Def. Duels Won", "Def Duels Won")}
+        secondaryClip={clipRef(videos, "Def. Duels Lost", "Def Duels Lost")}
         showShare={false}
       />
       <section className="stats-topic">
@@ -413,8 +423,8 @@ export function StatsHeroSideboard({
             secondaryLabel="Recoveries"
             primaryTone="accent"
             secondaryTone="recover"
-            primaryHref={clipUrl(videos, "Interceptions")}
-            secondaryHref={clipUrl(videos, "Recoveries")}
+            primaryClip={clipRef(videos, "Interceptions")}
+            secondaryClip={clipRef(videos, "Recoveries")}
           />
         </div>
       </section>

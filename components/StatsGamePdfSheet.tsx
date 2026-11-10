@@ -1,5 +1,5 @@
 import { BRAND } from "@/lib/brand";
-import { clipUrl, combinePassResults, formatCount, matchSummary, perGame, type GameStats, type PassResultBreakdown } from "@/lib/stats";
+import { clipRef, combinePassResults, formatCount, matchSummary, perGame, type ClipRef, type GameStats, type PassResultBreakdown } from "@/lib/stats";
 
 type StatsGamePdfSheetProps = {
   stats: GameStats;
@@ -13,12 +13,16 @@ type PrintTone = "green" | "yellow" | "blue" | "mint" | "grey" | "pass-progressi
 
 type Tone = "blue" | "red" | "burnt" | "warn" | "pass-progressive" | "pass-neutral" | "pass-lost";
 
-function PdfPlay({ href }: { href?: string }) {
-  if (!href) return null;
+function PdfPlay({ clip }: { clip?: ClipRef }) {
+  if (!clip?.hasClip) return null;
+  const icon = (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/brand/play-icon.png" alt="" className="spdf-play__icon" width={14} height={14} />
+  );
+  if (!clip.href) return <span className="spdf-play spdf-play--pending">{icon}</span>;
   return (
-    <a className="spdf-play" href={href} data-pdf-link={href} target="_blank" rel="noreferrer" aria-label="Open video">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/play-icon.png" alt="" className="spdf-play__icon" width={14} height={14} />
+    <a className="spdf-play" href={clip.href} data-pdf-link={clip.href} target="_blank" rel="noreferrer" aria-label="Open video">
+      {icon}
     </a>
   );
 }
@@ -74,7 +78,7 @@ function PassResultPanel({
       value: breakdown.progressive,
       tone: "pass-progressive",
       nested: false,
-      href: clipUrl(videos, "Progressive Passes", "Progressive Pass"),
+      clip: clipRef(videos, "Progressive Passes", "Progressive Pass"),
     },
     {
       key: "inaccurate",
@@ -82,7 +86,7 @@ function PassResultPanel({
       value: breakdown.lost,
       tone: "pass-inaccurate",
       nested: false,
-      href: clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass"),
+      clip: clipRef(videos, "Inaccurate Passes", "Inaccurate Pass"),
     },
     {
       key: "turnover",
@@ -90,9 +94,9 @@ function PassResultPanel({
       value: turnovers,
       tone: "pass-turnover",
       nested: true,
-      href: clipUrl(videos, "Turnover Passes", "Turnover Pass"),
+      clip: clipRef(videos, "Turnover Passes", "Turnover Pass"),
     },
-    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false, href: undefined },
+    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false, clip: undefined },
   ].filter((segment) => segment.value > 0);
 
   return (
@@ -141,7 +145,7 @@ function PassResultPanel({
                 <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
                 <span className="spdf-pass-panel__legend-label">
                   {segment.label}
-                  <PdfPlay href={segment.href} />
+                  <PdfPlay clip={segment.clip} />
                 </span>
                 <strong>
                   {segment.nested ? formatCount(segment.value) : `${formatCount(segment.value)} · ${pct(segment.value, total)}%`}
@@ -192,7 +196,7 @@ function PdfPossessionSplit({
   rows,
 }: {
   title: string;
-  rows: { label: string; value: number; tone: "lost-yellow-deep" | "lost-yellow-mid"; href?: string }[];
+  rows: { label: string; value: number; tone: "lost-yellow-deep" | "lost-yellow-mid"; clip?: ClipRef }[];
 }) {
   const scale = Math.max(
     rows.reduce((sum, row) => sum + row.value, 0),
@@ -207,7 +211,7 @@ function PdfPossessionSplit({
           <li key={row.label} className="spdf-possession-row">
             <span className="spdf-possession-row__label">
               {row.label}
-              <PdfPlay href={row.href} />
+              <PdfPlay clip={row.clip} />
             </span>
             <span className="spdf-possession-row__track">
               <span className={`spdf-possession-row__fill spdf-pass-panel__seg--${row.tone}`} style={{ width: `${pct(row.value, scale)}%` }} />
@@ -320,7 +324,7 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
 function SummaryMeter({
   segments,
 }: {
-  segments: { label: string; value: string; share: number; tone: PrintTone; href?: string }[];
+  segments: { label: string; value: string; share: number; tone: PrintTone; clip?: ClipRef }[];
 }) {
   const total = segments.reduce((sum, segment) => sum + segment.share, 0);
 
@@ -345,7 +349,7 @@ function SummaryMeter({
             <span className={`spdf-pressure__dot spdf-pressure__dot--${segment.tone}`} />
             <span>
               {segment.label}
-              <PdfPlay href={segment.href} />
+              <PdfPlay clip={segment.clip} />
             </span>
             <strong className={`spdf-tone spdf-tone--${segment.tone}`}>{segment.value}</strong>
           </li>
@@ -370,7 +374,7 @@ function SummaryStatCard({
   rate?: number;
   rateLabel?: string;
   perGameLabel?: string;
-  segments: { label: string; value: string; share: number; tone: PrintTone; href?: string }[];
+  segments: { label: string; value: string; share: number; tone: PrintTone; clip?: ClipRef }[];
 }) {
   return (
     <section className="spdf-section spdf-section--build-up spdf-section--summary">
@@ -452,7 +456,7 @@ function SummaryPdfPage({
                 value: formatCount(summary.inaccurate),
                 share: summary.inaccurate,
                 tone: "grey",
-                href: clipUrl(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
+                clip: clipRef(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
               },
             ]}
           />
@@ -471,14 +475,14 @@ function SummaryPdfPage({
                 value: formatCount(summary.offensiveWon),
                 share: summary.offensiveWon,
                 tone: "pass-progressive",
-                href: clipUrl(stats.videos, "Off. Duels Won", "Off Duels Won"),
+                clip: clipRef(stats.videos, "Off. Duels Won", "Off Duels Won"),
               },
               {
                 label: "Lost",
                 value: formatCount(summary.offensiveLost),
                 share: summary.offensiveLost,
                 tone: "grey",
-                href: clipUrl(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
+                clip: clipRef(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
               },
             ]}
           />
@@ -493,14 +497,14 @@ function SummaryPdfPage({
                 value: formatCount(summary.interceptions),
                 share: summary.interceptions,
                 tone: "blue",
-                href: clipUrl(stats.videos, "Interceptions"),
+                clip: clipRef(stats.videos, "Interceptions"),
               },
               {
                 label: "Recoveries",
                 value: formatCount(summary.recoveries),
                 share: summary.recoveries,
                 tone: "mint",
-                href: clipUrl(stats.videos, "Recoveries"),
+                clip: clipRef(stats.videos, "Recoveries"),
               },
             ]}
           />
@@ -519,14 +523,14 @@ function SummaryPdfPage({
                 value: formatCount(summary.defensiveWon),
                 share: summary.defensiveWon,
                 tone: "pass-progressive",
-                href: clipUrl(stats.videos, "Def. Duels Won", "Def Duels Won"),
+                clip: clipRef(stats.videos, "Def. Duels Won", "Def Duels Won"),
               },
               {
                 label: "Lost",
                 value: formatCount(summary.defensiveLost),
                 share: summary.defensiveLost,
                 tone: "grey",
-                href: clipUrl(stats.videos, "Def. Duels Lost", "Def Duels Lost"),
+                clip: clipRef(stats.videos, "Def. Duels Lost", "Def Duels Lost"),
               },
             ]}
           />
@@ -623,13 +627,13 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                       label: "Lost Duels",
                       value: possessions.lostBalls,
                       tone: "lost-yellow-deep",
-                      href: clipUrl(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
+                      clip: clipRef(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
                     },
                     {
                       label: "Inaccurate Pass",
                       value: possessions.wrongPasses,
                       tone: "lost-yellow-mid",
-                      href: clipUrl(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
+                      clip: clipRef(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
                     },
                   ]}
                 />
@@ -640,13 +644,13 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                       label: "Turnover Duel",
                       value: possessions.duelTurnover ?? 0,
                       tone: "lost-yellow-deep",
-                      href: clipUrl(stats.videos, "Turnover Duels", "Turnover Duel"),
+                      clip: clipRef(stats.videos, "Turnover Duels", "Turnover Duel"),
                     },
                     {
                       label: "Turnover Pass",
                       value: possessions.passTurnover ?? 0,
                       tone: "lost-yellow-mid",
-                      href: clipUrl(stats.videos, "Turnover Passes", "Turnover Pass"),
+                      clip: clipRef(stats.videos, "Turnover Passes", "Turnover Pass"),
                     },
                   ]}
                 />

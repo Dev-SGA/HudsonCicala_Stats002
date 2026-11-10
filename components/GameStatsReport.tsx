@@ -12,13 +12,14 @@ import { CountLine } from "@/components/CountLine";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import {
-  clipUrl,
+  clipRef,
   combinePassResults,
   formatCount,
   matchSummary,
   perGameMatch,
   seasonMatch,
   toGameStats,
+  type ClipRef,
   type GameStats,
   type MatchStats,
   type PassResultBreakdown,
@@ -37,34 +38,56 @@ const PASS_PLAY_TIPS = {
   lost: "Inaccurate Pass — Losing possession through an inaccurate pass or finding a teammate who is immediately under pressure and at high risk of losing possession.",
 } as const;
 
-function PassPlayTip({ label, tip, href }: { label: string; tip: string; href?: string }) {
-  const className = `pass-play-tip legend__label${href ? " pass-play-tip--clip" : ""}`;
-  if (href) {
+function PassPlayTip({ label, tip, clip }: { label: string; tip: string; clip?: ClipRef }) {
+  const className = `pass-play-tip legend__label${clip?.href ? " pass-play-tip--clip" : ""}`;
+  const icon = clip?.hasClip ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/brand/play-icon.png"
+      alt=""
+      className={`play-icon${clip.href ? "" : " play-icon--pending"}`}
+      width={14}
+      height={14}
+    />
+  ) : null;
+  if (clip?.href) {
     return (
-      <a className={className} href={href} target="_blank" rel="noreferrer" data-tip={tip} aria-label={`${label}. ${tip}`}>
+      <a className={className} href={clip.href} target="_blank" rel="noreferrer" data-tip={tip} aria-label={`${label}. ${tip}`}>
         <span className="pass-play-tip__label">
           {label}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
+          {icon}
         </span>
       </a>
     );
   }
   return (
     <button type="button" className={className} data-tip={tip} aria-label={`${label}. ${tip}`}>
-      <span className="pass-play-tip__label">{label}</span>
+      <span className="pass-play-tip__label">
+        {label}
+        {icon}
+      </span>
     </button>
   );
 }
 
-function ClipLegendLabel({ label, href }: { label: string; href?: string }) {
-  if (!href) return <span className="legend__label">{label}</span>;
+function ClipLegendLabel({ label, clip }: { label: string; clip?: ClipRef }) {
+  if (clip?.href) {
+    return (
+      <a className="legend__label clip-link" href={clip.href} target="_blank" rel="noreferrer">
+        {label}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
+      </a>
+    );
+  }
   return (
-    <a className="legend__label clip-link" href={href} target="_blank" rel="noreferrer">
+    <span className="legend__label">
       {label}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
-    </a>
+      {clip?.hasClip ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/brand/play-icon.png" alt="" className="play-icon play-icon--pending" width={14} height={14} />
+      ) : null}
+    </span>
   );
 }
 
@@ -117,7 +140,7 @@ function PassResultsMeter({
           <PassPlayTip
             label="Progressive Pass"
             tip={PASS_PLAY_TIPS.progressive}
-            href={clipUrl(videos, "Progressive Passes", "Progressive Pass")}
+            clip={clipRef(videos, "Progressive Passes", "Progressive Pass")}
           />
           <strong>
             {formatCount(breakdown.progressive)} · {progressivePct}%
@@ -128,7 +151,7 @@ function PassResultsMeter({
           <PassPlayTip
             label="Inaccurate Pass"
             tip={PASS_PLAY_TIPS.lost}
-            href={clipUrl(videos, "Inaccurate Passes", "Inaccurate Pass")}
+            clip={clipRef(videos, "Inaccurate Passes", "Inaccurate Pass")}
           />
           <strong>
             {formatCount(breakdown.lost)} · {percent(breakdown.lost, total)}%
@@ -137,7 +160,7 @@ function PassResultsMeter({
         {turnovers > 0 ? (
           <li className="legend__nested">
             <span className="legend__dot legend__dot--pass-turnover" />
-            <ClipLegendLabel label="Turnover Pass" href={clipUrl(videos, "Turnover Passes", "Turnover Pass")} />
+            <ClipLegendLabel label="Turnover Pass" clip={clipRef(videos, "Turnover Passes", "Turnover Pass")} />
             <strong>{formatCount(turnovers)}</strong>
           </li>
         ) : null}
