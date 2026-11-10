@@ -270,8 +270,8 @@
       },
       "passResults": {
         "underPressure": {
-          "progressive": 16,
-          "neutral": 61,
+          "progressive": 15,
+          "neutral": 62,
           "lost": 10,
           "turnovers": 6
         },
@@ -284,7 +284,7 @@
         "videoLink": ""
       },
       "possessions": {
-        "total": 133,
+        "total": 132,
         "lostBalls": 2,
         "wrongPasses": 14,
         "lostPlays": 16,
@@ -305,7 +305,7 @@
         { "label": "Turnover Duels", "url": "" }
       ],
       "duels": {
-        "offensiveWon": { "actions": 5, "good": 0, "bad": 0 },
+        "offensiveWon": { "actions": 4, "good": 0, "bad": 0 },
         "offensiveLost": { "actions": 2, "good": 0, "bad": 0 },
         "fouled": { "actions": 0, "good": 0, "bad": 0 },
         "defensiveWon": { "actions": 2, "good": 0, "bad": 0 },
@@ -346,7 +346,7 @@
         "videoLink": ""
       },
       "possessions": {
-        "total": 109,
+        "total": 110,
         "lostBalls": 3,
         "wrongPasses": 11,
         "lostPlays": 14,
@@ -367,13 +367,13 @@
         { "label": "Turnover Duels", "url": "" }
       ],
       "duels": {
-        "offensiveWon": { "actions": 4, "good": 0, "bad": 0 },
+        "offensiveWon": { "actions": 5, "good": 0, "bad": 0 },
         "offensiveLost": { "actions": 3, "good": 0, "bad": 0 },
         "fouled": { "actions": 0, "good": 0, "bad": 0 },
         "defensiveWon": { "actions": 5, "good": 0, "bad": 0 },
         "defensiveLost": { "actions": 4, "good": 0, "bad": 0 },
         "fouls": { "actions": 0, "good": 0, "bad": 0 },
-        "interception": { "actions": 4, "good": 0, "bad": 0 },
+        "interception": { "actions": 5, "good": 0, "bad": 0 },
         "recovery": { "actions": 2, "good": 0, "bad": 0 }
       }
     }
