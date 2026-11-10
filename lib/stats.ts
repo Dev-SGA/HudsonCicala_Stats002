@@ -280,11 +280,11 @@ export function seasonMatch(matches: MatchStats[]): MatchStats {
   };
 }
 
-function scaleNumbers<T>(value: T, factor: number): T {
-  if (typeof value === "number") return (value * factor) as T;
+function scaleNumbers<T>(value: T, factor: number, round = false): T {
+  if (typeof value === "number") return (round ? Math.round(value * factor) : value * factor) as T;
   if (Array.isArray(value) || value === null || typeof value !== "object") return value;
   return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, scaleNumbers(item, factor)]),
+    Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, scaleNumbers(item, factor, round)]),
   ) as T;
 }
 
@@ -294,12 +294,12 @@ export function projectedMatch(match: MatchStats, targetMinutes = 90): MatchStat
 
   return {
     ...match,
-    goals: match.goals !== undefined ? match.goals * factor : undefined,
-    assists: match.assists !== undefined ? match.assists * factor : undefined,
-    passesUnderPressure: scaleNumbers(match.passesUnderPressure, factor),
-    passResults: scaleNumbers(match.passResults, factor),
-    possessions: scaleNumbers(match.possessions, factor),
-    duels: scaleNumbers(match.duels, factor),
+    goals: match.goals !== undefined ? Math.round(match.goals * factor) : undefined,
+    assists: match.assists !== undefined ? Math.round(match.assists * factor) : undefined,
+    passesUnderPressure: scaleNumbers(match.passesUnderPressure, factor, true),
+    passResults: scaleNumbers(match.passResults, factor, true),
+    possessions: scaleNumbers(match.possessions, factor, true),
+    duels: scaleNumbers(match.duels, factor, true),
     projected: true,
   };
 }
