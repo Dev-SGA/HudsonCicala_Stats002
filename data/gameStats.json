@@ -321,6 +321,7 @@
       "label": "vs Vardar Soccer Club",
       "shortLabel": "Vardar",
       "logo": "/clubs/vardar.png",
+      "minutes": 70,
       "goals": 0,
       "assists": 0,
       "passesUnderPressure": {

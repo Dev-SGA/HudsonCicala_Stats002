@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AthleteProfileCard } from "@/components/AthleteProfileCard";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
@@ -17,6 +17,7 @@ import {
   formatCount,
   matchSummary,
   perGameMatch,
+  projectedMatch,
   seasonMatch,
   toGameStats,
   type ClipRef,
@@ -328,8 +329,11 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
   const initialMatchId = matches.find((match) => match.kind === "session")?.id ?? matches[0]?.id ?? "";
   const [matchId, setMatchId] = useState(initialMatchId);
   const match = options.find((item) => item.id === matchId) ?? options[0];
-  const exportStats: GameStats = useMemo(() => toGameStats(report, match), [report, match]);
-  const topics = useMemo(() => buildTopics(match), [match]);
+  const [projected, setProjected] = useState(false);
+  useEffect(() => setProjected(false), [match.id]);
+  const displayMatch = match.minutes && projected ? projectedMatch(match) : match;
+  const exportStats: GameStats = useMemo(() => toGameStats(report, displayMatch), [report, displayMatch]);
+  const topics = useMemo(() => buildTopics(displayMatch), [displayMatch]);
 
   return (
     <VideoLinksProvider
@@ -365,7 +369,12 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
               <MatchSwitcher matches={options} activeId={match.id} onChange={setMatchId}>
                 {match.id === "season" ? <SeasonModeToggle mode={seasonMode} onChange={setSeasonMode} /> : null}
               </MatchSwitcher>
-              <TopicsBoard topics={topics} />
+              <TopicsBoard
+                topics={topics}
+                minutes={match.minutes}
+                projected={projected}
+                onProjectedChange={setProjected}
+              />
             </div>
           </main>
         </div>

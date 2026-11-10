@@ -19,9 +19,13 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 type TopicsBoardProps = {
   topics: Topic[];
+  /** Minutes played, when shorter than a full match. */
+  minutes?: number;
+  projected?: boolean;
+  onProjectedChange?: (projected: boolean) => void;
 };
 
-export function TopicsBoard({ topics }: TopicsBoardProps) {
+export function TopicsBoard({ topics, minutes, projected = false, onProjectedChange }: TopicsBoardProps) {
   const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
   const allOpen = openIds.size === topics.length;
 
@@ -41,10 +45,35 @@ export function TopicsBoard({ topics }: TopicsBoardProps) {
   return (
     <div className="board">
       <div className="board__toolbar">
-        <h2 className="board__heading">Match breakdown</h2>
-        <button type="button" className="btn btn--ghost" onClick={toggleAll}>
-          {allOpen ? "Collapse all" : "Expand all"}
-        </button>
+        <h2 className="board__heading">
+          Match breakdown
+          {minutes ? <span className="board__minutes">{projected ? "Proj. 90'" : `${minutes}'`}</span> : null}
+        </h2>
+        <div className="board__actions">
+          {minutes && minutes < 90 && onProjectedChange ? (
+            <div className="match-nav__pills season-mode" role="group" aria-label="Minutes projection">
+              <button
+                type="button"
+                className={`match-nav__pill${projected ? "" : " is-active"}`}
+                aria-pressed={!projected}
+                onClick={() => onProjectedChange(false)}
+              >
+                {minutes}'
+              </button>
+              <button
+                type="button"
+                className={`match-nav__pill${projected ? " is-active" : ""}`}
+                aria-pressed={projected}
+                onClick={() => onProjectedChange(true)}
+              >
+                90'
+              </button>
+            </div>
+          ) : null}
+          <button type="button" className="btn btn--ghost" onClick={toggleAll}>
+            {allOpen ? "Collapse all" : "Expand all"}
+          </button>
+        </div>
       </div>
 
       <div className="topic-list">

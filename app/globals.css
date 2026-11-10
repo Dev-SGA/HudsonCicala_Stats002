@@ -282,12 +282,28 @@ body::before {
 }
 
 .board__heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin: 0;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
+}
+
+.board__minutes {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--tone-accent);
+}
+
+.board__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .topic-list {
@@ -1921,16 +1937,35 @@ body::before {
   align-items: center;
   gap: 8px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .match-nav__pills {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface-sunken);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.match-nav__pills::-webkit-scrollbar {
+  height: 6px;
+}
+
+.match-nav__pills::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+
+.match-nav__pill {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .match-nav__pill,
@@ -2156,10 +2191,6 @@ body::before {
 }
 
 @media (max-width: 720px) {
-  .match-nav__pills {
-    flex-wrap: wrap;
-  }
-
   .match-nav__pill {
     padding: 8px 10px;
   }

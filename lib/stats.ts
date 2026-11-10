@@ -58,6 +58,10 @@ export type MatchStats = {
   videos?: { label: string; url: string }[];
   duels: DuelBlock | null;
   games?: number;
+  /** Minutes played, when shorter than a full match. */
+  minutes?: number;
+  /** Numbers projected to a full match. */
+  projected?: boolean;
   /** Season numbers divided by the games played. */
   perGame?: boolean;
 };
@@ -282,6 +286,22 @@ function scaleNumbers<T>(value: T, factor: number): T {
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, scaleNumbers(item, factor)]),
   ) as T;
+}
+
+/** Match numbers projected to a full game, based on the minutes actually played. */
+export function projectedMatch(match: MatchStats, targetMinutes = 90): MatchStats {
+  const factor = (match.minutes ?? targetMinutes) > 0 ? targetMinutes / (match.minutes ?? targetMinutes) : 1;
+
+  return {
+    ...match,
+    goals: match.goals !== undefined ? match.goals * factor : undefined,
+    assists: match.assists !== undefined ? match.assists * factor : undefined,
+    passesUnderPressure: scaleNumbers(match.passesUnderPressure, factor),
+    passResults: scaleNumbers(match.passResults, factor),
+    possessions: scaleNumbers(match.possessions, factor),
+    duels: scaleNumbers(match.duels, factor),
+    projected: true,
+  };
 }
 
 /** Season match with every absolute number divided by the games played. Shares stay the same. */
