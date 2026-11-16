@@ -1839,6 +1839,14 @@ body::before {
     grid-template-columns: 1fr;
   }
 
+  .view-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .match-nav {
+    min-width: 0;
+  }
+
   .athlete-column {
     position: static;
   }
