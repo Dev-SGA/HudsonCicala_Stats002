@@ -146,7 +146,7 @@ body::before {
 }
 
 .club-logo--pill {
-  height: 18px;
+  height: 15px;
 }
 
 .sga-brand {
@@ -1980,12 +1980,12 @@ body::before {
 .match-nav__pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 5px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -1997,8 +1997,9 @@ body::before {
 .match-nav__arrow {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   color: var(--text);
@@ -2007,7 +2008,7 @@ body::before {
 }
 
 .season-mode .match-nav__pill {
-  padding: 7px 12px;
+  padding: 5px 9px;
   font-size: 11px;
 }
 
@@ -2192,7 +2193,7 @@ body::before {
 
 @media (max-width: 720px) {
   .match-nav__pill {
-    padding: 8px 10px;
+    padding: 5px 8px;
   }
 
   .stats-board {
