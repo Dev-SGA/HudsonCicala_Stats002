@@ -410,15 +410,15 @@
         "videoLink": ""
       },
       "videos": [
-        { "label": "Progressive Passes", "url": "" },
-        { "label": "Turnover Passes", "url": "" },
-        { "label": "Off. Duels Won", "url": "" },
-        { "label": "Off. Duels Lost", "url": "" },
-        { "label": "Def. Duels Won", "url": "" },
-        { "label": "Def. Duels Lost", "url": "" },
-        { "label": "Recoveries", "url": "" },
-        { "label": "Interceptions", "url": "" },
-        { "label": "Turnover Duels", "url": "" }
+        { "label": "Progressive Passes", "url": "https://drive.google.com/file/d/1IufFa4DZCRvXaTizBcVSPO-6ljeZa4kH/view?usp=drive_link" },
+        { "label": "Turnover Passes", "url": "https://drive.google.com/file/d/1R11vClOft77wm_zjkJj-iYFIqHeebe-W/view?usp=drive_link" },
+        { "label": "Off. Duels Won", "url": "https://drive.google.com/file/d/1RgIQoSylHlTV19PaQm6vzXsGHdnEW8Ea/view?usp=drive_link" },
+        { "label": "Off. Duels Lost", "url": "https://drive.google.com/file/d/1SkIyWd6hFukLXLLA3XG57HwA2Ccmzsop/view?usp=drive_link" },
+        { "label": "Def. Duels Won", "url": "https://drive.google.com/file/d/1OT6-ZXNhUOvEGj5i5LsL-UJSW4m-aZf8/view?usp=drive_link" },
+        { "label": "Def. Duels Lost", "url": "https://drive.google.com/file/d/1KD9vUcuYVCA8-9DIJhwdPMtxfsN0GtzW/view?usp=drive_link" },
+        { "label": "Recoveries", "url": "https://drive.google.com/file/d/1jzF1FR4-DC4oFYXWLAXMRtGzaIpOW3fs/view?usp=drive_link" },
+        { "label": "Interceptions", "url": "https://drive.google.com/file/d/1Sl97mM4fsREe1C04WYkaw-cVf5V0E-7F/view?usp=drive_link" },
+        { "label": "Goal", "url": "https://drive.google.com/file/d/1mJutCNbdX8tYYypQX6COgC9h2rlGtYli/view?usp=drive_link" }
       ],
       "duels": {
         "offensiveWon": { "actions": 2, "good": 0, "bad": 0 },

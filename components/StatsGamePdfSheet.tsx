@@ -397,10 +397,20 @@ function SummaryStatCard({
   );
 }
 
-function GoalsAssistsCard({ goals, assists, games }: { goals: number; assists: number; games?: number }) {
+function GoalsAssistsCard({
+  goals,
+  assists,
+  games,
+  videos,
+}: {
+  goals: number;
+  assists: number;
+  games?: number;
+  videos?: GameStats["videos"];
+}) {
   const items = [
-    { label: "Goals", value: goals },
-    { label: "Assists", value: assists },
+    { label: "Goals", value: goals, clip: clipRef(videos, "Goals", "Goal") },
+    { label: "Assists", value: assists, clip: clipRef(videos, "Assists", "Assist") },
   ];
 
   return (
@@ -410,7 +420,10 @@ function GoalsAssistsCard({ goals, assists, games }: { goals: number; assists: n
         {items.map((item) => (
           <div key={item.label} className="spdf-summary-kpi">
             <span className="spdf-summary-kpi__value">{formatCount(item.value)}</span>
-            <span className="spdf-summary-kpi__label">{item.label}</span>
+            <span className="spdf-summary-kpi__label">
+              {item.label}
+              <PdfPlay clip={item.clip} />
+            </span>
             {games ? <span className="spdf-summary-kpi__per">{perGame(item.value, games)} per game</span> : null}
           </div>
         ))}
@@ -534,7 +547,7 @@ function SummaryPdfPage({
               },
             ]}
           />
-          <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} />
+          <GoalsAssistsCard goals={summary.goals} assists={summary.assists} games={games} videos={stats.videos} />
         </div>
         <footer className="spdf-foot">
           <span>{BRAND.name}</span>

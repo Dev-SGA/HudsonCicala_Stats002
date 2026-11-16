@@ -270,16 +270,20 @@ function StatsFigure({
   unit,
   games,
   rate,
+  clip,
 }: {
   label: string;
   value: number;
   unit?: string;
   games?: number;
   rate?: boolean;
+  clip?: ClipRef;
 }) {
   return (
     <div className={`stats-figure${rate ? " stats-figure--rate" : ""}`}>
-      <span className="stats-figure__label">{label}</span>
+      <span className="stats-figure__label">
+        <ClipLabel label={label} clip={clip} />
+      </span>
       {games && unit ? (
         <CountLine value={value} unit={unit} games={games} />
       ) : (
@@ -431,8 +435,8 @@ export function StatsHeroSideboard({
       <section className="stats-topic">
         <h3 className="stats-topic__title">Goals &amp; Assists</h3>
         <div className="stats-topic__panel stats-topic__panel--duo">
-          <StatsFigure label="Goals" value={summary.goals} unit="goals" games={games} />
-          <StatsFigure label="Assists" value={summary.assists} unit="assists" games={games} />
+          <StatsFigure label="Goals" value={summary.goals} unit="goals" games={games} clip={clipRef(videos, "Goals", "Goal")} />
+          <StatsFigure label="Assists" value={summary.assists} unit="assists" games={games} clip={clipRef(videos, "Assists", "Assist")} />
         </div>
       </section>
     </div>
