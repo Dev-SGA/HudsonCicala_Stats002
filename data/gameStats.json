@@ -370,6 +370,66 @@
         "interception": { "actions": 5, "good": 0, "bad": 0 },
         "recovery": { "actions": 2, "good": 0, "bad": 0 }
       }
+    },
+    {
+      "id": "colorado-rapids",
+      "kind": "session",
+      "label": "vs Colorado Rapids",
+      "shortLabel": "Colorado",
+      "logo": "/clubs/colorado-rapids.png",
+      "goals": 1,
+      "assists": 0,
+      "passesUnderPressure": {
+        "total": 61,
+        "underPressure": 49,
+        "notUnderPressure": 12,
+        "videoLink": ""
+      },
+      "passResults": {
+        "underPressure": {
+          "progressive": 17,
+          "neutral": 24,
+          "lost": 8,
+          "turnovers": 7
+        },
+        "notUnderPressure": {
+          "progressive": 4,
+          "neutral": 8,
+          "lost": 0,
+          "turnovers": 0
+        },
+        "videoLink": ""
+      },
+      "possessions": {
+        "total": 64,
+        "lostBalls": 1,
+        "wrongPasses": 8,
+        "lostPlays": 9,
+        "passTurnover": 7,
+        "duelTurnover": 0,
+        "videoLink": ""
+      },
+      "videos": [
+        { "label": "Progressive Passes", "url": "" },
+        { "label": "Turnover Passes", "url": "" },
+        { "label": "Off. Duels Won", "url": "" },
+        { "label": "Off. Duels Lost", "url": "" },
+        { "label": "Def. Duels Won", "url": "" },
+        { "label": "Def. Duels Lost", "url": "" },
+        { "label": "Recoveries", "url": "" },
+        { "label": "Interceptions", "url": "" },
+        { "label": "Turnover Duels", "url": "" }
+      ],
+      "duels": {
+        "offensiveWon": { "actions": 2, "good": 0, "bad": 0 },
+        "offensiveLost": { "actions": 1, "good": 0, "bad": 0 },
+        "fouled": { "actions": 0, "good": 0, "bad": 0 },
+        "defensiveWon": { "actions": 5, "good": 0, "bad": 0 },
+        "defensiveLost": { "actions": 7, "good": 0, "bad": 0 },
+        "fouls": { "actions": 0, "good": 0, "bad": 0 },
+        "interception": { "actions": 8, "good": 0, "bad": 0 },
+        "recovery": { "actions": 11, "good": 0, "bad": 0 }
+      }
     }
   ]
 }
