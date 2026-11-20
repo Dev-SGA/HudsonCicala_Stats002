@@ -97,34 +97,37 @@ function percent(value: number, total: number): number {
   return total > 0 ? Math.round((value / total) * 100) : 0;
 }
 
-function PassChip({
-  label,
-  value,
+function PassRow({
   tone,
-  hint,
+  value,
+  share,
+  scale,
+  note,
   nested,
   children,
 }: {
-  label: string;
-  value: number;
   tone: string;
-  hint?: string;
+  value: number;
+  /** Share shown on the right, e.g. "28%" or "8 of 9". */
+  share: string;
+  /** Bar fill, 0-100. */
+  scale: number;
+  note?: string;
   nested?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <li
-      className={`outcome-chip outcome-chip--${tone}${value === 0 ? " is-empty" : ""}${nested ? " outcome-chip--nested" : ""}`}
-      aria-label={label}
-    >
-      <span className="outcome-chip__label">
-        <span className={`legend__dot legend__dot--${tone}`} />
+    <li className={`pass-row pass-row--${tone}${nested ? " pass-row--nested" : ""}${value === 0 ? " is-empty" : ""}`}>
+      <span className={`legend__dot legend__dot--${tone}`} />
+      <span className="pass-row__label">
         {children}
+        {note ? <span className="pass-row__note">{note}</span> : null}
       </span>
-      <span className="outcome-chip__value">
-        {formatCount(value)}
-        {hint ? <small>{hint}</small> : null}
+      <span className="pass-row__track">
+        <span className={`pass-row__fill meter__seg--${tone}`} style={{ width: `${scale}%` }} />
       </span>
+      <strong className="pass-row__value">{formatCount(value)}</strong>
+      <span className="pass-row__share">{share}</span>
     </li>
   );
 }
@@ -134,11 +137,13 @@ function PassResultsMeter({
   breakdown,
   games,
   videos,
+  featured = false,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
   games?: number;
   videos?: MatchStats["videos"];
+  featured?: boolean;
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
@@ -147,78 +152,68 @@ function PassResultsMeter({
   const neutralPct = percent(breakdown.neutral, total);
 
   return (
-    <div className="metric-card outcome-card">
-      <h3 className="metric-card__title">{title}</h3>
-      <div className="outcome-card__head">
-        {games ? (
-          <CountLine value={total} unit="passes" games={games} />
-        ) : (
-          <p className="outcome-card__total">
-            <strong>{formatCount(total)}</strong>
-            <span>passes</span>
-          </p>
-        )}
-        {total > 0 ? (
-          <span className="outcome-card__rate outcome-card__rate--positive">{progressivePct}% progressive</span>
-        ) : null}
+    <div className={`metric-card pass-card${featured ? " pass-card--featured" : ""}`}>
+      <div className="pass-card__head">
+        <h3 className="metric-card__title">{title}</h3>
+        <div className="pass-card__kpis">
+          {games ? (
+            <CountLine value={total} unit="passes" games={games} />
+          ) : (
+            <p className="pass-card__total">
+              <strong>{formatCount(total)}</strong>
+              <span>passes</span>
+            </p>
+          )}
+          {total > 0 ? (
+            <p className="pass-card__rate">
+              <strong>{progressivePct}%</strong>
+              <span>progressive</span>
+            </p>
+          ) : null}
+        </div>
       </div>
       <div
         className="meter meter--tri"
         role="img"
         aria-label={`Progressive Pass: ${breakdown.progressive}. Inaccurate Pass: ${breakdown.lost}. Turnover Pass: ${turnovers}. Other: ${breakdown.neutral}.`}
       >
-        <span className="meter__seg meter__seg--pass-progressive" style={{ flex: `${breakdown.progressive} 1 0` }}>
-          {progressivePct >= 14 ? <span className="meter__pct">{progressivePct}%</span> : null}
-        </span>
+        <span className="meter__seg meter__seg--pass-progressive" style={{ flex: `${breakdown.progressive} 1 0` }} />
         <span className="meter__seg meter__seg--pass-inaccurate meter__seg--host" style={{ flex: `${breakdown.lost} 1 0` }}>
-          {lostPct >= 14 ? <span className="meter__pct meter__pct--end">{lostPct}%</span> : null}
           {turnovers > 0 ? (
             <span className="meter__seg-inner meter__seg--pass-turnover" style={{ width: `${percent(turnovers, breakdown.lost)}%` }} />
           ) : null}
         </span>
-        <span className="meter__seg meter__seg--pass-neutral" style={{ flex: `${breakdown.neutral} 1 0` }}>
-          {neutralPct >= 14 ? <span className="meter__pct">{neutralPct}%</span> : null}
-        </span>
+        <span className="meter__seg meter__seg--pass-neutral" style={{ flex: `${breakdown.neutral} 1 0` }} />
       </div>
-      <ul className="outcome-grid outcome-grid--pass">
-        <PassChip
-          label="Progressive Pass"
-          value={breakdown.progressive}
-          tone="pass-progressive"
-          hint={`${progressivePct}%`}
-        >
+      <ul className="pass-rows">
+        <PassRow tone="pass-progressive" value={breakdown.progressive} share={`${progressivePct}%`} scale={progressivePct}>
           <PassPlayTip
             label="Progressive Pass"
             tip={PASS_PLAY_TIPS.progressive}
             clip={clipRef(videos, "Progressive Passes", "Progressive Pass")}
           />
-        </PassChip>
-        <PassChip
-          label="Inaccurate Pass"
-          value={breakdown.lost}
-          tone="pass-inaccurate"
-          hint={`${lostPct}%`}
-        >
+        </PassRow>
+        <PassRow tone="pass-inaccurate" value={breakdown.lost} share={`${lostPct}%`} scale={lostPct}>
           <PassPlayTip
             label="Inaccurate Pass"
             tip={PASS_PLAY_TIPS.lost}
             clip={clipRef(videos, "Inaccurate Passes", "Inaccurate Pass")}
           />
-        </PassChip>
+        </PassRow>
         {turnovers > 0 ? (
-          <PassChip
-            label="Turnover Pass"
-            value={turnovers}
+          <PassRow
             tone="pass-turnover"
-            hint={`of ${formatCount(breakdown.lost)} inaccurate`}
+            value={turnovers}
+            share={`of ${formatCount(breakdown.lost)}`}
+            scale={percent(turnovers, total)}
             nested
           >
             <ClipLegendLabel label="Turnover Pass" clip={clipRef(videos, "Turnover Passes", "Turnover Pass")} />
-          </PassChip>
+          </PassRow>
         ) : null}
-        <PassChip label="Other" value={breakdown.neutral} tone="pass-neutral" hint={`${neutralPct}%`}>
+        <PassRow tone="pass-neutral" value={breakdown.neutral} share={`${neutralPct}%`} scale={neutralPct}>
           <PassPlayTip label="Other" tip={PASS_PLAY_TIPS.neutral} />
-        </PassChip>
+        </PassRow>
       </ul>
     </div>
   );
@@ -333,6 +328,7 @@ function buildTopics(match: MatchStats): Topic[] {
             breakdown={combinePassResults(passResults.underPressure, passResults.notUnderPressure)}
             games={games}
             videos={videos}
+            featured
           />
           <MetricFlow
             items={[

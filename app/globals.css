@@ -3014,3 +3014,205 @@ body::before {
 .outcome-chip__label .clip-link {
   text-transform: inherit;
 }
+
+/* ---------- Pass Results: linear read (head -> bar -> rows in bar order) ---------- */
+
+.pass-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pass-card .metric-card__title {
+  margin: 0;
+}
+
+.pass-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pass-card__kpis {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.pass-card__kpis .count-line {
+  margin: 0;
+}
+
+.pass-card__total,
+.pass-card__rate {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin: 0;
+}
+
+.pass-card__rate {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.pass-card__total strong,
+.pass-card__rate strong {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.pass-card__rate strong {
+  color: var(--tone-positive);
+}
+
+.pass-card__total span,
+.pass-card__rate span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.pass-card--featured .pass-card__total strong,
+.pass-card--featured .pass-card__rate strong {
+  font-size: 38px;
+}
+
+.pass-card .meter--tri {
+  height: 16px;
+}
+
+.pass-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.pass-row {
+  display: grid;
+  grid-template-columns: 10px minmax(130px, 180px) minmax(40px, 1fr) 40px 48px;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--sga-white) 6%, transparent);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.pass-row:last-child {
+  border-bottom: 0;
+}
+
+.pass-row .legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.pass-row__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.pass-row__label .pass-play-tip {
+  display: inline-flex;
+  width: auto;
+}
+
+.pass-row__label .legend__label {
+  display: inline-flex;
+  flex-direction: row;
+}
+
+.pass-row__note {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.pass-row__track {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sga-white) 7%, transparent);
+  overflow: hidden;
+}
+
+.pass-row__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.pass-row__value {
+  font-size: 16px;
+  font-weight: 800;
+  text-align: right;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.pass-row__share {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Turnover hangs off the Inaccurate row it belongs to */
+.pass-row--nested {
+  position: relative;
+  padding-top: 4px;
+  padding-left: 22px;
+  grid-template-columns: 10px minmax(108px, 158px) minmax(40px, 1fr) 40px 48px;
+  font-size: 12px;
+}
+
+.pass-row--nested::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: -6px;
+  width: 12px;
+  height: 18px;
+  border-left: 1px solid color-mix(in srgb, #f0c48a 55%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, #f0c48a 55%, transparent);
+  border-bottom-left-radius: 6px;
+}
+
+.pass-row--nested .pass-row__value {
+  font-size: 14px;
+}
+
+.pass-row:has(+ .pass-row--nested) {
+  border-bottom: 0;
+}
+
+.pass-row.is-empty {
+  opacity: 0.45;
+}
+
+@media (max-width: 560px) {
+  .pass-row {
+    grid-template-columns: 10px minmax(0, 1fr) 36px 40px;
+  }
+
+  .pass-row__track {
+    display: none;
+  }
+}
