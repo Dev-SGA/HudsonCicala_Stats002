@@ -2430,7 +2430,7 @@ body::before {
 
 .prog-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   border-block: 1px solid color-mix(in srgb, var(--sga-white) 7%, transparent);
 }
@@ -2467,24 +2467,6 @@ body::before {
   width: 18px;
   height: 18px;
   object-fit: contain;
-}
-
-.prog-stat dd.prog-stat__trend {
-  font-size: 14px;
-  letter-spacing: 0.04em;
-}
-
-.prog-stat__trend--up {
-  color: var(--tone-positive);
-}
-
-.prog-stat__trend--down {
-  color: var(--tone-warn);
-}
-
-.prog-stat__trend--flat,
-.prog-stat__trend--neutral {
-  color: var(--text-muted);
 }
 
 .prog-legend {

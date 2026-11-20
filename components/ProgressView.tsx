@@ -5,7 +5,6 @@ import { formatCount, progressMetrics, type MatchStats, type ProgressMetric } fr
 
 type Focus = "quantity" | "quality";
 type Pt = [number, number];
-type Trend = "up" | "down" | "flat";
 
 const COLORS: Record<Focus, string> = { quantity: "#5aa2e0", quality: "#3fb56b" };
 const PHASE_LABEL = { "build-up": "Build-Up", defensive: "Defensive Phase" } as const;
@@ -64,22 +63,12 @@ function smoothPath(pts: Pt[]): string {
   return d;
 }
 
-/** Average, best match and least-squares trend of a series. */
-function seriesStats(values: number[], isRate: boolean) {
+/** Average and best match of a series. */
+function seriesStats(values: number[]) {
   const n = values.length;
   const avg = n > 0 ? values.reduce((sum, value) => sum + value, 0) / n : 0;
   const best = values.indexOf(Math.max(...values));
-  const mid = (n - 1) / 2;
-  let num = 0;
-  let den = 0;
-  values.forEach((value, index) => {
-    num += (index - mid) * (value - avg);
-    den += (index - mid) ** 2;
-  });
-  const slope = den > 0 ? num / den : 0;
-  const threshold = isRate ? 1 : Math.max(avg * 0.03, 0.2);
-  const trend: Trend = Math.abs(slope) < threshold ? "flat" : slope > 0 ? "up" : "down";
-  return { avg, best, trend };
+  return { avg, best };
 }
 
 function Delta({ value, unit, tone }: { value: number; unit: string; tone: "neutral" | "quality" }) {
@@ -393,7 +382,7 @@ function TrendChart({ metric, focus }: { metric: ProgressMetric; focus: Focus })
           </div>
           {series.map((s) => {
             const value = s.values[hover];
-            const diff = value - seriesStats(s.values, s.key === "quality").avg;
+            const diff = value - seriesStats(s.values).avg;
             const tone = Math.abs(diff) < 0.05 ? "flat" : diff > 0 ? "up" : "down";
             return (
               <p key={s.key} className={`prog-tip__row${s.key === emphasized ? " is-strong" : ""}`}>
@@ -433,7 +422,7 @@ function MetricCard({
   const previous = points.length > 1 ? points[points.length - 2] : null;
   const values = points.map((point) => (isRate ? point.quality ?? 0 : point.quantity));
   const format = isRate ? pctLabel : countLabel;
-  const stats = seriesStats(values, isRate);
+  const stats = seriesStats(values);
   const bestPoint = points[stats.best];
 
   const delta = previous
@@ -441,10 +430,6 @@ function MetricCard({
       ? { value: Math.round(last.quality ?? 0) - Math.round(previous.quality ?? 0), unit: " pts", tone: "quality" as const }
       : { value: last.quantity - previous.quantity, unit: "", tone: "neutral" as const }
     : null;
-  const trendLabel = { up: "Rising", down: "Falling", flat: "Stable" }[stats.trend];
-  const trendArrow = { up: "↗", down: "↘", flat: "→" }[stats.trend];
-  const trendTone = isRate || stats.trend === "flat" ? stats.trend : "neutral";
-
   return (
     <article className={`prog-card prog-card--${metric.phase}`}>
       <header className="prog-card__head">
@@ -482,12 +467,6 @@ function MetricCard({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={bestPoint.logo} alt={bestPoint.label} title={bestPoint.label} className="prog-stat__logo" />
             ) : null}
-          </dd>
-        </div>
-        <div className="prog-stat">
-          <dt>Trend</dt>
-          <dd className={`prog-stat__trend prog-stat__trend--${trendTone}`}>
-            <span aria-hidden="true">{trendArrow}</span> {trendLabel}
           </dd>
         </div>
       </dl>
