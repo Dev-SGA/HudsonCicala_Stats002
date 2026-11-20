@@ -51,18 +51,49 @@ function StatTiles({
   );
 }
 
+function PassRow({
+  tone,
+  label,
+  value,
+  share,
+  scale,
+  clip,
+  nested = false,
+}: {
+  tone: string;
+  label: string;
+  value: number;
+  share: string;
+  scale: number;
+  clip?: ClipRef;
+  nested?: boolean;
+}) {
+  return (
+    <li className={`spdf-pass-row${nested ? " spdf-pass-row--nested" : ""}`}>
+      <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${tone}`} />
+      <span className="spdf-pass-row__label">
+        {label}
+        <PdfPlay clip={clip} />
+      </span>
+      <span className="spdf-pass-row__track">
+        <span className={`spdf-pass-row__fill spdf-pass-panel__seg--${tone}`} style={{ width: `${scale}%` }} />
+      </span>
+      <strong className="spdf-pass-row__value">{formatCount(value)}</strong>
+      <span className="spdf-pass-row__share">{share}</span>
+    </li>
+  );
+}
+
 function PassResultPanel({
   title,
   breakdown,
   videos,
   wide = false,
-  compact = false,
 }: {
   title: string;
   breakdown: PassResultBreakdown;
   videos?: GameStats["videos"];
   wide?: boolean;
-  compact?: boolean;
 }) {
   const total = breakdown.progressive + breakdown.neutral + breakdown.lost;
   const turnovers = Math.min(breakdown.turnovers ?? 0, breakdown.lost);
@@ -71,90 +102,72 @@ function PassResultPanel({
     { key: "inaccurate", value: breakdown.lost, tone: "pass-inaccurate", host: true },
     { key: "other", value: breakdown.neutral, tone: "pass-neutral", host: false },
   ].filter((segment) => segment.value > 0);
-  const legend = [
-    {
-      key: "progressive",
-      label: "Progressive Pass",
-      value: breakdown.progressive,
-      tone: "pass-progressive",
-      nested: false,
-      clip: clipRef(videos, "Progressive Passes", "Progressive Pass"),
-    },
-    {
-      key: "inaccurate",
-      label: "Inaccurate Pass",
-      value: breakdown.lost,
-      tone: "pass-inaccurate",
-      nested: false,
-      clip: clipRef(videos, "Inaccurate Passes", "Inaccurate Pass"),
-    },
-    {
-      key: "turnover",
-      label: "Turnover Pass",
-      value: turnovers,
-      tone: "pass-turnover",
-      nested: true,
-      clip: clipRef(videos, "Turnover Passes", "Turnover Pass"),
-    },
-    { key: "other", label: "Other", value: breakdown.neutral, tone: "pass-neutral", nested: false, clip: undefined },
-  ].filter((segment) => segment.value > 0);
+  const progressivePct = pct(breakdown.progressive, total);
 
   return (
-    <div className={`spdf-pass-panel${wide ? " spdf-pass-panel--wide" : ""}${compact ? " spdf-pass-panel--total" : ""}`}>
+    <div className={`spdf-pass-panel${wide ? " spdf-pass-panel--wide" : ""}`}>
       <div className="spdf-pass-panel__head">
         <p className="spdf-pass-panel__title">{title}</p>
-        <span className="spdf-pass-panel__total">{formatCount(total)} passes</span>
-      </div>
-      {compact ? (
-        <div className="spdf-pass-panel__meter" style={{ gridTemplateColumns: bar.map((segment) => `${segment.value}fr`).join(" ") }}>
-          {bar.map((segment) => (
-            <span key={segment.key} className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}`} />
-          ))}
-          {legend
-            .filter((segment) => !segment.nested)
-            .map((segment) => (
-            <div key={`${segment.key}-caption`} className="spdf-pass-panel__cap">
-              <span className="spdf-pass-panel__cap-label">
-                <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
-                {segment.label}
-              </span>
-              <strong>
-                {formatCount(segment.value)} · {pct(segment.value, total)}%
-              </strong>
-            </div>
-          ))}
+        <div className="spdf-pass-panel__kpis">
+          <span className="spdf-pass-panel__total">
+            <strong>{formatCount(total)}</strong> passes
+          </span>
+          {total > 0 ? (
+            <span className="spdf-pass-panel__rate">
+              <strong>{progressivePct}%</strong> progressive
+            </span>
+          ) : null}
         </div>
-      ) : (
-        <>
-          <div className="spdf-pass-panel__track">
-            {bar.map((segment) => (
-              <span
-                key={segment.key}
-                className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}${segment.host ? " spdf-pass-panel__seg--host" : ""}`}
-                style={{ width: `${pct(segment.value, total)}%` }}
-              >
-                {segment.host && turnovers > 0 ? (
-                  <span className="spdf-pass-panel__seg-inner spdf-pass-panel__seg--pass-turnover" style={{ width: `${pct(turnovers, segment.value)}%` }} />
-                ) : null}
-              </span>
-            ))}
-          </div>
-          <ul className="spdf-pass-panel__legend">
-            {legend.map((segment) => (
-              <li key={segment.key} className={segment.nested ? "is-nested" : undefined}>
-                <span className={`spdf-pass-panel__dot spdf-pass-panel__dot--${segment.tone}`} />
-                <span className="spdf-pass-panel__legend-label">
-                  {segment.label}
-                  <PdfPlay clip={segment.clip} />
-                </span>
-                <strong>
-                  {segment.nested ? formatCount(segment.value) : `${formatCount(segment.value)} · ${pct(segment.value, total)}%`}
-                </strong>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+      </div>
+      <div className="spdf-pass-panel__track">
+        {bar.map((segment) => (
+          <span
+            key={segment.key}
+            className={`spdf-pass-panel__seg spdf-pass-panel__seg--${segment.tone}${segment.host ? " spdf-pass-panel__seg--host" : ""}`}
+            style={{ width: `${pct(segment.value, total)}%` }}
+          >
+            {segment.host && turnovers > 0 ? (
+              <span className="spdf-pass-panel__seg-inner spdf-pass-panel__seg--pass-turnover" style={{ width: `${pct(turnovers, segment.value)}%` }} />
+            ) : null}
+          </span>
+        ))}
+      </div>
+      <ul className="spdf-pass-rows">
+        <PassRow
+          tone="pass-progressive"
+          label="Progressive Pass"
+          value={breakdown.progressive}
+          share={`${progressivePct}%`}
+          scale={progressivePct}
+          clip={clipRef(videos, "Progressive Passes", "Progressive Pass")}
+        />
+        <PassRow
+          tone="pass-inaccurate"
+          label="Inaccurate Pass"
+          value={breakdown.lost}
+          share={`${pct(breakdown.lost, total)}%`}
+          scale={pct(breakdown.lost, total)}
+          clip={clipRef(videos, "Inaccurate Passes", "Inaccurate Pass")}
+        />
+        {turnovers > 0 ? (
+          <PassRow
+            nested
+            tone="pass-turnover"
+            label="Turnover Pass"
+            value={turnovers}
+            share={`of ${formatCount(breakdown.lost)}`}
+            scale={pct(turnovers, total)}
+            clip={clipRef(videos, "Turnover Passes", "Turnover Pass")}
+          />
+        ) : null}
+        <PassRow
+          tone="pass-neutral"
+          label="Other"
+          value={breakdown.neutral}
+          share={`${pct(breakdown.neutral, total)}%`}
+          scale={pct(breakdown.neutral, total)}
+        />
+      </ul>
     </div>
   );
 }
@@ -321,6 +334,28 @@ function PdfHeader({ title, subtitle, opponentLogoUrl }: { title: string; subtit
   );
 }
 
+function RateRing({ value, color }: { value: number; color: string }) {
+  const radius = 25;
+  const circumference = 2 * Math.PI * radius;
+  const filled = (Math.max(0, Math.min(value, 100)) / 100) * circumference;
+  return (
+    <svg viewBox="0 0 64 64" width={46} height={46} className="spdf-ring" aria-hidden="true">
+      <circle cx={32} cy={32} r={radius} fill="none" stroke="#e3eaf0" strokeWidth={7} />
+      <circle
+        cx={32}
+        cy={32}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={7}
+        strokeLinecap="round"
+        strokeDasharray={`${filled} ${circumference}`}
+        transform="rotate(-90 32 32)"
+      />
+    </svg>
+  );
+}
+
 function SummaryMeter({
   segments,
 }: {
@@ -330,28 +365,38 @@ function SummaryMeter({
 
   return (
     <div className="spdf-summary-meter">
-      <div className="spdf-pressure__track">
+      <div className="spdf-pressure__track spdf-pressure__track--thick">
         {total === 0 ? (
           <span className="spdf-pressure__seg spdf-pressure__seg--grey" style={{ width: "100%" }} />
         ) : (
-          segments.map((segment) => (
-            <span
-              key={segment.label}
-              className={`spdf-pressure__seg spdf-pressure__seg--${segment.tone}`}
-              style={{ width: `${(segment.share / total) * 100}%` }}
-            />
-          ))
+          segments
+            .filter((segment) => segment.share > 0)
+            .map((segment) => {
+              const share = pct(segment.share, total);
+              return (
+                <span
+                  key={segment.label}
+                  className={`spdf-pressure__seg spdf-pressure__seg--${segment.tone}`}
+                  style={{ width: `${(segment.share / total) * 100}%` }}
+                >
+                  {share >= 14 ? <span className="spdf-pressure__pct">{share}%</span> : null}
+                </span>
+              );
+            })
         )}
       </div>
-      <ul className="spdf-pressure__legend">
+      <ul className="spdf-chips">
         {segments.map((segment) => (
-          <li key={segment.label}>
-            <span className={`spdf-pressure__dot spdf-pressure__dot--${segment.tone}`} />
-            <span>
+          <li key={segment.label} className="spdf-chip">
+            <span className="spdf-chip__label">
+              <span className={`spdf-pressure__dot spdf-pressure__dot--${segment.tone}`} />
               {segment.label}
               <PdfPlay clip={segment.clip} />
             </span>
-            <strong className={`spdf-tone spdf-tone--${segment.tone}`}>{segment.value}</strong>
+            <span className="spdf-chip__value">
+              {segment.value}
+              <small>{pct(segment.share, total)}%</small>
+            </span>
           </li>
         ))}
       </ul>
@@ -365,6 +410,7 @@ function SummaryStatCard({
   totalLabel,
   rate,
   rateLabel,
+  rateCaption,
   perGameLabel,
   segments,
 }: {
@@ -373,6 +419,7 @@ function SummaryStatCard({
   totalLabel: string;
   rate?: number;
   rateLabel?: string;
+  rateCaption?: string;
   perGameLabel?: string;
   segments: { label: string; value: string; share: number; tone: PrintTone; clip?: ClipRef }[];
 }) {
@@ -381,14 +428,20 @@ function SummaryStatCard({
       <h3 className="spdf-section__title">{title}</h3>
       <div className={`spdf-summary-kpis${rate == null ? " spdf-summary-kpis--single" : ""}`}>
         <div className="spdf-summary-kpi">
-          <span className="spdf-summary-kpi__value">{formatCount(total)}</span>
           <span className="spdf-summary-kpi__label">{totalLabel}</span>
+          <span className="spdf-summary-kpi__value">{formatCount(total)}</span>
           {perGameLabel ? <span className="spdf-summary-kpi__per">{perGameLabel}</span> : null}
         </div>
         {rate != null ? (
           <div className="spdf-summary-kpi spdf-summary-kpi--rate">
-            <span className="spdf-summary-kpi__value">{rate}%</span>
             <span className="spdf-summary-kpi__label">{rateLabel}</span>
+            <div className="spdf-summary-kpi__rate">
+              <RateRing value={rate} color="#4d8f6e" />
+              <div className="spdf-summary-kpi__rate-text">
+                <span className="spdf-summary-kpi__value">{rate}%</span>
+                {rateCaption ? <span className="spdf-summary-kpi__caption">{rateCaption}</span> : null}
+              </div>
+            </div>
           </div>
         ) : null}
       </div>
@@ -460,7 +513,8 @@ function SummaryPdfPage({
             total={summary.totalPasses}
             totalLabel="Total passes"
             rate={summary.accuracy}
-            rateLabel="Accurate"
+            rateLabel="Accuracy"
+            rateCaption={`${formatCount(summary.accurate)} of ${formatCount(summary.totalPasses)} accurate`}
             perGameLabel={games ? `${perGame(summary.totalPasses, games)} per game` : undefined}
             segments={[
               { label: "Accurate", value: formatCount(summary.accurate), share: summary.accurate, tone: "pass-progressive" },
@@ -468,7 +522,7 @@ function SummaryPdfPage({
                 label: "Inaccurate",
                 value: formatCount(summary.inaccurate),
                 share: summary.inaccurate,
-                tone: "grey",
+                tone: "yellow",
                 clip: clipRef(stats.videos, "Inaccurate Passes", "Inaccurate Pass"),
               },
             ]}
@@ -478,7 +532,8 @@ function SummaryPdfPage({
             total={summary.offensiveWon + summary.offensiveLost}
             totalLabel="Total duels"
             rate={summary.offensiveWinRate}
-            rateLabel="Won rate"
+            rateLabel="Win rate"
+            rateCaption={`${formatCount(summary.offensiveWon)} of ${formatCount(summary.offensiveWon + summary.offensiveLost)} won`}
             perGameLabel={
               games ? `${perGame(summary.offensiveWon + summary.offensiveLost, games)} per game` : undefined
             }
@@ -494,7 +549,7 @@ function SummaryPdfPage({
                 label: "Lost",
                 value: formatCount(summary.offensiveLost),
                 share: summary.offensiveLost,
-                tone: "grey",
+                tone: "yellow",
                 clip: clipRef(stats.videos, "Off. Duels Lost", "Off Duels Lost"),
               },
             ]}
@@ -526,7 +581,8 @@ function SummaryPdfPage({
             total={summary.defensiveWon + summary.defensiveLost}
             totalLabel="Total duels"
             rate={summary.defensiveWinRate}
-            rateLabel="Won rate"
+            rateLabel="Win rate"
+            rateCaption={`${formatCount(summary.defensiveWon)} of ${formatCount(summary.defensiveWon + summary.defensiveLost)} won`}
             perGameLabel={
               games ? `${perGame(summary.defensiveWon + summary.defensiveLost, games)} per game` : undefined
             }
@@ -542,7 +598,7 @@ function SummaryPdfPage({
                 label: "Lost",
                 value: formatCount(summary.defensiveLost),
                 share: summary.defensiveLost,
-                tone: "grey",
+                tone: "yellow",
                 clip: clipRef(stats.videos, "Def. Duels Lost", "Def Duels Lost"),
               },
             ]}

@@ -1685,3 +1685,283 @@
 .stats-pdf .spdf-possession-row {
   grid-template-columns: 128px minmax(0, 1fr) auto;
 }
+
+/* ---------- Polish: rings, in-bar shares, chips, linear pass rows ---------- */
+
+.spdf-summary-kpi__rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spdf-summary-kpi__rate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.spdf-summary-kpi--rate .spdf-summary-kpi__value {
+  color: #3f7d5e;
+  font-size: 26px;
+}
+
+.spdf-summary-kpi__caption {
+  font-size: 9px;
+  font-weight: 700;
+  color: #6b8192;
+  white-space: nowrap;
+}
+
+.spdf-ring {
+  flex: 0 0 46px;
+  display: block;
+}
+
+.spdf-pressure__track--thick {
+  height: 16px;
+  gap: 2px;
+  border-radius: 5px;
+}
+
+.spdf-pressure__track--thick .spdf-pressure__seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.spdf-pressure__pct {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+}
+
+.spdf-pressure__seg--yellow .spdf-pressure__pct,
+.spdf-pressure__seg--mint .spdf-pressure__pct,
+.spdf-pressure__seg--grey .spdf-pressure__pct {
+  color: #072334;
+}
+
+.spdf-summary-meter {
+  gap: 8px;
+}
+
+.spdf-chips {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spdf-chip {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid #dbe6ee;
+  border-radius: 5px;
+  background: #f6f9fc;
+}
+
+.spdf-chip__label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #56697a;
+}
+
+.spdf-chip__value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  color: #072334;
+}
+
+.spdf-chip__value small {
+  font-size: 9px;
+  font-weight: 700;
+  color: #8a9dab;
+}
+
+/* Pass Results: head -> bar -> one row per outcome in bar order */
+
+.spdf-pass-panel__kpis {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.spdf-pass-panel__total,
+.spdf-pass-panel__rate {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b8192;
+  white-space: nowrap;
+}
+
+.spdf-pass-panel__total strong,
+.spdf-pass-panel__rate strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #072334;
+}
+
+.spdf-pass-panel__rate {
+  padding-left: 10px;
+  border-left: 1px solid #d4e8f7;
+}
+
+.spdf-pass-panel__rate strong {
+  color: #3f7d5e;
+}
+
+.spdf-pass-panel--wide .spdf-pass-panel__total strong,
+.spdf-pass-panel--wide .spdf-pass-panel__rate strong {
+  font-size: 18px;
+}
+
+.spdf-pass-panel__track {
+  height: 10px;
+  border-radius: 4px;
+}
+
+.spdf-pass-panel__seg {
+  border-radius: 2px;
+}
+
+.spdf-pass-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 3px 0 0;
+  list-style: none;
+  border-top: 1px solid #e3eaf0;
+}
+
+.spdf-pass-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 7px 112px minmax(30px, 1fr) 26px 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.spdf-pass-row__label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #56697a;
+  white-space: nowrap;
+}
+
+.spdf-pass-row__track {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: #e3eaf0;
+  overflow: hidden;
+}
+
+.spdf-pass-row__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.spdf-pass-row__value {
+  font-size: 11px;
+  font-weight: 800;
+  text-align: right;
+  color: #072334;
+}
+
+.spdf-pass-row__share {
+  font-size: 8px;
+  font-weight: 700;
+  text-align: right;
+  color: #8a9dab;
+  white-space: nowrap;
+}
+
+.spdf-pass-row--nested {
+  padding-left: 14px;
+  grid-template-columns: 7px 98px minmax(30px, 1fr) 26px 34px;
+}
+
+.spdf-pass-row--nested::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: -6px;
+  width: 8px;
+  height: 14px;
+  border-left: 1px solid #d9b98d;
+  border-bottom: 1px solid #d9b98d;
+  border-bottom-left-radius: 4px;
+}
+
+.spdf-pass-row--nested .spdf-pass-row__value {
+  font-size: 10px;
+}
+
+/* Possessions: retained tone */
+
+.spdf-possession-stat--retained {
+  border-color: #b9dcc7;
+  background: #eef7f1;
+}
+
+.spdf-possession-stat--retained .spdf-possession-stat__label {
+  color: #3f7d5e;
+}
+
+.spdf-possession-stat--retained .spdf-possession-stat__value {
+  color: #2f6a4d;
+}
+
+.spdf-pass-row {
+  padding: 1px 0;
+}
+
+.spdf-pass-panel__track {
+  height: 8px;
+}
+
+.spdf-pass-results-app,
+.spdf-pass-results-app__pair {
+  gap: 6px;
+}
+
+.spdf-pass-results-app__pair .spdf-pass-panel,
+.spdf-pass-panel--wide {
+  padding: 7px 12px 5px;
+  gap: 4px;
+}
+
+.spdf-pass-rows {
+  padding-top: 2px;
+}
+
+.spdf-pass-row.spdf-pass-row--nested {
+  padding-left: 14px;
+}
