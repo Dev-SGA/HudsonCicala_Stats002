@@ -443,6 +443,22 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
           }),
         }
       : null,
+    {
+      id: "turnovers",
+      title: "Turnovers",
+      phase: "offensive",
+      volumeLabel: "Turnovers",
+      rateLabel: "% of possession",
+      points: matches.map((match) => {
+        const turnovers = (match.possessions.passTurnover ?? 0) + (match.possessions.duelTurnover ?? 0);
+        return {
+          ...base(match),
+          volume: turnovers,
+          rate: rate(turnovers, match.possessions.total),
+          rateDetail: `${turnovers} of ${match.possessions.total} possessions`,
+        };
+      }),
+    },
     everyDuels
       ? {
           id: "defensive-duels",
@@ -463,22 +479,6 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
           }),
         }
       : null,
-    {
-      id: "turnovers",
-      title: "Turnovers",
-      phase: "offensive",
-      volumeLabel: "Turnovers",
-      rateLabel: "% of possession",
-      points: matches.map((match) => {
-        const turnovers = (match.possessions.passTurnover ?? 0) + (match.possessions.duelTurnover ?? 0);
-        return {
-          ...base(match),
-          volume: turnovers,
-          rate: rate(turnovers, match.possessions.total),
-          rateDetail: `${turnovers} of ${match.possessions.total} possessions`,
-        };
-      }),
-    },
     everyDuels
       ? {
           id: "tackles",
