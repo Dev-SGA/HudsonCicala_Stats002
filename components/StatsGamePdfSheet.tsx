@@ -654,8 +654,8 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl, clubLogoUrl, oppon
                 videos={stats.videos}
               />
               <div className="spdf-pass-results-app__pair">
-                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} videos={stats.videos} />
-                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} videos={stats.videos} />
+                <PassResultPanel title="Under pressure" breakdown={passResults.underPressure} />
+                <PassResultPanel title="Not under pressure" breakdown={passResults.notUnderPressure} />
               </div>
             </div>
           </PdfSection>

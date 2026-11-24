@@ -337,14 +337,12 @@ function buildTopics(match: MatchStats): Topic[] {
                 title="Under pressure"
                 breakdown={passResults.underPressure}
                 games={games}
-                videos={videos}
               />,
               <PassResultsMeter
                 key="nop"
                 title="Not under pressure"
                 breakdown={passResults.notUnderPressure}
                 games={games}
-                videos={videos}
               />,
             ]}
           />
