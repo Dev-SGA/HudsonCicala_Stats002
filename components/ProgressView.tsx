@@ -258,11 +258,11 @@ function TrendChart({ metric, focus }: { metric: ProgressMetric; focus: Focus })
                 d={line}
                 fill="none"
                 stroke={color}
-                strokeWidth={strong ? 3 : 1.75}
+                strokeWidth={strong ? 3 : 1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray={strong ? undefined : "5 6"}
-                strokeOpacity={strong ? 1 : 0.5}
+                strokeDasharray={strong ? undefined : "4 7"}
+                strokeOpacity={strong ? 1 : 0.3}
               />
               {pts.map(([px, py], index) => {
                 const isLast = index === count - 1;
@@ -273,11 +273,11 @@ function TrendChart({ metric, focus }: { metric: ProgressMetric; focus: Focus })
                       key={index}
                       cx={px}
                       cy={py}
-                      r={isHover ? 4.5 : 3}
+                      r={isHover ? 4.5 : 2.5}
                       fill={INK}
                       stroke={color}
-                      strokeOpacity={isHover ? 1 : 0.6}
-                      strokeWidth={1.75}
+                      strokeOpacity={isHover ? 1 : 0.35}
+                      strokeWidth={1.5}
                     />
                   );
                 }

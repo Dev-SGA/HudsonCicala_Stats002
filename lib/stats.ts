@@ -463,12 +463,28 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
           }),
         }
       : null,
+    {
+      id: "turnovers",
+      title: "Turnovers",
+      phase: "build-up",
+      volumeLabel: "Turnovers",
+      rateLabel: "% of possession",
+      points: matches.map((match) => {
+        const turnovers = (match.possessions.passTurnover ?? 0) + (match.possessions.duelTurnover ?? 0);
+        return {
+          ...base(match),
+          volume: turnovers,
+          rate: rate(turnovers, match.possessions.total),
+          rateDetail: `${turnovers} of ${match.possessions.total} possessions`,
+        };
+      }),
+    },
     everyDuels
       ? {
-          id: "regains",
-          title: "Regains",
+          id: "tackles",
+          title: "Tackles",
           phase: "defensive",
-          volumeLabel: "Regains",
+          volumeLabel: "Tackles",
           points: matches.map((match) => ({
             ...base(match),
             volume: (match.duels?.interception.actions ?? 0) + (match.duels?.recovery.actions ?? 0),
