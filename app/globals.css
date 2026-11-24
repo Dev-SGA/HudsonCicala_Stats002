@@ -2347,6 +2347,7 @@ body::before {
   opacity: 0.75;
 }
 
+.prog-card--offensive,
 .prog-card--defensive {
   --phase-color: #8fa5b5;
 }

@@ -7,7 +7,7 @@ type Focus = "volume" | "rate";
 type Pt = [number, number];
 
 const COLORS: Record<Focus, string> = { volume: "#5aa2e0", rate: "#3fb56b" };
-const PHASE_LABEL = { "build-up": "Build-Up", defensive: "Defensive Phase" } as const;
+const PHASE_LABEL = { offensive: "Offensive Phase", defensive: "Defensive Phase" } as const;
 const NICE_STEPS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 500, 1000];
 const INK = "#04141f";
 

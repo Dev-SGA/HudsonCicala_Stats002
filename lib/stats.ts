@@ -358,7 +358,7 @@ export type ProgressPoint = {
 export type ProgressMetric = {
   id: string;
   title: string;
-  phase: "build-up" | "defensive";
+  phase: "offensive" | "defensive";
   volumeLabel: string;
   rateLabel?: string;
   points: ProgressPoint[];
@@ -378,7 +378,7 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
     {
       id: "passes",
       title: "Passes",
-      phase: "build-up",
+      phase: "offensive",
       volumeLabel: "Passes",
       rateLabel: "Accurate",
       points: matches.map((match) => {
@@ -394,7 +394,7 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
     {
       id: "progressive-passes",
       title: "Progressive Passes",
-      phase: "build-up",
+      phase: "offensive",
       volumeLabel: "Progressive",
       rateLabel: "Share of passes",
       points: matches.map((match) => {
@@ -410,7 +410,7 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
     {
       id: "possessions",
       title: "Possessions",
-      phase: "build-up",
+      phase: "offensive",
       volumeLabel: "Possessions",
       rateLabel: "Kept",
       points: matches.map((match) => {
@@ -427,7 +427,7 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
       ? {
           id: "offensive-duels",
           title: "Offensive Duels",
-          phase: "build-up",
+          phase: "offensive",
           volumeLabel: "Duels",
           rateLabel: "Won",
           points: matches.map((match) => {
@@ -466,7 +466,7 @@ export function progressMetrics(matches: MatchStats[]): ProgressMetric[] {
     {
       id: "turnovers",
       title: "Turnovers",
-      phase: "build-up",
+      phase: "offensive",
       volumeLabel: "Turnovers",
       rateLabel: "% of possession",
       points: matches.map((match) => {
