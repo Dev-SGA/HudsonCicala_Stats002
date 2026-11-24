@@ -447,25 +447,25 @@
       },
       "passResults": {
         "underPressure": {
-          "progressive": 10,
-          "neutral": 24,
+          "progressive": 5,
+          "neutral": 29,
           "lost": 6,
-          "turnovers": 0
+          "turnovers": 5
         },
         "notUnderPressure": {
-          "progressive": 3,
-          "neutral": 9,
+          "progressive": 8,
+          "neutral": 4,
           "lost": 1,
-          "turnovers": 0
+          "turnovers": 1
         },
         "videoLink": ""
       },
       "possessions": {
-        "total": 53,
+        "total": 54,
         "lostBalls": 0,
         "wrongPasses": 7,
         "lostPlays": 7,
-        "passTurnover": 0,
+        "passTurnover": 6,
         "duelTurnover": 0,
         "videoLink": ""
       },
@@ -481,7 +481,7 @@
         { "label": "Turnover Duels", "url": "" }
       ],
       "duels": {
-        "offensiveWon": { "actions": 0, "good": 0, "bad": 0 },
+        "offensiveWon": { "actions": 1, "good": 0, "bad": 0 },
         "offensiveLost": { "actions": 0, "good": 0, "bad": 0 },
         "fouled": { "actions": 0, "good": 0, "bad": 0 },
         "defensiveWon": { "actions": 5, "good": 0, "bad": 0 },
